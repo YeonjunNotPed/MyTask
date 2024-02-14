@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">MyTask</string>
+
+    <string name="label_first_screen">First</string>
+    <string name="label_second_screen">Second</string>
+    <string name="label_third_screen">Third</string>
+
+    <string name="item_count">%d개</string>
+    <string name="item_price">%s원</string>
+
+    <string name="login_title">Welcome to\nMyTask!</string>
+    <string name="login_email_title">Email</string>
+    <string name="login_email_hint">Enter your email</string>
+    <string name="login_password_title">Password</string>
+    <string name="login_password_hint">Enter your password</string>
+    <string name="login_forgot_password">Forgot your password?</string>
+    <string name="login_sign_in">Log in</string>
+    <string name="login_sign_up">Don\'t have an account? Sign up</string>
+
+    <string name="login_kakao_social_login">카카오 로그인</string>
+    <string name="login_google_social_login">Google로 계속하기</string>
+
+    <string name="store_tab_title_purchase">구매하기</string>
+    <string name="store_tab_title_charge">충전하기</string>
+    <string name="store_purchase_item">아이템 구매</string>
+    <string name="store_current_item_count">현재 보유 아이템</string>
+</resources>

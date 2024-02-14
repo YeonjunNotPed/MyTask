@@ -1,0 +1,47 @@
+package com.youhajun.data.di
+
+import com.youhajun.data.BuildConfig
+import com.youhajun.data.network.AuthenticationInterceptor
+import com.youhajun.data.network.TokenAuthenticator
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+
+@Module
+@InstallIn(SingletonComponent::class)
+object RetrofitModule {
+
+    @Provides
+    @MyTaskRetrofit
+    fun provideRetrofit(
+        @MyTaskOkHttpClient okHttpClient: OkHttpClient,
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @MyTaskOkHttpClient
+    fun provideHttpClient(
+        authenticator: TokenAuthenticator,
+        authenticationInterceptor: AuthenticationInterceptor,
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .readTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(authenticationInterceptor)
+            .authenticator(authenticator)
+            .addInterceptor(HttpLoggingInterceptor())
+            .build()
+    }
+}
