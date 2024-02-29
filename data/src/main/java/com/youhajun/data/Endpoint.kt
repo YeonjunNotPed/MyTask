@@ -16,5 +16,6 @@ object Endpoint {
     object STORE {
         private const val STORE_URL = "/api/store"
         const val GET_PURCHASE_ITEM_INFO = "$STORE_URL/item_info"
+        const val POST_PURCHASE_VERIFY = "$STORE_URL/verify"
     }
 }

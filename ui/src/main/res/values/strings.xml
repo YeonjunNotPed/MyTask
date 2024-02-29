@@ -24,4 +24,7 @@
     <string name="store_tab_title_charge">충전하기</string>
     <string name="store_purchase_item">아이템 구매</string>
     <string name="store_current_item_count">현재 보유 아이템</string>
+    <string name="store_current_subscribe">현재 구독 중</string>
+    <string name="store_in_app_multiple_item_purchase_count">구매 개수 : %d</string>
+    <string name="store_in_app_multiple_item_per_price">개당 %s</string>
 </resources>

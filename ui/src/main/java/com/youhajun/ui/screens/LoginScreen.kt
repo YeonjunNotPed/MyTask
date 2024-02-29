@@ -18,8 +18,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,12 +50,12 @@ import com.youhajun.ui.viewModels.LoginViewModel
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
-    val googleLoginUtil = GoogleLoginUtil
-    val kakaoLoginUtil = KakaoLoginUtil
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
+    val googleLoginUtil = remember { GoogleLoginUtil(context) }
+    val kakaoLoginUtil = remember { KakaoLoginUtil(context) }
     val googleLoginLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             googleLoginUtil.handleIntentResult(result) {
@@ -62,21 +64,28 @@ fun LoginScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            googleLoginUtil.onDispose()
+            kakaoLoginUtil.onDispose()
+        }
+    }
+
     LaunchedEffect(viewModel) {
         viewModel.container.sideEffectFlow.collect {
             when (it) {
                 is LoginSideEffect.Toast -> Toast.makeText(context, it.text, Toast.LENGTH_SHORT).show()
                 LoginSideEffect.GoogleLoginLaunch -> {
-                    val googleLoginIntent = googleLoginUtil.getGoogleLoginIntent(context)
+                    val googleLoginIntent = googleLoginUtil.getGoogleLoginIntent()
                     googleLoginLauncher.launch(googleLoginIntent)
                 }
-                LoginSideEffect.KakaoLoginLaunch -> kakaoLoginUtil.kakaoLogin(context) {
+                LoginSideEffect.KakaoLoginLaunch -> kakaoLoginUtil.kakaoLogin {
                     viewModel.onSuccessKakaoLogin(it)
                 }
             }
         }
 
-        googleLoginUtil.checkAlreadyGoogleLogin(context) {
+        googleLoginUtil.checkAlreadyGoogleLogin {
             viewModel.onSuccessGoogleLogin(it)
         }
     }

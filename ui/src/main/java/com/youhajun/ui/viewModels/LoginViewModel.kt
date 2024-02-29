@@ -7,10 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.kakao.sdk.auth.model.OAuthToken
-import com.kakao.sdk.common.model.ClientError
-import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.user.UserApiClient
-import com.youhajun.domain.model.ErrorCode
+import com.youhajun.domain.model.StatusCode
 import com.youhajun.domain.model.UiStateErrorVo
 import com.youhajun.domain.model.enums.SocialLoginType
 import com.youhajun.domain.model.inspectUiState
@@ -85,7 +82,7 @@ class LoginViewModel @Inject constructor(
 
     private fun onErrorLogin(error: UiStateErrorVo<Unit>) = intent {
         when(error.code) {
-            ErrorCode.NO_ACCOUNT_ERROR -> postSideEffect(LoginSideEffect.Toast("계정 없음"))
+            StatusCode.NO_ACCOUNT_ERROR -> postSideEffect(LoginSideEffect.Toast("계정 없음"))
             else -> postSideEffect(LoginSideEffect.Toast("로그인 실패"))
         }
     }

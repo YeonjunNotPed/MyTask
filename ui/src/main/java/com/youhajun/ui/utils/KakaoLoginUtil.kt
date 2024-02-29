@@ -5,34 +5,42 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import javax.inject.Singleton
+import dagger.hilt.android.qualifiers.ActivityContext
 
-object KakaoLoginUtil {
+class KakaoLoginUtil(
+    @ActivityContext private var _context: Context?
+) {
 
-    fun kakaoLogin(context: Context, onSuccess:(OAuthToken) -> Unit) {
+    private val context get() = _context!!
+
+    fun kakaoLogin(onSuccess:(OAuthToken) -> Unit) {
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-            loginKakaoApp(context, onSuccess)
+            loginKakaoApp(onSuccess)
         } else {
-            loginKakaoEmail(context, onSuccess)
+            loginKakaoEmail(onSuccess)
         }
     }
 
-    private fun loginKakaoApp(context: Context, onSuccess:(OAuthToken) -> Unit) {
+    private fun loginKakaoApp(onSuccess:(OAuthToken) -> Unit) {
         UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
             token?.let {
                 onSuccess(it)
             } ?: run {
                 val userCancel = error is ClientError? && error?.reason == ClientErrorCause.Cancelled
-                if (!userCancel) loginKakaoEmail(context, onSuccess)
+                if (!userCancel) loginKakaoEmail(onSuccess)
             }
         }
     }
 
-    private fun loginKakaoEmail(context: Context, onSuccess:(OAuthToken) -> Unit) {
+    private fun loginKakaoEmail(onSuccess:(OAuthToken) -> Unit) {
         UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
             token?.let {
                 onSuccess(it)
             }
         }
+    }
+
+    fun onDispose() {
+        _context = null
     }
 }

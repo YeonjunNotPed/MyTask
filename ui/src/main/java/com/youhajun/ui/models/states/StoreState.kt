@@ -1,10 +1,15 @@
 package com.youhajun.ui.models.states
 
-import com.youhajun.domain.model.vo.PurchaseItemVo
+import com.youhajun.domain.model.enums.SubsGradeType
+import com.youhajun.domain.model.vo.PurchaseInAppItemVo
+import com.youhajun.domain.model.vo.PurchaseSubsItemVo
 
 data class StoreState(
     val onProgress: Boolean = false,
     val onError: Boolean = false,
-    val purchaseItemList: List<PurchaseItemVo> = emptyList(),
-    val currentItemCount: Int = 0
+    val purchaseInAppItemList: List<PurchaseInAppItemVo> = emptyList(),
+    val purchaseSubsItemList: List<PurchaseSubsItemVo> = emptyList(),
+    val currentItemCount: Int = 0,
+    val currentGrade: SubsGradeType = SubsGradeType.NONE,
+    val multiplePurchaseCount:Int = 1,
 )

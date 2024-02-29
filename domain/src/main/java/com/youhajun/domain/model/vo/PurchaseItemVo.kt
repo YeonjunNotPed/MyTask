@@ -1,24 +1,10 @@
 package com.youhajun.domain.model.vo
 
-import com.youhajun.data.model.dto.store.PurchaseItem
-import com.youhajun.domain.model.Mapper
+import com.youhajun.domain.model.enums.PurchaseType
 
-data class PurchaseItemVo(
-    val idx: Int,
-    val icon: String,
-    val itemCount: Int,
-    val itemPrice: String,
-) {
-    companion object : Mapper.ResponseMapper<PurchaseItem, PurchaseItemVo> {
-        override fun mapDtoToModel(type: PurchaseItem): PurchaseItemVo {
-            return type.run {
-                PurchaseItemVo(
-                    idx = idx,
-                    icon = "",
-                    itemCount = itemCount,
-                    itemPrice = itemPrice
-                )
-            }
-        }
-    }
+interface PurchaseItemVo {
+    val idx: Int
+    val productId: String
+    val purchaseType: PurchaseType
+    val price: String
 }

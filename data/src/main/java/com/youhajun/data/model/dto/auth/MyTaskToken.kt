@@ -4,8 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 data class MyTaskToken(
     @SerializedName("accessToken")
-    val accessToken : String = "",
+    private val _accessToken : String?,
     @SerializedName("refreshToken")
-    val refreshToken : String = ""
-)
+    private val _refreshToken : String?
+) {
+    val accessToken: String
+        get() = _accessToken ?: ""
+    val refreshToken: String
+        get() = _refreshToken ?: ""
+}
 
