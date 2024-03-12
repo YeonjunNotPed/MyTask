@@ -4,6 +4,10 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class MyTaskWebSocketOkHttpClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class MyTaskOkHttpClient
 
 @Qualifier

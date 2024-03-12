@@ -1,4 +1,4 @@
-package com.youhajun.ui.components
+package com.youhajun.ui.components.purchase
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

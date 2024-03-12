@@ -18,5 +18,7 @@ fun MyTaskNavHost(
         thirdNav(navController)
         loginNav(navController)
         storeNav(navController)
+        selectRoomNav(navController)
+        liveRoomNav(navController)
     }
 }

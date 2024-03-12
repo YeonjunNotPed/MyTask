@@ -50,9 +50,10 @@ import com.youhajun.domain.model.enums.PurchaseType
 import com.youhajun.domain.model.vo.PurchaseInAppItemVo
 import com.youhajun.domain.model.vo.PurchaseSubsItemVo
 import com.youhajun.ui.R
-import com.youhajun.ui.components.PurchaseInAppItemComp
-import com.youhajun.ui.components.PurchaseInAppMultipleItemComp
-import com.youhajun.ui.components.PurchaseSubsItemComp
+import com.youhajun.ui.components.MyTaskTabHeader
+import com.youhajun.ui.components.purchase.PurchaseInAppItemComp
+import com.youhajun.ui.components.purchase.PurchaseInAppMultipleItemComp
+import com.youhajun.ui.components.purchase.PurchaseSubsItemComp
 import com.youhajun.ui.models.sideEffects.StoreSideEffect
 import com.youhajun.ui.models.states.StoreState
 import com.youhajun.ui.utils.getActivity
@@ -62,7 +63,7 @@ import com.youhajun.ui.viewModels.StoreViewModel
 @Composable
 fun StoreScreen(
     viewModel: StoreViewModel = hiltViewModel(),
-    onNavigate: (StoreSideEffect.Navigation) -> Unit = { }
+    onNavigate: (StoreSideEffect.Navigation) -> Unit
 ) {
 
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
@@ -71,9 +72,7 @@ fun StoreScreen(
     LaunchedEffect(viewModel) {
         viewModel.container.sideEffectFlow.collect {
             when (it) {
-                is StoreSideEffect.Toast -> Toast.makeText(context, it.text, Toast.LENGTH_SHORT)
-                    .show()
-
+                is StoreSideEffect.Toast -> Toast.makeText(context, it.text, Toast.LENGTH_SHORT).show()
                 is StoreSideEffect.Navigation -> onNavigate.invoke(it)
                 is StoreSideEffect.BillingLaunch -> {
                     context.getActivity()?.let { activity -> it.onBillingLaunch(activity) }
@@ -94,6 +93,11 @@ fun StoreScreen(
             .fillMaxSize()
             .background(colorResource(id = R.color.color_161616))
     ) {
+
+        MyTaskTabHeader(stringResource(id = R.string.header_title_store)) {
+            viewModel.onClickHeaderBackIcon()
+        }
+
         TabRow(
             containerColor = colorResource(id = R.color.color_292929),
             selectedTabIndex = pagerState.currentPage,

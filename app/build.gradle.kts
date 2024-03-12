@@ -74,6 +74,8 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 
     implementation("com.kakao.sdk:v2-user:2.19.0")
+
+    implementation("io.getstream:stream-log:1.1.4")
 }
 
 kapt {

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.ui.R
+import com.youhajun.ui.components.MyTaskTabHeader
 import com.youhajun.ui.components.input.TopTitleInput
 import com.youhajun.ui.components.social.GoogleLoginButton
 import com.youhajun.ui.components.social.KakaoLoginButton
@@ -49,6 +50,7 @@ import com.youhajun.ui.viewModels.LoginViewModel
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
+    onNavigate: (LoginSideEffect.Navigation) -> Unit
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -56,13 +58,14 @@ fun LoginScreen(
 
     val googleLoginUtil = remember { GoogleLoginUtil(context) }
     val kakaoLoginUtil = remember { KakaoLoginUtil(context) }
-    val googleLoginLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            googleLoginUtil.handleIntentResult(result) {
-                viewModel.onSuccessGoogleLogin(it)
+    val googleLoginLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                googleLoginUtil.handleIntentResult(result) {
+                    viewModel.onSuccessGoogleLogin(it)
+                }
             }
         }
-    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -74,14 +77,19 @@ fun LoginScreen(
     LaunchedEffect(viewModel) {
         viewModel.container.sideEffectFlow.collect {
             when (it) {
-                is LoginSideEffect.Toast -> Toast.makeText(context, it.text, Toast.LENGTH_SHORT).show()
+                is LoginSideEffect.Toast -> Toast.makeText(context, it.text, Toast.LENGTH_SHORT)
+                    .show()
+
                 LoginSideEffect.GoogleLoginLaunch -> {
                     val googleLoginIntent = googleLoginUtil.getGoogleLoginIntent()
                     googleLoginLauncher.launch(googleLoginIntent)
                 }
+
                 LoginSideEffect.KakaoLoginLaunch -> kakaoLoginUtil.kakaoLogin {
                     viewModel.onSuccessKakaoLogin(it)
                 }
+
+                is LoginSideEffect.Navigation -> onNavigate.invoke(it)
             }
         }
 
@@ -90,92 +98,98 @@ fun LoginScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                })
-            }
-            .background(colorResource(id = R.color.color_161616))
-            .padding(horizontal = 24.dp, vertical = 30.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.login_title),
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.W800,
-            lineHeight = 48.sp
-        )
+    Column(modifier = Modifier
+        .background(colorResource(id = R.color.color_161616))
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        }) {
 
-        Spacer(modifier = Modifier.height(34.dp))
-
-        TopTitleInput(
-            R.string.login_email_title,
-            R.string.login_email_hint,
-            KeyboardType.Text, viewModel.emailStateOf.value,
-            viewModel::onChangedEmail
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        TopTitleInput(
-            R.string.login_password_title,
-            R.string.login_password_hint,
-            KeyboardType.Password, viewModel.passwordStateOf.value,
-            viewModel::onChangedPassword
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            modifier = Modifier
-                .align(Alignment.End)
-                .clickable { viewModel.onClickForgotPassword() },
-            text = stringResource(id = R.string.login_forgot_password),
-            fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.W400,
-            textAlign = TextAlign.End
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = viewModel::onClickLogin,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonColors(
-                containerColor = colorResource(id = R.color.color_292929),
-                contentColor = Color.White,
-                disabledContainerColor = colorResource(id = R.color.color_292929),
-                disabledContentColor = Color.White,
-            ),
-            shape = RoundedCornerShape(12.dp),
-        ) {
-            Text(
-                text = stringResource(id = R.string.login_sign_in),
-                fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.W600
-            )
+        MyTaskTabHeader(stringResource(id = R.string.header_title_login)) {
+            viewModel.onClickHeaderBackIcon()
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Column(
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 30.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.login_title),
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.W800,
+                lineHeight = 48.sp
+            )
 
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { viewModel.onClickSignUp() },
-            text = stringResource(id = R.string.login_sign_up),
-            fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.W600,
-            textAlign = TextAlign.Center
-        )
+            Spacer(modifier = Modifier.height(34.dp))
 
-        Spacer(modifier = Modifier.height(40.dp))
+            TopTitleInput(
+                R.string.login_email_title,
+                R.string.login_email_hint,
+                KeyboardType.Text, viewModel.emailStateOf.value,
+                viewModel::onChangedEmail
+            )
 
-        KakaoLoginButton(viewModel::onClickKakaoLogin)
+            Spacer(modifier = Modifier.height(20.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+            TopTitleInput(
+                R.string.login_password_title,
+                R.string.login_password_hint,
+                KeyboardType.Password, viewModel.passwordStateOf.value,
+                viewModel::onChangedPassword
+            )
 
-        GoogleLoginButton(viewModel::onClickGoogleLogin)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable { viewModel.onClickForgotPassword() },
+                text = stringResource(id = R.string.login_forgot_password),
+                fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.W400,
+                textAlign = TextAlign.End
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = viewModel::onClickLogin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonColors(
+                    containerColor = colorResource(id = R.color.color_292929),
+                    contentColor = Color.White,
+                    disabledContainerColor = colorResource(id = R.color.color_292929),
+                    disabledContentColor = Color.White,
+                ),
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.login_sign_in),
+                    fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.W600
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.onClickSignUp() },
+                text = stringResource(id = R.string.login_sign_up),
+                fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.W600,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            KakaoLoginButton(viewModel::onClickKakaoLogin)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            GoogleLoginButton(viewModel::onClickGoogleLogin)
+        }
     }
 }

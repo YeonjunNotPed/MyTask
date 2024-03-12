@@ -1,4 +1,4 @@
-package com.youhajun.ui.view
+package com.youhajun.ui.windows
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,9 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.youhajun.ui.screens.MainScreen
 import com.youhajun.mytask.ui.theme.MyTaskTheme
 import com.youhajun.ui.viewModels.MainViewModel

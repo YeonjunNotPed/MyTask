@@ -28,6 +28,7 @@ interface StoreIntent {
     fun onClickCheckItemHistory()
     fun onFetchPurchaseItem()
     fun onClickMultipleItemCountControl(isPlus: Boolean)
+    fun onClickHeaderBackIcon()
 }
 
 @HiltViewModel
@@ -45,6 +46,9 @@ class StoreViewModel @Inject constructor(
 
     override val container: Container<StoreState, StoreSideEffect> = container(StoreState()) {
         onFetchPurchaseItem()
+    }
+    override fun onClickHeaderBackIcon() {
+        intent { postSideEffect(StoreSideEffect.Navigation.NavigateUp) }
     }
 
     private val googleBillingCallback = object : GoogleBillingUtil.Callback {

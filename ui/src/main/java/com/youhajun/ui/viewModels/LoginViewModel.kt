@@ -37,6 +37,7 @@ interface LoginIntent {
     fun onSuccessKakaoLogin(oAuthToken: OAuthToken)
     fun onChangedEmail(email:String)
     fun onChangedPassword(password:String)
+    fun onClickHeaderBackIcon()
 }
 
 @HiltViewModel
@@ -51,6 +52,9 @@ class LoginViewModel @Inject constructor(
     val passwordStateOf: State<String> = _passwordStateOf
 
     override val container: Container<LoginState, LoginSideEffect> = container(LoginState())
+    override fun onClickHeaderBackIcon() {
+        intent { postSideEffect(LoginSideEffect.Navigation.NavigateUp) }
+    }
 
     override fun onChangedEmail(email: String) {
         _emailStateOf.value = email

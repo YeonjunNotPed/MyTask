@@ -6,11 +6,38 @@ import com.youhajun.data.Resource
 import com.youhajun.data.ResourceErrorVo
 import com.youhajun.data.model.MyTaskCode.API_DATA_NULL_ERROR_CODE
 import com.youhajun.data.model.MyTaskCode.API_LAUNCHER_CONVERT_ERROR_CODE
+import com.youhajun.data.model.MyTaskCode.WEB_SOCKET_SUCCESS_CODE
+import com.youhajun.data.model.sealeds.WebSocketStateDTO
 import com.youhajun.data.model.dto.ApiResponse
 import retrofit2.Response
 import java.io.Reader
 
 abstract class BaseRepository {
+
+    protected fun socketConverter(
+        ws: WebSocketStateDTO,
+        transformMessage:(String)-> String = { it }
+    ): Resource<WebSocketStateDTO> {
+        return when(ws) {
+            is WebSocketStateDTO.Open -> Resource.Success(ws)
+            is WebSocketStateDTO.Message -> {
+                val messageState = WebSocketStateDTO.Message(transformMessage(ws.text))
+                Resource.Success(messageState)
+            }
+            is WebSocketStateDTO.Close -> {
+                if(ws.code == WEB_SOCKET_SUCCESS_CODE) {
+                    Resource.Success(ws)
+                }else {
+                    val errorVo = ResourceErrorVo<WebSocketStateDTO>(ws,ws.code, ws.reason)
+                    Resource.Error(errorVo)
+                }
+            }
+            is WebSocketStateDTO.Failure -> {
+                val errorVo = ResourceErrorVo<WebSocketStateDTO>(ws,ws.response?.code, ws.t.message)
+                Resource.Error(errorVo)
+            }
+        }
+    }
 
     protected inline fun <reified DTO> apiConverter(
         response: Response<ApiResponse<DTO>>,

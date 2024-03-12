@@ -19,6 +19,7 @@ android {
     defaultConfig {
         minSdk = Configs.MIN_SDK
         buildConfigField("String", "BASE_URL", getProperty("BASE_URL"))
+        buildConfigField("String", "WEBSOCKET_BASE_URL", getProperty("WEBSOCKET_BASE_URL"))
     }
     buildFeatures {
         buildConfig = true
@@ -52,6 +53,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")
 
     implementation("androidx.security:security-crypto:1.0.0")
+
+    implementation("io.getstream:stream-webrtc-android:1.0.3")
 }
 
 fun getProperty(propertyKey: String): String {

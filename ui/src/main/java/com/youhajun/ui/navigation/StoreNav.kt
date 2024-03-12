@@ -9,11 +9,13 @@ import com.youhajun.ui.screens.StoreScreen
 
 fun NavGraphBuilder.storeNav(navController: NavHostController) {
     composable(MyTaskDestination.Store.route) {
-        StoreScreen() {
+        StoreScreen {
             when(it) {
                 StoreSideEffect.Navigation.NavigateToStoreHistory -> {
 
                 }
+
+                StoreSideEffect.Navigation.NavigateUp -> navController.navigateUp()
             }
         }
     }

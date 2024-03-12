@@ -23,15 +23,36 @@ fun FirstScreen(navController: NavController) {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Button(onClick = {
-            navController.navigate(MyTaskDestination.Login.route)
+            navController.navigate(MyTaskDestination.Login.route) {
+                popUpTo(MyTaskDestination.First.route) {
+                    inclusive = false
+                    saveState = true
+                }
+            }
         }) {
             Text("로그인")
         }
 
         Button(onClick = {
-            navController.navigate(MyTaskDestination.Store.route)
+            navController.navigate(MyTaskDestination.Store.route) {
+                popUpTo(MyTaskDestination.First.route) {
+                    inclusive = false
+                    saveState = true
+                }
+            }
         }) {
             Text("스토어")
+        }
+
+        Button(onClick = {
+            navController.navigate(MyTaskDestination.SelectRoom.route) {
+                popUpTo(MyTaskDestination.First.route) {
+                    inclusive = false
+                    saveState = true
+                }
+            }
+        }) {
+            Text("룸 선택")
         }
     }
 }

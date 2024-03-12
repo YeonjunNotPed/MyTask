@@ -20,6 +20,7 @@ android {
 
         manifestPlaceholders["KAKAO_NATIVE_KEY"] = getProperty("KAKAO_NATIVE_KEY")
         buildConfigField("String", "GOOGLE_API_SERVER_ID", getProperty("GOOGLE_API_SERVER_ID"))
+        buildConfigField("String", "STUN_SERVER_URL", getProperty("STUN_SERVER_URL"))
     }
 
     buildTypes {
@@ -90,9 +91,15 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
-    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    implementation("com.android.billingclient:billing-ktx:6.2.0")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    implementation("io.getstream:stream-webrtc-android:1.0.3")
+
+    implementation("io.getstream:stream-webrtc-android-ui:1.0.3")
+
+    implementation("io.getstream:stream-log:1.1.4")
 }
 
 kapt {

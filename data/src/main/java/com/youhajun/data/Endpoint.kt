@@ -2,6 +2,10 @@ package com.youhajun.data
 
 object Endpoint {
 
+    object SOCKET {
+        const val LIVE_ROOM = "LIVE_ROOM"
+    }
+
     object AUTH {
         private const val AUTH_URL = "/api/auth"
         const val GET_REFRESHED_TOKEN = "$AUTH_URL/refresh"
@@ -18,4 +22,10 @@ object Endpoint {
         const val GET_PURCHASE_ITEM_INFO = "$STORE_URL/item_info"
         const val POST_PURCHASE_VERIFY = "$STORE_URL/verify"
     }
+
+    object ROOM {
+        private const val ROOM_URL = "/api/room"
+        const val GET_ROOM_PREVIEW_INFO = "${ROOM.ROOM_URL}/room_list"
+    }
+
 }

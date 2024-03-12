@@ -1,9 +1,19 @@
 <resources>
     <string name="app_name">MyTask</string>
 
+    <string name="header_title_login">로그인</string>
+    <string name="header_title_store">스토어</string>
+    <string name="header_title_select_room">ROOM 선택</string>
+    <string name="header_title_live_room">LIVE ROOM</string>
+
     <string name="label_first_screen">First</string>
     <string name="label_second_screen">Second</string>
     <string name="label_third_screen">Third</string>
+    
+    <string name="room_preview_matching_standard_number">매칭 기준 인원 : %d</string>
+    <string name="room_preview_current_people">현재 인원 : %d</string>
+    <string name="room_preview_create_at">생성일 : %s</string>
+    <string name="create_room">Create Room</string>
 
     <string name="item_count">%d개</string>
     <string name="item_price">%s원</string>

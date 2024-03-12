@@ -1,6 +1,7 @@
 package com.youhajun.data.di
 
 import com.youhajun.data.services.AuthService
+import com.youhajun.data.services.RoomService
 import com.youhajun.data.services.SignService
 import com.youhajun.data.services.StoreService
 import dagger.Module
@@ -26,5 +27,10 @@ object ServiceModule {
     @Provides
     fun provideSignService(@MyTaskRetrofit retrofit: Retrofit): SignService {
         return retrofit.create(SignService::class.java)
+    }
+
+    @Provides
+    fun provideRoomService(@MyTaskRetrofit retrofit: Retrofit): RoomService {
+        return retrofit.create(RoomService::class.java)
     }
 }
