@@ -20,6 +20,8 @@ android {
         minSdk = Configs.MIN_SDK
         buildConfigField("String", "BASE_URL", getProperty("BASE_URL"))
         buildConfigField("String", "WEBSOCKET_BASE_URL", getProperty("WEBSOCKET_BASE_URL"))
+        buildConfigField("String", "CHAT_GPT_API_KEY", getProperty("CHAT_GPT_API_KEY"))
+        buildConfigField("String", "GEMINI_API_KEY", getProperty("GEMINI_API_KEY"))
     }
     buildFeatures {
         buildConfig = true

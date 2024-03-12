@@ -5,6 +5,7 @@
     <string name="header_title_store">스토어</string>
     <string name="header_title_select_room">ROOM 선택</string>
     <string name="header_title_live_room">LIVE ROOM</string>
+    <string name="header_title_gpt">GPT</string>
 
     <string name="label_first_screen">First</string>
     <string name="label_second_screen">Second</string>
@@ -37,4 +38,6 @@
     <string name="store_current_subscribe">현재 구독 중</string>
     <string name="store_in_app_multiple_item_purchase_count">구매 개수 : %d</string>
     <string name="store_in_app_multiple_item_per_price">개당 %s</string>
+
+    <string name="gpt_input_hint">AI 에게 무엇이든 물어보세요!</string>
 </resources>

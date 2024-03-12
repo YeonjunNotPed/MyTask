@@ -2,7 +2,9 @@ package com.youhajun.data.di
 
 import com.google.gson.GsonBuilder
 import com.youhajun.data.BuildConfig
+import com.youhajun.data.Endpoint
 import com.youhajun.data.network.AuthenticationInterceptor
+import com.youhajun.data.network.GptInterceptor
 import com.youhajun.data.network.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
@@ -21,7 +23,7 @@ object RetrofitModule {
 
     @Provides
     @MyTaskRetrofit
-    fun provideRetrofit(
+    fun provideMyTaskRetrofit(
         @MyTaskOkHttpClient okHttpClient: OkHttpClient,
         gson: GsonConverterFactory
     ): Retrofit {
@@ -33,15 +35,8 @@ object RetrofitModule {
     }
 
     @Provides
-    fun provideGson(): GsonConverterFactory {
-        val gson = GsonBuilder().setLenient().create()
-        return GsonConverterFactory.create(gson)
-    }
-
-
-    @Provides
     @MyTaskOkHttpClient
-    fun provideHttpClient(
+    fun provideMyTaskHttpClient(
         authenticator: TokenAuthenticator,
         authenticationInterceptor: AuthenticationInterceptor,
     ): OkHttpClient {
@@ -55,5 +50,51 @@ object RetrofitModule {
             .authenticator(authenticator)
             .addInterceptor(loggingInterceptor)
             .build()
+    }
+
+    @Provides
+    @ChatGptRetrofit
+    fun provideChatGptRetrofit(
+        @GptOkHttpClient okHttpClient: OkHttpClient,
+        gson: GsonConverterFactory
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Endpoint.ChatGpt.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(gson)
+            .build()
+    }
+
+    @Provides
+    @GeminiRetrofit
+    fun provideGeminiRetrofit(
+        @GptOkHttpClient okHttpClient: OkHttpClient,
+        gson: GsonConverterFactory
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Endpoint.Gemini.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(gson)
+            .build()
+    }
+
+    @Provides
+    @GptOkHttpClient
+    fun provideGptHttpClient(
+        gptInterceptor: GptInterceptor
+    ): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        return OkHttpClient.Builder()
+            .addInterceptor(gptInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+
+    @Provides
+    fun provideGson(): GsonConverterFactory {
+        val gson = GsonBuilder().setLenient().create()
+        return GsonConverterFactory.create(gson)
     }
 }

@@ -2,6 +2,15 @@ package com.youhajun.data
 
 object Endpoint {
 
+    object ChatGpt {
+        const val BASE_URL = "https://api.openai.com/v1/"
+        const val CHAT_COMPLETIONS = "chat/completions"
+    }
+
+    object Gemini {
+        const val BASE_URL = ""
+    }
+
     object Socket {
         const val LIVE_ROOM = "LIVE_ROOM"
     }

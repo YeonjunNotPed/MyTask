@@ -1,6 +1,7 @@
 package com.youhajun.data.di
 
 import com.youhajun.data.services.AuthService
+import com.youhajun.data.services.ChatGptService
 import com.youhajun.data.services.RoomService
 import com.youhajun.data.services.SignService
 import com.youhajun.data.services.StoreService
@@ -13,6 +14,12 @@ import retrofit2.Retrofit
 @Module
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
+
+    @Provides
+    fun provideChatGptService(@ChatGptRetrofit retrofit: Retrofit): ChatGptService {
+        return retrofit.create(ChatGptService::class.java)
+    }
+
 
     @Provides
     fun provideAuthService(@MyTaskRetrofit retrofit: Retrofit): AuthService {
