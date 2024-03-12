@@ -1,6 +1,7 @@
 package com.youhajun.ui.utils.webRtc
 
 import com.youhajun.domain.model.enums.SignalingType
+import com.youhajun.ui.utils.webRtc.managers.WebRtcManager
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import com.youhajun.ui.utils.webRtc.models.VideoTrackListVo
 import com.youhajun.ui.utils.webRtc.models.VideoTrackVo
@@ -57,7 +58,7 @@ interface WebRTCContract {
 
     @AssistedFactory
     interface Factory {
-        fun createSessionManager(signaling: Signaling): WebRtcMeshManager
+        fun createSessionManager(signaling: Signaling): WebRtcManager
     }
 
     interface SessionManager {

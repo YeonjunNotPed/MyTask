@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.ui.R
-import com.youhajun.ui.components.MyTaskTabHeader
+import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.input.TopTitleInput
 import com.youhajun.ui.components.social.GoogleLoginButton
 import com.youhajun.ui.components.social.KakaoLoginButton
@@ -107,7 +107,7 @@ fun LoginScreen(
             })
         }) {
 
-        MyTaskTabHeader(stringResource(id = R.string.header_title_login)) {
+        MyTaskHeader(stringResource(id = R.string.header_title_login)) {
             viewModel.onClickHeaderBackIcon()
         }
 

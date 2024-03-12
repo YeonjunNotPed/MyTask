@@ -50,7 +50,7 @@ import com.youhajun.domain.model.enums.PurchaseType
 import com.youhajun.domain.model.vo.PurchaseInAppItemVo
 import com.youhajun.domain.model.vo.PurchaseSubsItemVo
 import com.youhajun.ui.R
-import com.youhajun.ui.components.MyTaskTabHeader
+import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.purchase.PurchaseInAppItemComp
 import com.youhajun.ui.components.purchase.PurchaseInAppMultipleItemComp
 import com.youhajun.ui.components.purchase.PurchaseSubsItemComp
@@ -94,7 +94,7 @@ fun StoreScreen(
             .background(colorResource(id = R.color.color_161616))
     ) {
 
-        MyTaskTabHeader(stringResource(id = R.string.header_title_store)) {
+        MyTaskHeader(stringResource(id = R.string.header_title_store)) {
             viewModel.onClickHeaderBackIcon()
         }
 

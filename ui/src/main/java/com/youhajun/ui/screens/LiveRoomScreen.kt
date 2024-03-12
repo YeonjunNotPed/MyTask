@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.ui.R
-import com.youhajun.ui.components.MyTaskTabHeader
+import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.viewModels.LiveRoomViewModel
 
@@ -40,7 +40,7 @@ fun LiveRoomScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        MyTaskTabHeader(stringResource(id = R.string.header_title_select_room)) {
+        MyTaskHeader(stringResource(id = R.string.header_title_select_room)) {
             viewModel.onClickHeaderBackIcon()
         }
 
