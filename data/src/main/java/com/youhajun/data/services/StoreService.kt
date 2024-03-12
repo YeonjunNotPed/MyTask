@@ -11,9 +11,9 @@ import retrofit2.http.POST
 
 interface StoreService {
 
-    @GET(Endpoint.STORE.GET_PURCHASE_ITEM_INFO)
+    @GET(Endpoint.Store.GET_PURCHASE_ITEM_INFO)
     suspend fun getPurchaseItemInfo(): Response<ApiResponse<PurchaseItemInfo>>
 
-    @POST(Endpoint.STORE.POST_PURCHASE_VERIFY)
+    @POST(Endpoint.Store.POST_PURCHASE_VERIFY)
     suspend fun postPurchaseVerify(@Body request: PurchaseVerifyRequest): Response<ApiResponse<Unit>>
 }

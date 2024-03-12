@@ -5,9 +5,6 @@ import com.youhajun.data.Endpoint
 import com.youhajun.data.Resource
 import com.youhajun.data.repositories.AuthRepository
 import dagger.Lazy
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
 import javax.inject.Inject
@@ -35,8 +32,8 @@ class AuthenticationInterceptor @Inject constructor(
     }
 
     private val withoutAuthTokenEndpointList = listOf(
-        Endpoint.AUTH.GET_REFRESHED_TOKEN,
-        Endpoint.SIGN.POST_LOGIN
+        Endpoint.Auth.GET_REFRESHED_TOKEN,
+        Endpoint.Sign.POST_LOGIN
     )
 
     private fun Request.isWithoutAuthTokenRequest() = withoutAuthTokenEndpointList.any {

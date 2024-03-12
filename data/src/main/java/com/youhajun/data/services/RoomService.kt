@@ -8,6 +8,6 @@ import retrofit2.http.GET
 
 interface RoomService {
 
-    @GET(Endpoint.ROOM.GET_ROOM_PREVIEW_INFO)
+    @GET(Endpoint.Room.GET_ROOM_PREVIEW_INFO)
     suspend fun getRoomPreviewInfo(): Response<ApiResponse<RoomPreviewInfo>>
 }

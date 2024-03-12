@@ -85,5 +85,5 @@ class TokenAuthenticator @Inject constructor(
     }
 
     private fun Request.isGetRefreshedTokenRequest() =
-        url.toString().contains(Endpoint.AUTH.GET_REFRESHED_TOKEN)
+        url.toString().contains(Endpoint.Auth.GET_REFRESHED_TOKEN)
 }

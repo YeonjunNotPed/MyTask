@@ -8,13 +8,12 @@ import com.youhajun.data.model.dto.sign.SocialLoginRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface SignService {
 
-    @POST(Endpoint.SIGN.POST_LOGIN)
+    @POST(Endpoint.Sign.POST_LOGIN)
     suspend fun postLogin(@Body request: LoginRequest): Response<ApiResponse<MyTaskToken>>
 
-    @POST(Endpoint.SIGN.POST_LOGIN)
+    @POST(Endpoint.Sign.POST_LOGIN)
     suspend fun postSocialLogin(@Body socialLoginRequest: SocialLoginRequest): Response<ApiResponse<MyTaskToken>>
 }
