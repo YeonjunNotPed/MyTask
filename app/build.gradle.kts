@@ -21,25 +21,28 @@ android {
         buildConfigField("String", "KAKAO_NATIVE_KEY", getProperty("KAKAO_NATIVE_KEY"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig = signingConfigs.getByName("debug")
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file(getProperty("STORE_FILE"))
-            storePassword = getProperty("STORE_PASSWORD")
-            keyAlias = getProperty("KEY_ALIAS")
-            keyPassword = getProperty("KEY_PASSWORD")
-        }
-    }
+//    signingConfigs {
+//        create("release") {
+//            storeFile = file(getProperty("STORE_FILE"))
+//            storePassword = getProperty("STORE_PASSWORD")
+//            keyAlias = getProperty("KEY_ALIAS")
+//            keyPassword = getProperty("KEY_PASSWORD")
+//        }
+//    }
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+//            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "../proguard-rules.pro",
+                "../proguard_retrofit2.pro",
+                "../proguard_gson.pro",
             )
         }
     }

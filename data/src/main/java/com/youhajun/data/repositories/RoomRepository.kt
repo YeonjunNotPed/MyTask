@@ -2,10 +2,10 @@ package com.youhajun.data.repositories
 
 import com.youhajun.data.Resource
 import com.youhajun.data.di.DefaultDispatcher
-import com.youhajun.data.model.dto.room.RoomPreviewInfo
-import com.youhajun.data.model.enums.SignalingCommand
-import com.youhajun.data.model.enums.WebRTCSessionState
-import com.youhajun.data.model.sealeds.WebSocketStateDTO
+import com.youhajun.data.models.dto.room.RoomPreviewInfo
+import com.youhajun.data.models.enums.SignalingCommand
+import com.youhajun.data.models.enums.WebRTCSessionState
+import com.youhajun.data.models.sealeds.WebSocketStateDTO
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.remoteDataSource.RoomRemoteDataSource
 import com.youhajun.data.repositories.remoteDataSource.WebSocketDataSource

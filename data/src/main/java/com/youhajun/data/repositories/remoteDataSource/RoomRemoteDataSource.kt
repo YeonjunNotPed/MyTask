@@ -1,7 +1,7 @@
 package com.youhajun.data.repositories.remoteDataSource
 
-import com.youhajun.data.model.dto.ApiResponse
-import com.youhajun.data.model.dto.room.RoomPreviewInfo
+import com.youhajun.data.models.dto.ApiResponse
+import com.youhajun.data.models.dto.room.RoomPreviewInfo
 import com.youhajun.data.network.safeFlow
 import com.youhajun.data.services.RoomService
 import kotlinx.coroutines.flow.Flow

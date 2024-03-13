@@ -2,8 +2,8 @@ package com.youhajun.data.repositories.remoteDataSource
 
 import com.youhajun.data.di.DefaultDispatcher
 import com.youhajun.data.di.MyTaskWebSocketOkHttpClient
-import com.youhajun.data.model.MyTaskCode
-import com.youhajun.data.model.sealeds.WebSocketStateDTO
+import com.youhajun.data.models.MyTaskCode
+import com.youhajun.data.models.sealeds.WebSocketStateDTO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob

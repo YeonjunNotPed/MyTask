@@ -2,8 +2,8 @@ package com.youhajun.domain.usecase.room
 
 import com.youhajun.data.repositories.RoomRepository
 import com.youhajun.domain.mapToUiState
-import com.youhajun.domain.model.UiState
-import com.youhajun.domain.model.vo.RoomPreviewInfoVo
+import com.youhajun.domain.models.UiState
+import com.youhajun.domain.models.vo.RoomPreviewInfoVo
 import com.youhajun.domain.usecase.UseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

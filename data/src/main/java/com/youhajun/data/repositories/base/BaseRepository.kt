@@ -1,14 +1,15 @@
 package com.youhajun.data.repositories.base
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.youhajun.data.Resource
 import com.youhajun.data.ResourceErrorVo
-import com.youhajun.data.model.MyTaskCode.API_DATA_NULL_ERROR_CODE
-import com.youhajun.data.model.MyTaskCode.API_LAUNCHER_CONVERT_ERROR_CODE
-import com.youhajun.data.model.MyTaskCode.WEB_SOCKET_SUCCESS_CODE
-import com.youhajun.data.model.sealeds.WebSocketStateDTO
-import com.youhajun.data.model.dto.ApiResponse
+import com.youhajun.data.models.MyTaskCode.API_DATA_NULL_ERROR_CODE
+import com.youhajun.data.models.MyTaskCode.API_LAUNCHER_CONVERT_ERROR_CODE
+import com.youhajun.data.models.MyTaskCode.WEB_SOCKET_SUCCESS_CODE
+import com.youhajun.data.models.dto.ApiResponse
+import com.youhajun.data.models.sealeds.WebSocketStateDTO
 import retrofit2.Response
 import java.io.Reader
 

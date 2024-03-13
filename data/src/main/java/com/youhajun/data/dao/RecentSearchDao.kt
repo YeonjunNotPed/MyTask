@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
-import com.youhajun.data.model.entity.EntityTable
-import com.youhajun.data.model.entity.search.RecentSearchEntity
+import com.youhajun.data.models.entity.EntityTable
+import com.youhajun.data.models.entity.search.RecentSearchEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

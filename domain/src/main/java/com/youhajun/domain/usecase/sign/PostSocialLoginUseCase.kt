@@ -4,8 +4,8 @@ import com.youhajun.data.Resource
 import com.youhajun.data.repositories.AuthRepository
 import com.youhajun.data.repositories.SignRepository
 import com.youhajun.domain.mapToUiState
-import com.youhajun.domain.model.UiState
-import com.youhajun.domain.model.vo.SocialLoginRequestVo
+import com.youhajun.domain.models.UiState
+import com.youhajun.domain.models.vo.SocialLoginRequestVo
 import com.youhajun.domain.usecase.UseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

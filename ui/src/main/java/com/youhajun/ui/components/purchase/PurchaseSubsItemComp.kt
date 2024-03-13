@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
-import com.youhajun.domain.model.enums.SubsGradeType
-import com.youhajun.domain.model.vo.PurchaseSubsItemVo
+import com.youhajun.domain.models.enums.SubsGradeType
+import com.youhajun.domain.models.vo.PurchaseSubsItemVo
 import com.youhajun.ui.R
 import com.youhajun.ui.graphics.modifier.conditional
 import com.youhajun.ui.graphics.modifier.shimmerBadgeModifier

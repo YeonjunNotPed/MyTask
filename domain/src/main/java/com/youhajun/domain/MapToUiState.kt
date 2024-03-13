@@ -1,8 +1,8 @@
 package com.youhajun.domain
 
 import com.youhajun.data.Resource
-import com.youhajun.domain.model.UiState
-import com.youhajun.domain.model.UiStateErrorVo
+import com.youhajun.domain.models.UiState
+import com.youhajun.domain.models.UiStateErrorVo
 
 fun <DTO, MODEL> Resource<DTO>.mapToUiState(transform: (DTO) -> MODEL): UiState<MODEL> {
     return when (this) {

@@ -1,9 +1,9 @@
 package com.youhajun.data.repositories.remoteDataSource
 
-import com.youhajun.data.model.dto.ApiResponse
-import com.youhajun.data.model.dto.auth.MyTaskToken
-import com.youhajun.data.model.dto.sign.LoginRequest
-import com.youhajun.data.model.dto.sign.SocialLoginRequest
+import com.youhajun.data.models.dto.ApiResponse
+import com.youhajun.data.models.dto.auth.MyTaskToken
+import com.youhajun.data.models.dto.sign.LoginRequest
+import com.youhajun.data.models.dto.sign.SocialLoginRequest
 import com.youhajun.data.network.safeFlow
 import com.youhajun.data.services.SignService
 import kotlinx.coroutines.flow.Flow

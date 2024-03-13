@@ -28,7 +28,9 @@ android {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "../proguard-rules.pro",
+                "../proguard_retrofit2.pro",
+                "../proguard_gson.pro",
             )
         }
 

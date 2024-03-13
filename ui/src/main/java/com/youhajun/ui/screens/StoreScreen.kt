@@ -46,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.youhajun.domain.model.enums.PurchaseType
-import com.youhajun.domain.model.vo.PurchaseInAppItemVo
-import com.youhajun.domain.model.vo.PurchaseSubsItemVo
+import com.youhajun.domain.models.enums.PurchaseType
+import com.youhajun.domain.models.vo.PurchaseInAppItemVo
+import com.youhajun.domain.models.vo.PurchaseSubsItemVo
 import com.youhajun.ui.R
 import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.purchase.PurchaseInAppItemComp

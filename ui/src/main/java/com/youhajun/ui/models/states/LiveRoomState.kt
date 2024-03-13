@@ -1,6 +1,6 @@
 package com.youhajun.ui.models.states
 
-import com.youhajun.domain.model.enums.WebRTCSessionType
+import com.youhajun.domain.models.enums.WebRTCSessionType
 import org.webrtc.VideoTrack
 
 data class LiveRoomState(

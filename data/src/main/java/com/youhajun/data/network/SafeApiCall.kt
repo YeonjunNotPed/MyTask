@@ -1,6 +1,6 @@
 package com.youhajun.data.network
 
-import com.youhajun.data.model.MyTaskCode
+import com.youhajun.data.models.MyTaskCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import okhttp3.ResponseBody.Companion.toResponseBody

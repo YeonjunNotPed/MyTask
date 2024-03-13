@@ -2,7 +2,7 @@ package com.youhajun.data.repositories
 
 import com.youhajun.data.Resource
 import com.youhajun.data.encrypt.Crypto
-import com.youhajun.data.model.dto.auth.MyTaskToken
+import com.youhajun.data.models.dto.auth.MyTaskToken
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.localDataSource.PrefDataStoreDataSource
 import com.youhajun.data.repositories.remoteDataSource.AuthRemoteDataSource

@@ -14,9 +14,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youhajun.domain.model.enums.GptMessageType
-import com.youhajun.domain.model.sealeds.GptMessageFooterState
-import com.youhajun.domain.model.vo.GptMessageVo
+import com.youhajun.domain.models.enums.GptMessageType
+import com.youhajun.domain.models.sealeds.GptMessageFooterState
+import com.youhajun.domain.models.vo.GptMessageVo
 import com.youhajun.ui.R
 
 @Composable

@@ -24,8 +24,8 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
-import com.youhajun.domain.model.enums.PurchaseType
-import com.youhajun.domain.model.vo.PurchaseItemVo
+import com.youhajun.domain.models.enums.PurchaseType
+import com.youhajun.domain.models.vo.PurchaseItemVo
 import com.youhajun.ui.di.IoDispatcher
 import com.youhajun.ui.di.MainImmediateDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext

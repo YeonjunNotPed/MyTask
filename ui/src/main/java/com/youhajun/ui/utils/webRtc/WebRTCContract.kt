@@ -1,6 +1,6 @@
 package com.youhajun.ui.utils.webRtc
 
-import com.youhajun.domain.model.enums.SignalingType
+import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.ui.utils.webRtc.managers.WebRtcManager
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import com.youhajun.ui.utils.webRtc.models.VideoTrackListVo

@@ -1,8 +1,8 @@
 package com.youhajun.data.repositories.remoteDataSource
 
-import com.youhajun.data.model.dto.ApiResponse
-import com.youhajun.data.model.dto.store.PurchaseItemInfo
-import com.youhajun.data.model.dto.store.PurchaseVerifyRequest
+import com.youhajun.data.models.dto.ApiResponse
+import com.youhajun.data.models.dto.store.PurchaseItemInfo
+import com.youhajun.data.models.dto.store.PurchaseVerifyRequest
 import com.youhajun.data.network.safeFlow
 import com.youhajun.data.services.StoreService
 import kotlinx.coroutines.flow.Flow

@@ -2,7 +2,7 @@ package com.youhajun.data.network
 
 import com.youhajun.data.Resource
 import com.youhajun.data.ResourceErrorVo
-import com.youhajun.data.model.MyTaskCode
+import com.youhajun.data.models.MyTaskCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first

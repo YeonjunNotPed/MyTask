@@ -25,7 +25,7 @@ fun Modifier.shimmerBadgeModifier(
     duration: Int = 4000,
     repeatMode: RepeatMode = RepeatMode.Reverse,
 ): Modifier {
-    val transition = rememberInfiniteTransition(label = "")
+    val transition = rememberInfiniteTransition(label = "infinityAnime")
 
     val progress by transition.animateFloat(
         initialValue = 0f,
@@ -33,7 +33,7 @@ fun Modifier.shimmerBadgeModifier(
         animationSpec = infiniteRepeatable(
             animation = tween(duration, easing = LinearEasing),
             repeatMode = repeatMode
-        ), label = ""
+        ), label = "shimmerAnime"
     )
 
     return this then Modifier

@@ -1,6 +1,6 @@
 package com.youhajun.data.repositories.localDataSource
 
-import com.youhajun.data.model.dto.store.PurchaseItemInfo
+import com.youhajun.data.models.dto.store.PurchaseItemInfo
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import javax.inject.Inject

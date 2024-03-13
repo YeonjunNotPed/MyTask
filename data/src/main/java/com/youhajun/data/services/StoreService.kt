@@ -1,9 +1,9 @@
 package com.youhajun.data.services
 
 import com.youhajun.data.Endpoint
-import com.youhajun.data.model.dto.ApiResponse
-import com.youhajun.data.model.dto.store.PurchaseItemInfo
-import com.youhajun.data.model.dto.store.PurchaseVerifyRequest
+import com.youhajun.data.models.dto.ApiResponse
+import com.youhajun.data.models.dto.store.PurchaseItemInfo
+import com.youhajun.data.models.dto.store.PurchaseVerifyRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

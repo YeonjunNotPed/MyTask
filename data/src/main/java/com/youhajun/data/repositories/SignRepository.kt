@@ -1,9 +1,9 @@
 package com.youhajun.data.repositories
 
 import com.youhajun.data.Resource
-import com.youhajun.data.model.dto.auth.MyTaskToken
-import com.youhajun.data.model.dto.sign.LoginRequest
-import com.youhajun.data.model.dto.sign.SocialLoginRequest
+import com.youhajun.data.models.dto.auth.MyTaskToken
+import com.youhajun.data.models.dto.sign.LoginRequest
+import com.youhajun.data.models.dto.sign.SocialLoginRequest
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.remoteDataSource.SignRemoteDataSource
 import kotlinx.coroutines.flow.Flow

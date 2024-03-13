@@ -2,7 +2,7 @@ package com.youhajun.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.domain.model.inspectUiState
+import com.youhajun.domain.models.inspectUiState
 import com.youhajun.domain.usecase.room.GetRoomPreviewInfoUseCase
 import com.youhajun.ui.models.sideEffects.SelectRoomSideEffect
 import com.youhajun.ui.models.states.SelectRoomState

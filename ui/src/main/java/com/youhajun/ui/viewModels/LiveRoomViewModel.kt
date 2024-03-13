@@ -2,16 +2,15 @@ package com.youhajun.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.domain.model.UiStateErrorVo
-import com.youhajun.domain.model.enums.SignalingType
-import com.youhajun.domain.model.inspectUiState
-import com.youhajun.domain.model.sealeds.WebSocketState
+import com.youhajun.domain.models.UiStateErrorVo
+import com.youhajun.domain.models.enums.SignalingType
+import com.youhajun.domain.models.inspectUiState
+import com.youhajun.domain.models.sealeds.WebSocketState
 import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
 import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
 import com.youhajun.domain.usecase.room.GetRoomSignalingCommandUseCase
 import com.youhajun.domain.usecase.room.GetRoomSocketStateUseCase
 import com.youhajun.domain.usecase.room.GetRoomWebRTCSessionUseCase
-import com.youhajun.domain.usecase.room.SendLiveRoomMsgUseCase
 import com.youhajun.domain.usecase.room.SendLiveRoomSignalingMsgUseCase
 import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.models.states.LiveRoomState

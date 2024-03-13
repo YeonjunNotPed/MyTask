@@ -3,10 +3,10 @@ package com.youhajun.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.Purchase
-import com.youhajun.domain.model.enums.PurchaseType
-import com.youhajun.domain.model.enums.SubsGradeType
-import com.youhajun.domain.model.inspectUiState
-import com.youhajun.domain.model.vo.PurchaseVerifyRequestVo
+import com.youhajun.domain.models.enums.PurchaseType
+import com.youhajun.domain.models.enums.SubsGradeType
+import com.youhajun.domain.models.inspectUiState
+import com.youhajun.domain.models.vo.PurchaseVerifyRequestVo
 import com.youhajun.domain.usecase.store.GetPurchaseItemInfoUseCase
 import com.youhajun.domain.usecase.store.PostVerifyPurchaseUseCase
 import com.youhajun.ui.models.sideEffects.StoreSideEffect

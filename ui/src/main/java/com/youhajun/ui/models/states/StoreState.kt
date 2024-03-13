@@ -1,8 +1,8 @@
 package com.youhajun.ui.models.states
 
-import com.youhajun.domain.model.enums.SubsGradeType
-import com.youhajun.domain.model.vo.PurchaseInAppItemVo
-import com.youhajun.domain.model.vo.PurchaseSubsItemVo
+import com.youhajun.domain.models.enums.SubsGradeType
+import com.youhajun.domain.models.vo.PurchaseInAppItemVo
+import com.youhajun.domain.models.vo.PurchaseSubsItemVo
 
 data class StoreState(
     val onProgress: Boolean = false,

@@ -1,8 +1,8 @@
 package com.youhajun.domain.usecase.room
 
-import com.youhajun.data.model.enums.SignalingCommand
+import com.youhajun.data.models.enums.SignalingCommand
 import com.youhajun.data.repositories.RoomRepository
-import com.youhajun.domain.model.enums.SignalingType
+import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.domain.usecase.UseCase
 import javax.inject.Inject
 

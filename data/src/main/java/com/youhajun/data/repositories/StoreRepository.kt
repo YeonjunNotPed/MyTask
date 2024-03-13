@@ -1,8 +1,8 @@
 package com.youhajun.data.repositories
 
 import com.youhajun.data.Resource
-import com.youhajun.data.model.dto.store.PurchaseItemInfo
-import com.youhajun.data.model.dto.store.PurchaseVerifyRequest
+import com.youhajun.data.models.dto.store.PurchaseItemInfo
+import com.youhajun.data.models.dto.store.PurchaseVerifyRequest
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.localDataSource.StoreLocalDataSource
 import com.youhajun.data.repositories.remoteDataSource.StoreRemoteDataSource
