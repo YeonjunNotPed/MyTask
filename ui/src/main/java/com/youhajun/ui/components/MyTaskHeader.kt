@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun MyTaskHeader(
+    modifier: Modifier = Modifier,
     title: String,
     rightIcon: ImageVector? = null,
     onClickRightIcon: () -> Unit = { },
@@ -36,7 +37,7 @@ fun MyTaskHeader(
     onClickLeftIcon: () -> Unit,
 ) {
     Surface(
-        shadowElevation = 7.dp, modifier = Modifier
+        shadowElevation = 7.dp, modifier = modifier
             .height(44.dp)
             .fillMaxWidth()
             .background(Color.White)

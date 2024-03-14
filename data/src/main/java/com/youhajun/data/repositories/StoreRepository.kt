@@ -14,12 +14,11 @@ import javax.inject.Singleton
 @Singleton
 class StoreRepository @Inject constructor(
     private val storeRemoteDataSource: StoreRemoteDataSource,
-    private val storeLocalDataSource: StoreLocalDataSource
 ) : BaseRepository() {
     suspend fun getPurchaseItemInfo(): Flow<Resource<PurchaseItemInfo>> =
-        storeRemoteDataSource.getPurchaseItemInfo().map { apiConverter(it) }
+        storeRemoteDataSource.getPurchaseItemInfo().map { myTaskApiConverter(it) }
 
     suspend fun postPurchaseVerify(request: PurchaseVerifyRequest): Flow<Resource<Unit>> =
-        storeRemoteDataSource.postPurchaseVerify(request).map { apiConverter(it) }
+        storeRemoteDataSource.postPurchaseVerify(request).map { myTaskApiConverter(it) }
 }
 

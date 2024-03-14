@@ -61,7 +61,7 @@ fun SelectRoomScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            MyTaskHeader(stringResource(id = R.string.header_title_select_room)) {
+            MyTaskHeader(title = stringResource(id = R.string.header_title_select_room)) {
                 viewModel.onClickHeaderBackIcon()
             }
 

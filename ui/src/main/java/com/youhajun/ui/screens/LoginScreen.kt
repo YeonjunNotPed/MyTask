@@ -107,7 +107,7 @@ fun LoginScreen(
             })
         }) {
 
-        MyTaskHeader(stringResource(id = R.string.header_title_login)) {
+        MyTaskHeader(title = stringResource(id = R.string.header_title_login)) {
             viewModel.onClickHeaderBackIcon()
         }
 

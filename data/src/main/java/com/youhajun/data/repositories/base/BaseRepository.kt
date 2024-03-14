@@ -1,6 +1,5 @@
 package com.youhajun.data.repositories.base
 
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.youhajun.data.Resource
@@ -40,7 +39,7 @@ abstract class BaseRepository {
         }
     }
 
-    protected inline fun <reified DTO> apiConverter(
+    protected inline fun <reified DTO> myTaskApiConverter(
         response: Response<ApiResponse<DTO>>,
     ): Resource<DTO> {
         try {
@@ -73,5 +72,33 @@ abstract class BaseRepository {
 
     protected fun <DTO> fromGson(json: Reader?): ApiResponse<DTO> {
         return Gson().fromJson(json, object : TypeToken<ApiResponse<DTO>>() {}.type)
+    }
+
+    protected inline fun <reified DTO> apiConverter(
+        response: Response<DTO>,
+    ): Resource<DTO> {
+        try {
+            return when (response.isSuccessful) {
+                true -> {
+                    val body = response.body()
+                    if (body == null) {
+                        if(DTO::class == Unit::class) Resource.Success(Unit as DTO)
+                        else {
+                            val errorVo = ResourceErrorVo<DTO>(null, API_DATA_NULL_ERROR_CODE, NullPointerException().message)
+                            Resource.Error(errorVo)
+                        }
+
+                    } else Resource.Success(body)
+                }
+
+                false -> {
+                    val errorVo = ResourceErrorVo<DTO>(null, response.code(), response.errorBody()?.string())
+                    Resource.Error(errorVo)
+                }
+            }
+        } catch (e: Throwable) {
+            val errorVo = ResourceErrorVo<DTO>(null, API_LAUNCHER_CONVERT_ERROR_CODE, e.message)
+            return Resource.Error(errorVo)
+        }
     }
 }

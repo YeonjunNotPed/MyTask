@@ -94,7 +94,7 @@ fun StoreScreen(
             .background(colorResource(id = R.color.color_161616))
     ) {
 
-        MyTaskHeader(stringResource(id = R.string.header_title_store)) {
+        MyTaskHeader(title = stringResource(id = R.string.header_title_store)) {
             viewModel.onClickHeaderBackIcon()
         }
 

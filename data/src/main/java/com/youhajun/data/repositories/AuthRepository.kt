@@ -28,7 +28,7 @@ class AuthRepository @Inject constructor(
     }
 
     fun getRefreshedMyTaskToken(refreshToken: String): Flow<Resource<MyTaskToken>> =
-        authRemoteDataSource.getRefreshedToken(refreshToken).map { apiConverter(it) }
+        authRemoteDataSource.getRefreshedToken(refreshToken).map { myTaskApiConverter(it) }
 
     fun getAccessTokenSync(): Resource<String> {
         return prefDataStoreDataSource.getStringSync(ACCESS_TOKEN_KEY)

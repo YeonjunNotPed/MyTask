@@ -43,7 +43,7 @@ class RoomRepository @Inject constructor(
     private val _sessionStateFlow = MutableStateFlow(WebRTCSessionState.Offline)
     val sessionStateFlow: Flow<WebRTCSessionState> = _sessionStateFlow
     suspend fun getRoomPreviewInfo(): Flow<Resource<RoomPreviewInfo>> =
-        roomRemoteDataSource.getRoomPreviewInfo().map { apiConverter(it) }
+        roomRemoteDataSource.getRoomPreviewInfo().map { myTaskApiConverter(it) }
 
     fun connectLiveRoom() {
         webSocketDataSource.connect()

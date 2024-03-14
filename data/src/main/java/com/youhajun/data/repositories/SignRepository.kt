@@ -17,9 +17,9 @@ class SignRepository @Inject constructor(
 ) : BaseRepository() {
 
     fun postLogin(loginRequest: LoginRequest): Flow<Resource<MyTaskToken>> =
-        signRemoteDataSource.postLogin(loginRequest).map { apiConverter(it) }
+        signRemoteDataSource.postLogin(loginRequest).map { myTaskApiConverter(it) }
 
     fun postSocialLogin(socialLoginRequest: SocialLoginRequest): Flow<Resource<MyTaskToken>> =
-        signRemoteDataSource.postSocialLogin(socialLoginRequest).map { apiConverter(it) }
+        signRemoteDataSource.postSocialLogin(socialLoginRequest).map { myTaskApiConverter(it) }
 }
 
