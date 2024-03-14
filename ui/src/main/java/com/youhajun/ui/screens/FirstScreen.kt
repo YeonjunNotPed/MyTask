@@ -54,5 +54,16 @@ fun FirstScreen(navController: NavController) {
         }) {
             Text("룸 선택")
         }
+
+        Button(onClick = {
+            navController.navigate(MyTaskDestination.Gpt.route) {
+                popUpTo(MyTaskDestination.First.route) {
+                    inclusive = false
+                    saveState = true
+                }
+            }
+        }) {
+            Text("GPT 채팅")
+        }
     }
 }

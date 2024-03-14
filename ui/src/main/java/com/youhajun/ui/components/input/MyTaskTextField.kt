@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
@@ -59,7 +60,7 @@ fun MyTaskTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = TextFieldDefaults.shape,
     colors: TextFieldColors = TextFieldDefaults.colors(),
-    cursorColor: Color = Color.White,
+    cursorBrush: Brush = SolidColor(Color.White),
     textSelectionColors: TextSelectionColors = TextSelectionColors(
         handleColor = Color.White,
         backgroundColor = colorResource(id = R.color.color_b9b9b9).copy(alpha = 0.4f)
@@ -81,7 +82,7 @@ fun MyTaskTextField(
             interactionSource = interactionSource,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            cursorBrush = SolidColor(cursorColor),
+            cursorBrush = cursorBrush,
             decorationBox = { innerTextField ->
                 TextFieldDefaults.DecorationBox(
                     value = value,
@@ -100,7 +101,7 @@ fun MyTaskTextField(
                     isError = isError,
                     interactionSource = interactionSource,
                     colors = colors,
-                    contentPadding = paddingValues
+                    contentPadding = paddingValues,
                 )
             }
         )

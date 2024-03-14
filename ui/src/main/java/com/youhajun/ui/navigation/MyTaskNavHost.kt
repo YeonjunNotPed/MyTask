@@ -20,5 +20,6 @@ fun MyTaskNavHost(
         storeNav(navController)
         selectRoomNav(navController)
         liveRoomNav(navController)
+        gptNav(navController)
     }
 }

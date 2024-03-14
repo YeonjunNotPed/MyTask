@@ -49,4 +49,8 @@ sealed class MyTaskDestination {
 
         fun navigateLiveRoom(idx:Int):String = "$route/$idx"
     }
+
+    object Gpt : MyTaskDestination() {
+        override val route: String = "gpt"
+    }
 }

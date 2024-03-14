@@ -9,5 +9,5 @@ import retrofit2.http.POST
 
 interface ChatGptService {
     @POST(Endpoint.ChatGpt.CHAT_COMPLETIONS)
-    suspend fun getPrompt(@Body request: ChatGptRequest): Response<ChatGptResponse>
+    suspend fun postPrompt(@Body request: ChatGptRequest): Response<ChatGptResponse>
 }
