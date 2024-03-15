@@ -2,7 +2,7 @@ package com.youhajun.data.repositories.remoteDataSource
 
 import com.youhajun.data.models.dto.ApiResponse
 import com.youhajun.data.models.dto.auth.MyTaskToken
-import com.youhajun.data.network.safeFlow
+import com.youhajun.data.network.safeResponseFlow
 import com.youhajun.data.services.AuthService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,5 +16,5 @@ class AuthRemoteDataSource @Inject constructor(
 ) {
     fun getRefreshedToken(refreshToken: String): Flow<Response<ApiResponse<MyTaskToken>>> = flow {
         emit(authService.getRefreshedToken(refreshToken))
-    }.safeFlow()
+    }.safeResponseFlow()
 }

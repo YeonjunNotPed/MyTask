@@ -3,7 +3,7 @@ package com.youhajun.data.repositories.remoteDataSource
 import com.youhajun.data.models.dto.ApiResponse
 import com.youhajun.data.models.dto.store.PurchaseItemInfo
 import com.youhajun.data.models.dto.store.PurchaseVerifyRequest
-import com.youhajun.data.network.safeFlow
+import com.youhajun.data.network.safeResponseFlow
 import com.youhajun.data.services.StoreService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,9 +17,9 @@ class StoreRemoteDataSource @Inject constructor(
 ) {
     suspend fun getPurchaseItemInfo(): Flow<Response<ApiResponse<PurchaseItemInfo>>> = flow {
         emit(storeService.getPurchaseItemInfo())
-    }.safeFlow()
+    }.safeResponseFlow()
 
     suspend fun postPurchaseVerify(request: PurchaseVerifyRequest): Flow<Response<ApiResponse<Unit>>> = flow {
         emit(storeService.postPurchaseVerify(request))
-    }.safeFlow()
+    }.safeResponseFlow()
 }

@@ -2,7 +2,7 @@ package com.youhajun.data.repositories.remoteDataSource
 
 import com.youhajun.data.models.dto.ApiResponse
 import com.youhajun.data.models.dto.room.RoomPreviewInfo
-import com.youhajun.data.network.safeFlow
+import com.youhajun.data.network.safeResponseFlow
 import com.youhajun.data.services.RoomService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,5 +16,5 @@ class RoomRemoteDataSource @Inject constructor(
 ) {
     suspend fun getRoomPreviewInfo(): Flow<Response<ApiResponse<RoomPreviewInfo>>> = flow {
         emit(roomService.getRoomPreviewInfo())
-    }.safeFlow()
+    }.safeResponseFlow()
 }

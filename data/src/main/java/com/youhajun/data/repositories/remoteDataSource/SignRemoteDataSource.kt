@@ -4,7 +4,7 @@ import com.youhajun.data.models.dto.ApiResponse
 import com.youhajun.data.models.dto.auth.MyTaskToken
 import com.youhajun.data.models.dto.sign.LoginRequest
 import com.youhajun.data.models.dto.sign.SocialLoginRequest
-import com.youhajun.data.network.safeFlow
+import com.youhajun.data.network.safeResponseFlow
 import com.youhajun.data.services.SignService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -18,9 +18,9 @@ class SignRemoteDataSource @Inject constructor(
 ) {
     fun postLogin(loginRequest: LoginRequest): Flow<Response<ApiResponse<MyTaskToken>>> = flow {
         emit(signService.postLogin(loginRequest))
-    }.safeFlow()
+    }.safeResponseFlow()
 
     fun postSocialLogin(socialLoginRequest: SocialLoginRequest): Flow<Response<ApiResponse<MyTaskToken>>> = flow {
         emit(signService.postSocialLogin(socialLoginRequest))
-    }.safeFlow()
+    }.safeResponseFlow()
 }
