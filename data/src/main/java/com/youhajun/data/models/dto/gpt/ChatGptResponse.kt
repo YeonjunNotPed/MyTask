@@ -3,18 +3,15 @@ package com.youhajun.data.models.dto.gpt
 import com.google.gson.annotations.SerializedName
 
 data class ChatGptResponse(
+    @SerializedName("id")
+    val id: String,
+
     @SerializedName("choices")
-    val choices: List<ChatGptChoiceDto>,
+    val messageList: List<ChatGptMessageInfoResponse>,
 
     @SerializedName("created")
     val created: Int,
 
-    @SerializedName("id")
-    val id: String,
-
     @SerializedName("model")
     val model: String,
-
-    @SerializedName("object")
-    val `object`: String,
 )

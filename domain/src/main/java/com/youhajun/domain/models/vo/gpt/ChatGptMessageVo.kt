@@ -1,26 +1,28 @@
 package com.youhajun.domain.models.vo.gpt
 
-import com.youhajun.data.models.dto.gpt.ChatGptMessageDto
+import com.youhajun.data.models.dto.gpt.ChatGptMessageRequest
+import com.youhajun.data.models.dto.gpt.ChatGptMessageResponse
 import com.youhajun.domain.models.Mapper
+import com.youhajun.domain.models.enums.GptRoleType
 
 data class ChatGptMessageVo(
-    val role: String,
+    val gptRoleType: GptRoleType,
     val content: String,
 ) {
 
-    companion object : Mapper.RequestMapper<ChatGptMessageDto, ChatGptMessageVo>, Mapper.ResponseMapper<ChatGptMessageDto, ChatGptMessageVo> {
-        override fun mapModelToDto(type: ChatGptMessageVo): ChatGptMessageDto {
+    companion object : Mapper.RequestMapper<ChatGptMessageRequest, ChatGptMessageVo>, Mapper.ResponseMapper<ChatGptMessageResponse, ChatGptMessageVo> {
+        override fun mapModelToDto(type: ChatGptMessageVo): ChatGptMessageRequest {
             return type.run {
-                ChatGptMessageDto(
-                    role, content
+                ChatGptMessageRequest(
+                    gptRoleType.type, content
                 )
             }
         }
 
-        override fun mapDtoToModel(type: ChatGptMessageDto): ChatGptMessageVo {
+        override fun mapDtoToModel(type: ChatGptMessageResponse): ChatGptMessageVo {
             return type.run {
                 ChatGptMessageVo(
-                    role, content
+                    GptRoleType.typeOf(role), content
                 )
             }
         }

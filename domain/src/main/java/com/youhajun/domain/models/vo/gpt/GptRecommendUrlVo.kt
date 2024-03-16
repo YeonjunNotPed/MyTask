@@ -1,4 +1,4 @@
-package com.youhajun.domain.models.vo
+package com.youhajun.domain.models.vo.gpt
 
 data class GptRecommendUrlVo(
     val title: String,

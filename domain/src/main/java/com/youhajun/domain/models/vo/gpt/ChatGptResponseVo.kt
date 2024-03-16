@@ -5,7 +5,7 @@ import com.youhajun.domain.models.Mapper
 
 data class ChatGptResponseVo(
     val id: String,
-    val message: ChatGptMessageVo,
+    val message: List<ChatGptMessageInfoVo>,
     val createAt: Int,
     val model:String
 ) {
@@ -14,7 +14,7 @@ data class ChatGptResponseVo(
             return type.run {
                 ChatGptResponseVo(
                     id = id,
-                    message = ChatGptChoiceVo.mapDtoToModel(choices.first()).messageVo,
+                    message = messageList.map { ChatGptMessageInfoVo.mapDtoToModel(it) },
                     createAt = created,
                     model = model
                 )

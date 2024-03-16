@@ -1,4 +1,4 @@
-package com.youhajun.domain.models.vo
+package com.youhajun.domain.models.vo.gpt
 
 import com.youhajun.domain.models.enums.GptType
 
