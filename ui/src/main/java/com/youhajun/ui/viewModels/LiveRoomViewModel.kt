@@ -29,7 +29,7 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 interface LiveRoomIntent {
-    fun setRoomIdx(idx: Int)
+    fun setRoomIdx(idx: Long)
     fun onClickHeaderBackIcon()
 }
 
@@ -59,12 +59,12 @@ class LiveRoomViewModel @Inject constructor(
 
     private val sessionManager: WebRTCContract.SessionManager = webRtcSessionManagerFactory.createSessionManager(this)
 
-    private var idx by Delegates.notNull<Int>()
+    private var idx by Delegates.notNull<Long>()
 
     override fun onClickHeaderBackIcon() {
         intent { postSideEffect(LiveRoomSideEffect.Navigation.NavigateUp) }
     }
-    override fun setRoomIdx(idx: Int) {
+    override fun setRoomIdx(idx: Long) {
         this.idx = idx
     }
     override fun sendCommand(signalingCommand: SignalingType, message: String) {

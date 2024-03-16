@@ -33,9 +33,10 @@ fun RoomPreviewItemComp(
     Column(
         modifier = Modifier
             .clickable { onClickItem.invoke(roomPreviewVo) }
+            .border(1.dp, Color.White, RoundedCornerShape(12.dp))
+            .padding(0.5.dp)
             .clip(shape = RoundedCornerShape(12.dp))
             .background(Color.White)
-            .border(1.dp, Color.White, RoundedCornerShape(12.dp))
             .padding(horizontal = 8.dp, vertical = 12.dp)
             .wrapContentSize(),
     ) {

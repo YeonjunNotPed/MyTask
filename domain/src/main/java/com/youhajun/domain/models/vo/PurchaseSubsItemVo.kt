@@ -6,7 +6,7 @@ import com.youhajun.domain.models.enums.PurchaseType
 import com.youhajun.domain.models.enums.SubsGradeType
 
 data class PurchaseSubsItemVo(
-    override val idx: Int,
+    override val idx: Long,
     override val productId: String,
     override val purchaseType: PurchaseType,
     override val price: String,

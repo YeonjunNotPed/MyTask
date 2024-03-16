@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class PurchaseSubsItem(
     @SerializedName("idx")
-    private val _idx: Int?,
+    private val _idx: Long?,
 
     @SerializedName("productId")
     private val _productId: String?,
@@ -30,7 +30,7 @@ data class PurchaseSubsItem(
     @SerializedName("subsGrade")
     private val _subsGrade: String?,
 ) : PurchaseItem {
-    override val idx: Int
+    override val idx: Long
         get() = _idx ?: -1
     override val productId: String
         get() = _productId ?: ""

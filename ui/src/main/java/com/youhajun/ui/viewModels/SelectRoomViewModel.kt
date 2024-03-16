@@ -20,7 +20,7 @@ import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 interface SelectRoomIntent {
-    fun onClickRoom(idx:Int)
+    fun onClickRoom(idx:Long)
     fun onClickHeaderBackIcon()
     fun onClickCreateRoom()
 
@@ -42,7 +42,7 @@ class SelectRoomViewModel @Inject constructor(
         intent { postSideEffect(SelectRoomSideEffect.Navigation.NavigateUp) }
     }
 
-    override fun onClickRoom(idx: Int) {
+    override fun onClickRoom(idx: Long) {
         intent {
             postSideEffect(SelectRoomSideEffect.Navigation.NavigateToLiveRoom(idx))
         }

@@ -42,10 +42,11 @@ fun PurchaseSubsItemComp(
             .clickable { onClickItem.invoke(purchaseSubsItemVo) }
             .fillMaxWidth()
             .wrapContentHeight()
+            .border(1.dp, colorResource(id = R.color.color_b9b9b9), RoundedCornerShape(12.dp))
+            .padding(0.5.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
             .defaultMinSize(minHeight = 140.dp)
             .background(colorResource(id = R.color.color_373737))
-            .border(1.dp, colorResource(id = R.color.color_b9b9b9), RoundedCornerShape(12.dp))
-            .clip(shape = RoundedCornerShape(12.dp))
             .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         val (image, title, content, price, subsPeriod, badge) = createRefs()

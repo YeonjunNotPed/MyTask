@@ -47,7 +47,7 @@ sealed class MyTaskDestination {
         private const val PATH = "/{$IDX_ARG_KEY}"
         val routeWithArg = "$route$PATH"
 
-        fun navigateLiveRoom(idx:Int):String = "$route/$idx"
+        fun navigateLiveRoom(idx:Long):String = "$route/$idx"
     }
 
     object Gpt : MyTaskDestination() {

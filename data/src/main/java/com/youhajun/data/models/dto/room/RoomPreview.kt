@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class RoomPreview(
     @SerializedName("idx")
-    private val _idx: Int?,
+    private val _idx: Long?,
     @SerializedName("roomType")
     private val _roomType: String?,
     @SerializedName("title")
@@ -18,7 +18,7 @@ data class RoomPreview(
     @SerializedName("currentPeopleNumber")
     private val _currentPeopleNumber: Int?,
 ) {
-    val idx: Int
+    val idx: Long
         get() = _idx ?: -1
     val roomType: String
         get() = _roomType ?: ""

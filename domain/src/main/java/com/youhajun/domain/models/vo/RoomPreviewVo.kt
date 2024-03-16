@@ -5,7 +5,7 @@ import com.youhajun.domain.models.Mapper
 import com.youhajun.domain.models.enums.RoomType
 
 data class RoomPreviewVo(
-    val idx: Int,
+    val idx: Long,
     val roomType: RoomType,
     val title: String,
     val content: String,

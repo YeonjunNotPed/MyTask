@@ -15,7 +15,7 @@ fun NavGraphBuilder.liveRoomNav(navController: NavHostController) {
             type = NavType.IntType
         })
     ) {
-        val idx = it.arguments?.getInt(MyTaskDestination.LiveRoom.IDX_ARG_KEY) ?: -1
+        val idx = it.arguments?.getLong(MyTaskDestination.LiveRoom.IDX_ARG_KEY) ?: -1
         LiveRoomScreen(idx = idx) {
             when(it) {
                 LiveRoomSideEffect.Navigation.NavigateUp -> navController.navigateUp()

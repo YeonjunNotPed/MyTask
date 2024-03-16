@@ -5,7 +5,7 @@ import com.youhajun.domain.models.Mapper
 import com.youhajun.domain.models.enums.PurchaseType
 
 data class PurchaseInAppItemVo(
-    override val idx: Int,
+    override val idx: Long,
     override val productId: String,
     override val purchaseType: PurchaseType,
     override val price: String,
