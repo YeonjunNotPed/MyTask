@@ -17,7 +17,7 @@ object DaoModule {
     fun provideGptRoleDao(@RoomDB db: RoomDataBase) = db.gptRoleDao()
 
     @Provides
-    fun provideGptAssistantDao(@RoomDB db: RoomDataBase) = db.gptAssistantDao()
+    fun provideGptChannelDao(@RoomDB db: RoomDataBase) = db.gptChannelDao()
 
     @Provides
     fun provideGptMessageDao(@RoomDB db: RoomDataBase) = db.gptMessageDao()

@@ -12,15 +12,15 @@ import com.youhajun.domain.models.inspectUiState
 import com.youhajun.domain.models.vo.gpt.ChatGptMessageVo
 import com.youhajun.domain.models.vo.gpt.ChatGptRequestVo
 import com.youhajun.domain.models.vo.gpt.ChatGptResponseVo
-import com.youhajun.domain.models.vo.gpt.GptAssistantVo
-import com.youhajun.domain.usecase.gpt.DeleteGptAssistantUseCase
+import com.youhajun.domain.models.vo.gpt.GptChannelVo
+import com.youhajun.domain.usecase.gpt.DeleteGptChannelUseCase
 import com.youhajun.domain.usecase.gpt.DeleteGptRoleUseCase
-import com.youhajun.domain.usecase.gpt.InsertGptAssistantUseCase
+import com.youhajun.domain.usecase.gpt.InsertGptChannelUseCase
 import com.youhajun.domain.usecase.gpt.InsertGptRoleUseCase
 import com.youhajun.domain.usecase.gpt.PostChatGptPromptUseCase
-import com.youhajun.domain.usecase.gpt.SelectAllGptAssistantsUseCase
+import com.youhajun.domain.usecase.gpt.SelectAllGptChannelsUseCase
 import com.youhajun.domain.usecase.gpt.SelectAllGptRolesUseCase
-import com.youhajun.domain.usecase.gpt.SelectLatestAssistantsUseCase
+import com.youhajun.domain.usecase.gpt.SelectLatestChannelsUseCase
 import com.youhajun.ui.R
 import com.youhajun.ui.models.sideEffects.GptSideEffect
 import com.youhajun.ui.models.states.GptState
@@ -51,9 +51,9 @@ interface GptIntent {
     fun onClickDeleteRole(role: String)
     fun onClickHeaderBackIcon()
     fun onClickHeaderMenuIcon()
-    fun onClickAssistant(idx: Long)
-    fun onClickCreateAssistant()
-    fun onClickDeleteAssistant(idx: Long)
+    fun onClickChannel(idx: Long)
+    fun onClickCreateChannel()
+    fun onClickDeleteChannel(idx: Long)
 }
 
 @HiltViewModel
@@ -61,12 +61,12 @@ class GptViewModel @Inject constructor(
     private val resourceProviderUtil: ResourceProviderUtil,
     private val postChatGptPromptUseCase: PostChatGptPromptUseCase,
     private val insertGptRoleUseCase: InsertGptRoleUseCase,
-    private val insertGptAssistantUseCase: InsertGptAssistantUseCase,
+    private val insertGptChannelUseCase: InsertGptChannelUseCase,
     private val selectAllGptRolesUseCase: SelectAllGptRolesUseCase,
-    private val selectAllGptAssistantsUseCase: SelectAllGptAssistantsUseCase,
-    private val selectLatestGptAssistantsUseCase: SelectLatestAssistantsUseCase,
+    private val selectAllGptChannelsUseCase: SelectAllGptChannelsUseCase,
+    private val selectLatestGptChannelsUseCase: SelectLatestChannelsUseCase,
     private val deleteGptRoleUseCase: DeleteGptRoleUseCase,
-    private val deleteGptAssistantUseCase: DeleteGptAssistantUseCase,
+    private val deleteGptChannelUseCase: DeleteGptChannelUseCase,
 ) : ContainerHost<GptState, GptSideEffect>, ViewModel(), GptIntent {
 
     private val _gptInputStateOf: MutableState<String> = mutableStateOf("")
@@ -75,9 +75,9 @@ class GptViewModel @Inject constructor(
     val addRoleInputStateOf: State<String> = _addRoleInputStateOf
 
     override val container: Container<GptState, GptSideEffect> = container(GptState()) {
-        onFetchAllAssistants()
+        onFetchAllChannels()
         onFetchAllRoles()
-        initInsertNewAssistantCheck()
+        initInsertNewChannelCheck()
     }
 
     override fun onClickHeaderBackIcon() {
@@ -94,28 +94,28 @@ class GptViewModel @Inject constructor(
         }
     }
 
-    override fun onClickAssistant(idx: Long) {
+    override fun onClickChannel(idx: Long) {
         intent {
-            val clickedAssistant = state.gptAssistantList.find { it.assistantIdx == idx }
-            reduce { state.copy(currentGptAssistant = clickedAssistant) }
+            val clickedChannel = state.gptChannelList.find { it.channelIdx == idx }
+            reduce { state.copy(currentGptChannel = clickedChannel) }
         }
     }
 
-    override fun onClickDeleteAssistant(idx: Long) {
+    override fun onClickDeleteChannel(idx: Long) {
         intent {
-            val isLastAssistant = state.gptAssistantList.size == 1
-            val isCurrentAssistant = idx == state.currentGptAssistant?.assistantIdx
+            val isLastChannel = state.gptChannelList.size == 1
+            val isCurrentChannel = idx == state.currentGptChannel?.channelIdx
 
             viewModelScope.launch {
-                deleteGptAssistantUseCase(idx).first().inspectUiState {
-                    if (isCurrentAssistant && !isLastAssistant) insertNewAssistant()
+                deleteGptChannelUseCase(idx).first().inspectUiState {
+                    if (isCurrentChannel && !isLastChannel) insertNewChannel()
                 }
             }
         }
     }
 
-    override fun onClickCreateAssistant() {
-        insertNewAssistant()
+    override fun onClickCreateChannel() {
+        insertNewChannel()
     }
 
     override fun onChangedGptInput(input: String) {
@@ -131,14 +131,15 @@ class GptViewModel @Inject constructor(
         if (message.isEmpty()) return
 
         intent {
-            val currentAssistant = state.currentGptAssistant ?: return@intent
+            val currentChannel = state.currentGptChannel ?: return@intent
 
             val gptType =
-                if (currentAssistant.gptType == GptType.NONE) state.selectedGptType else currentAssistant.gptType
+                if (currentChannel.gptType == GptType.NONE) state.selectedGptType else currentChannel.gptType
 
             val prefixPrompt = makePrefixPrompt(state.currentRole)
+            val channelPrompt = makeChannelPrompt()
+            //TODO addChannel Prompt
             val prompt = makeMessagePrompt(message, prefixPrompt)
-            //TODO addAssistant Prompt
             val request = ChatGptRequestVo(state.selectedGptType, prompt)
             onPostChatGptPrompt(request)
         }
@@ -186,6 +187,10 @@ class GptViewModel @Inject constructor(
         return listOf(ChatGptMessageVo(GptRoleType.SYSTEM, prefixPrompt))
     }
 
+    private fun makeChannelPrompt() {
+
+    }
+
     private fun makeMessagePrompt(
         message: String,
         prefixPrompt: List<ChatGptMessageVo>
@@ -225,39 +230,39 @@ class GptViewModel @Inject constructor(
 
     }
 
-    private fun onFetchAllAssistants() {
+    private fun onFetchAllChannels() {
         intent {
             viewModelScope.launch {
-                selectAllGptAssistantsUseCase(Unit)
+                selectAllGptChannelsUseCase(Unit)
                     .onEach {
                         it.inspectUiState {
-                            if (it.isEmpty()) insertNewAssistant()
+                            if (it.isEmpty()) insertNewChannel()
                         }
                     }
                     .collect {
                         it.inspectUiState {
-                            reduce { state.copy(gptAssistantList = it) }
+                            reduce { state.copy(gptChannelList = it) }
                         }
                     }
             }
         }
     }
 
-    private fun insertNewAssistant() {
+    private fun insertNewChannel() {
         intent {
             viewModelScope.launch {
-                val newAssistant = GptAssistantVo(
+                val newChannel = GptChannelVo(
                     gptType = GptType.NONE,
                     createdAtUnixTimeStamp = TimeStampUtil.currentTimestamp
                 )
-                insertGptAssistantUseCase(newAssistant).collect {
+                insertGptChannelUseCase(newChannel).collect {
                     it.inspectUiState(
                         onLoading = { showLoading() }
                     ) {
                         reduce {
                             state.copy(
                                 onLoading = false,
-                                currentGptAssistant = it
+                                currentGptChannel = it
                             )
                         }
                     }
@@ -266,10 +271,10 @@ class GptViewModel @Inject constructor(
         }
     }
 
-    private fun initInsertNewAssistantCheck() {
+    private fun initInsertNewChannelCheck() {
         intent {
             viewModelScope.launch {
-                selectLatestGptAssistantsUseCase(Unit)
+                selectLatestGptChannelsUseCase(Unit)
                     .filter {
                         if (it is UiState.Success) {
                             it.data != null
@@ -280,8 +285,8 @@ class GptViewModel @Inject constructor(
 
                         val isNewCreate = it!!.gptType != GptType.NONE
 
-                        if (isNewCreate) insertNewAssistant()
-                        else reduce { state.copy(currentGptAssistant = it) }
+                        if (isNewCreate) insertNewChannel()
+                        else reduce { state.copy(currentGptChannel = it) }
                     }
             }
         }

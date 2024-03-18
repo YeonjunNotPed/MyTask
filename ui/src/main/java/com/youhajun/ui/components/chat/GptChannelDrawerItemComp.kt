@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,29 +37,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import com.youhajun.domain.models.enums.GptType
-import com.youhajun.domain.models.vo.gpt.GptAssistantVo
+import com.youhajun.domain.models.vo.gpt.GptChannelVo
 import com.youhajun.ui.R
 
 
 @Preview(showBackground = true )
 @Composable
 fun previsew() {
-    GptAssistantDrawerItemComp(
-        item = GptAssistantVo(
+    GptChannelDrawerItemComp(
+        item = GptChannelVo(
             2, GptType.NONE, null, 0
         ),
-        isCurrentAssistant = true,
-        onClickAssistant = {},
-        onClickDeleteAssistant = {}
+        isCurrentChannel = true,
+        onClickChannel = {},
+        onClickDeleteChannel = {}
     )
 }
 
 @Composable
-fun GptAssistantDrawerItemComp(
-    item: GptAssistantVo,
-    isCurrentAssistant: Boolean,
-    onClickAssistant: (idx: Long) -> Unit,
-    onClickDeleteAssistant: (idx: Long) -> Unit,
+fun GptChannelDrawerItemComp(
+    item: GptChannelVo,
+    isCurrentChannel: Boolean,
+    onClickChannel: (idx: Long) -> Unit,
+    onClickDeleteChannel: (idx: Long) -> Unit,
 ) {
 
     var dropDownMenuExpanded by remember { mutableStateOf(false) }
@@ -72,7 +71,7 @@ fun GptAssistantDrawerItemComp(
     val lastQuestionText: String =
         if (lastQuestion.isNullOrEmpty()) stringResource(id = R.string.gpt_drawer_item_default_content) else lastQuestion
     val backgroundColor =
-        if (isCurrentAssistant) colorResource(id = R.color.color_add8e6) else Color.LightGray
+        if (isCurrentChannel) colorResource(id = R.color.color_add8e6) else Color.LightGray
 
     Row(
         modifier = Modifier
@@ -82,7 +81,7 @@ fun GptAssistantDrawerItemComp(
             .padding(0.5.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(backgroundColor)
-            .clickable { onClickAssistant(item.assistantIdx) }
+            .clickable { onClickChannel(item.channelIdx) }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -133,10 +132,10 @@ fun GptAssistantDrawerItemComp(
                 )
             ) {
                 DropdownMenuItem(
-                    onClick = { onClickDeleteAssistant(item.assistantIdx) },
+                    onClick = { onClickDeleteChannel(item.channelIdx) },
                     text = {
                         Text(
-                            text = stringResource(id = R.string.gpt_drawer_item_dropdown_delete_assistant),
+                            text = stringResource(id = R.string.gpt_drawer_item_dropdown_delete_channel),
                             fontSize = 13.sp,
                             color = Color.Black,
                         )

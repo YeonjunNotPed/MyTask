@@ -16,9 +16,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AddComment
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Text
@@ -33,21 +31,19 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youhajun.domain.models.enums.GptType
-import com.youhajun.domain.models.vo.gpt.GptAssistantVo
+import com.youhajun.domain.models.vo.gpt.GptChannelVo
 import com.youhajun.ui.R
 
 @Composable
-fun GptAssistantDrawerSheetComp(
-    gptAssistantList: List<GptAssistantVo>,
-    currentAssistantIdx: Long?,
-    onClickAssistant: (idx: Long) -> Unit,
-    onClickDeleteAssistant: (idx: Long) -> Unit,
-    onClickCreateAssistant: () -> Unit,
+fun GptChannelDrawerSheetComp(
+    gptChannelList: List<GptChannelVo>,
+    currentChannelIdx: Long?,
+    onClickChannel: (idx: Long) -> Unit,
+    onClickDeleteChannel: (idx: Long) -> Unit,
+    onClickCreateChannel: () -> Unit,
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         ModalDrawerSheet(
@@ -92,7 +88,7 @@ fun GptAssistantDrawerSheetComp(
                         Icons.Outlined.AddComment,
                         contentDescription = null,
                         modifier = Modifier
-                            .clickable { onClickCreateAssistant() }
+                            .clickable { onClickCreateChannel() }
                             .size(18.dp),
                         tint = Color.Gray
                     )
@@ -107,15 +103,15 @@ fun GptAssistantDrawerSheetComp(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(
-                        items = gptAssistantList,
-                        key = { it.assistantIdx },
+                        items = gptChannelList,
+                        key = { it.channelIdx },
                     ) { item ->
-                        val isCurrentAssistant = item.assistantIdx == currentAssistantIdx
-                        GptAssistantDrawerItemComp(
+                        val isCurrentChannel = item.channelIdx == currentChannelIdx
+                        GptChannelDrawerItemComp(
                             item,
-                            isCurrentAssistant,
-                            onClickAssistant,
-                            onClickDeleteAssistant
+                            isCurrentChannel,
+                            onClickChannel,
+                            onClickDeleteChannel
                         )
                     }
                 }

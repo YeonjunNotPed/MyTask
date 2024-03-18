@@ -40,7 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.ui.R
 import com.youhajun.ui.components.MyTaskHeader
-import com.youhajun.ui.components.chat.GptAssistantDrawerSheetComp
+import com.youhajun.ui.components.chat.GptChannelDrawerSheetComp
 import com.youhajun.ui.components.chat.GptMessageItemComp
 import com.youhajun.ui.components.chat.GptSelectRoleComp
 import com.youhajun.ui.components.chat.GptTypeItemComp
@@ -86,12 +86,12 @@ fun GptScreen(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         ModalNavigationDrawer(
             drawerContent = {
-                GptAssistantDrawerSheetComp(
-                    state.gptAssistantList,
-                    state.currentGptAssistant?.assistantIdx,
-                    onClickAssistant = viewModel::onClickAssistant,
-                    onClickCreateAssistant = viewModel::onClickCreateAssistant,
-                    onClickDeleteAssistant = viewModel::onClickDeleteAssistant
+                GptChannelDrawerSheetComp(
+                    state.gptChannelList,
+                    state.currentGptChannel?.channelIdx,
+                    onClickChannel = viewModel::onClickChannel,
+                    onClickCreateChannel = viewModel::onClickCreateChannel,
+                    onClickDeleteChannel = viewModel::onClickDeleteChannel
                 )
             },
             gesturesEnabled = true,

@@ -3,7 +3,7 @@ package com.youhajun.data.repositories
 import com.youhajun.data.Resource
 import com.youhajun.data.models.dto.gpt.ChatGptRequest
 import com.youhajun.data.models.dto.gpt.ChatGptResponse
-import com.youhajun.data.models.entity.gpt.GptAssistantEntity
+import com.youhajun.data.models.entity.gpt.GptChannelEntity
 import com.youhajun.data.models.entity.gpt.GptRoleEntity
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.localDataSource.GptLocalDataSource
@@ -27,32 +27,32 @@ class GptRepository @Inject constructor(
         return gptLocalDataSource.insertGptRole(role)
     }
 
-    fun insertGptAssistant(assistantEntity: GptAssistantEntity): Flow<Resource<GptAssistantEntity>> {
-        return gptLocalDataSource.insertGptAssistant(assistantEntity).onStart { emit(Resource.Loading()) }
+    fun insertGptChannel(channelEntity: GptChannelEntity): Flow<Resource<GptChannelEntity>> {
+        return gptLocalDataSource.insertGptChannel(channelEntity).onStart { emit(Resource.Loading()) }
     }
 
     fun deleteGptRole(role: String): Flow<Resource<Unit>> {
         return gptLocalDataSource.deleteGptRole(role)
     }
 
-    fun deleteGptAssistant(idx: Long): Flow<Resource<Unit>> {
-        return gptLocalDataSource.deleteGptAssistant(idx)
+    fun deleteGptChannel(idx: Long): Flow<Resource<Unit>> {
+        return gptLocalDataSource.deleteGptChannel(idx)
     }
 
     fun selectAllGptRoles(): Flow<Resource<List<GptRoleEntity>>> {
         return gptLocalDataSource.selectAllGptRoles()
     }
 
-    fun selectAllGptAssistants(): Flow<Resource<List<GptAssistantEntity>>> {
-        return gptLocalDataSource.selectAllGptAssistants()
+    fun selectAllGptChannels(): Flow<Resource<List<GptChannelEntity>>> {
+        return gptLocalDataSource.selectAllGptChannels()
     }
 
-    fun selectGptAssistant(idx:Long): Flow<Resource<GptAssistantEntity>> {
-        return gptLocalDataSource.selectGptAssistant(idx)
+    fun selectGptChannel(idx:Long): Flow<Resource<GptChannelEntity>> {
+        return gptLocalDataSource.selectGptChannel(idx)
     }
 
-    fun selectLatestAssistant(): Flow<Resource<GptAssistantEntity?>> {
-        return gptLocalDataSource.selectLatestAssistant()
+    fun selectLatestChannel(): Flow<Resource<GptChannelEntity?>> {
+        return gptLocalDataSource.selectLatestChannel()
     }
 }
 

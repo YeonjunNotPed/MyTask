@@ -5,7 +5,7 @@ import com.youhajun.domain.models.sealeds.GptMessageFooterState
 
 data class GptMessageVo(
     val idx:Long,
-    val assistantIdx:Long,
+    val channelIdx:Long,
     val gptMessageType: GptMessageType,
     val message:String,
     val createdAtUnixTimeStamp: Long,

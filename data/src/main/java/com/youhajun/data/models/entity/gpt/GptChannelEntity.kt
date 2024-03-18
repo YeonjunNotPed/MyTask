@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.youhajun.data.models.entity.EntityTable
 
-@Entity(tableName = EntityTable.GPT_ASSISTANT)
-data class GptAssistantEntity(
+@Entity(tableName = EntityTable.GPT_CHANNEL)
+data class GptChannelEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_NAME_IDX)
     val idx:Long = 0,

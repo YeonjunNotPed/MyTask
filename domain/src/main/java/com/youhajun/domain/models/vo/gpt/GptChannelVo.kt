@@ -1,20 +1,20 @@
 package com.youhajun.domain.models.vo.gpt
 
-import com.youhajun.data.models.entity.gpt.GptAssistantEntity
+import com.youhajun.data.models.entity.gpt.GptChannelEntity
 import com.youhajun.domain.models.Mapper
 import com.youhajun.domain.models.enums.GptType
 
-data class GptAssistantVo(
-    val assistantIdx: Long = 0,
+data class GptChannelVo(
+    val channelIdx: Long = 0,
     val gptType: GptType,
     val lastQuestion: String? = null,
     val createdAtUnixTimeStamp: Long,
 ) {
-    companion object : Mapper.ResponseMapper<GptAssistantEntity, GptAssistantVo>, Mapper.RequestMapper<GptAssistantEntity, GptAssistantVo> {
-        override fun mapDtoToModel(type: GptAssistantEntity): GptAssistantVo {
+    companion object : Mapper.ResponseMapper<GptChannelEntity, GptChannelVo>, Mapper.RequestMapper<GptChannelEntity, GptChannelVo> {
+        override fun mapDtoToModel(type: GptChannelEntity): GptChannelVo {
             return type.run {
-                GptAssistantVo(
-                    assistantIdx = idx,
+                GptChannelVo(
+                    channelIdx = idx,
                     gptType = GptType.typeOf(gptType),
                     lastQuestion = lastQuestion,
                     createdAtUnixTimeStamp = createdAtUnixTimeStamp
@@ -22,10 +22,10 @@ data class GptAssistantVo(
             }
         }
 
-        override fun mapModelToDto(type: GptAssistantVo): GptAssistantEntity {
+        override fun mapModelToDto(type: GptChannelVo): GptChannelEntity {
             return type.run {
-                GptAssistantEntity(
-                    idx = assistantIdx,
+                GptChannelEntity(
+                    idx = channelIdx,
                     gptType = gptType.type,
                     lastQuestion = lastQuestion,
                     createdAtUnixTimeStamp = createdAtUnixTimeStamp
