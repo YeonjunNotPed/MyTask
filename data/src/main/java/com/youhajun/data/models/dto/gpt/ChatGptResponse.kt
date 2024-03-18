@@ -10,7 +10,7 @@ data class ChatGptResponse(
     val messageList: List<ChatGptMessageInfoResponse>,
 
     @SerializedName("created")
-    val created: Int,
+    val created: Long,
 
     @SerializedName("model")
     val model: String,

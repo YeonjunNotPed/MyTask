@@ -1,15 +1,13 @@
 package com.youhajun.domain.models.vo.gpt
 
 import com.youhajun.domain.models.enums.GptMessageType
-import com.youhajun.domain.models.enums.GptType
 import com.youhajun.domain.models.sealeds.GptMessageFooterState
 
 data class GptMessageVo(
-    val idx:Int,
-    val channelIdx:Int,
+    val idx:Long,
+    val assistantIdx:Long,
     val gptMessageType: GptMessageType,
     val message:String,
-    val createAt:String,
-    val gptType: GptType,
-    val messageFooterState: List<GptMessageFooterState>,
+    val createdAtUnixTimeStamp: Long,
+    val messageFooterState: List<GptMessageFooterState> = emptyList(),
 )
