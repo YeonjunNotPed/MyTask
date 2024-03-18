@@ -1,8 +1,13 @@
 package com.youhajun.data.di
 
 import android.content.Context
+import androidx.room.OnConflictStrategy
 import androidx.room.Room
-import com.youhajun.data.RoomDataBase
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.youhajun.data.models.entity.EntityTable
+import com.youhajun.data.room.RoomDataBase
+import com.youhajun.data.room.RoomInit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,13 +19,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RoomModule {
 
-    private const val DB_NAME = "database-my-task"
-
+    @RoomDB
     @Provides
     fun provideRoomDataBase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        callback: RoomDatabase.Callback
     ) = Room.databaseBuilder(
         context,
-        RoomDataBase::class.java, DB_NAME
-    ).build()
+        RoomDataBase::class.java, RoomInit.DB_NAME
+    ).addCallback(callback).build()
 }
