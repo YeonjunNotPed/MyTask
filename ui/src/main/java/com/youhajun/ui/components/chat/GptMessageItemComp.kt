@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youhajun.domain.models.enums.GptMessageType
 import com.youhajun.domain.models.sealeds.GptMessageFooterState
-import com.youhajun.domain.models.vo.GptMessageVo
+import com.youhajun.domain.models.vo.gpt.GptMessageVo
 import com.youhajun.ui.R
 
 @Composable
@@ -54,7 +54,7 @@ fun GptMessageItemComp(
 
         gptMessageVo.messageFooterState.forEach {
             when (it) {
-                GptMessageFooterState.ShowCreateAt -> GptFooterCreateAt(gptMessageVo.createAt)
+                GptMessageFooterState.ShowCreateAt -> GptFooterCreateAt(gptMessageVo.createdAtUnixTimeStamp)
                 is GptMessageFooterState.ShowRecommendingUrl -> GptFooterRecommendUrl(
                     recommendUrlVoList = it.recommendUrlVoList
                 )

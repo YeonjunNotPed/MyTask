@@ -8,12 +8,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youhajun.domain.models.vo.GptRecommendUrlVo
+import com.youhajun.domain.models.vo.gpt.GptRecommendUrlVo
 
 @Composable
-fun GptFooterCreateAt(createAt: String) {
+fun GptFooterCreateAt(createdAtUnixTimeStamp: Long) {
     Text(
-        text = createAt,
+        text = createdAtUnixTimeStamp.toString(), //TODO TimeStamp 변환 util
         fontSize = 8.sp,
         fontWeight = FontWeight.W400,
         color = Color.Gray,

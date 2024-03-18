@@ -40,4 +40,12 @@
     <string name="store_in_app_multiple_item_per_price">개당 %s</string>
 
     <string name="gpt_input_hint">AI 에게 무엇이든 물어보세요!</string>
+    <string name="gpt_select_role">AI 에게 역할을 부여해보세요!\n정확도가 높아질거예요</string>
+    <string name="gpt_add_role_hint">역할 추가</string>
+    <string name="gpt_prompt_prefix">너는 지금부터 %s야</string>
+    <string name="gpt_drawer_title">나의 어시스턴트</string>
+    <string name="gpt_drawer_list_title">목록</string>
+    <string name="gpt_drawer_item_default_title">대화를 시작하세요</string>
+    <string name="gpt_drawer_item_default_content">새 채팅</string>
+    <string name="gpt_drawer_item_dropdown_delete_assistant">채팅방 삭제하기</string>
 </resources>
