@@ -39,11 +39,12 @@ fun PurchaseInAppItemComp(
 ) {
     Row(
         modifier = Modifier
+            .border(1.dp, colorResource(id = R.color.color_b9b9b9), RoundedCornerShape(12.dp))
+            .padding(0.5.dp)
             .clip(shape = RoundedCornerShape(12.dp))
             .background(colorResource(id = R.color.color_373737))
             .fillMaxWidth()
             .height(60.dp)
-            .border(1.dp, colorResource(id = R.color.color_b9b9b9), RoundedCornerShape(12.dp))
             .padding(horizontal = 8.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,7 +75,7 @@ fun TopTitleInput(
                     width = 1.dp, color = colorResource(
                         id = R.color.color_b9b9b9
                     ), RoundedCornerShape(12.dp)
-                ),
+                ).padding(0.5.dp),
             textStyle = TextStyle(color = Color.White, fontSize = 14.sp),
             singleLine = true,
             shape = RoundedCornerShape(12.dp),

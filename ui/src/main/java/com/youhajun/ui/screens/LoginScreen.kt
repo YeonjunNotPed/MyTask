@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +43,7 @@ import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.input.TopTitleInput
 import com.youhajun.ui.components.social.GoogleLoginButton
 import com.youhajun.ui.components.social.KakaoLoginButton
+import com.youhajun.ui.models.sideEffects.GptSideEffect
 import com.youhajun.ui.models.sideEffects.LoginSideEffect
 import com.youhajun.ui.utils.GoogleLoginUtil
 import com.youhajun.ui.utils.KakaoLoginUtil
@@ -55,6 +57,7 @@ fun LoginScreen(
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val googleLoginUtil = remember { GoogleLoginUtil(context) }
     val kakaoLoginUtil = remember { KakaoLoginUtil(context) }
@@ -87,6 +90,11 @@ fun LoginScreen(
 
                 LoginSideEffect.KakaoLoginLaunch -> kakaoLoginUtil.kakaoLogin {
                     viewModel.onSuccessKakaoLogin(it)
+                }
+
+                LoginSideEffect.HideKeyboard -> {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
                 }
 
                 is LoginSideEffect.Navigation -> onNavigate.invoke(it)
