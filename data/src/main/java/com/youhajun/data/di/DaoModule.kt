@@ -1,6 +1,6 @@
 package com.youhajun.data.di
 
-import com.youhajun.data.RoomDataBase
+import com.youhajun.data.room.RoomDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,4 +12,13 @@ object DaoModule {
 
     @Provides
     fun provideUserInfoDao(@RoomDB db: RoomDataBase) = db.recentSearchDao()
+
+    @Provides
+    fun provideGptRoleDao(@RoomDB db: RoomDataBase) = db.gptRoleDao()
+
+    @Provides
+    fun provideGptAssistantDao(@RoomDB db: RoomDataBase) = db.gptAssistantDao()
+
+    @Provides
+    fun provideGptMessageDao(@RoomDB db: RoomDataBase) = db.gptMessageDao()
 }

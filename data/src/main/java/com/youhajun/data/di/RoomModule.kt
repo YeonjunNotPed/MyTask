@@ -28,4 +28,17 @@ object RoomModule {
         context,
         RoomDataBase::class.java, RoomInit.DB_NAME
     ).addCallback(callback).build()
+
+    @Provides
+    fun provideDatabaseCallback(): RoomDatabase.Callback {
+        return object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+
+                RoomInit.initGptRoles().forEach {
+                    db.insert(EntityTable.GPT_ROLE, OnConflictStrategy.IGNORE, it)
+                }
+            }
+        }
+    }
 }
