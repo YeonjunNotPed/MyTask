@@ -22,7 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -59,6 +63,8 @@ fun GptScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 
+    var typingAnimationTrigger by remember { mutableStateOf(false) }
+    var typingAnimationTargetIdx by remember { mutableLongStateOf(-1L) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel) {
@@ -76,8 +82,14 @@ fun GptScreen(
                 GptSideEffect.DrawerMenuClose -> scope.launch {
                     state.drawerState.close()
                 }
+
                 GptSideEffect.DrawerMenuOpen -> scope.launch {
                     state.drawerState.open()
+                }
+
+                is GptSideEffect.RunTypingAnimation -> {
+                    typingAnimationTargetIdx = it.targetIdx
+                    typingAnimationTrigger = !typingAnimationTrigger
                 }
             }
         }
@@ -121,6 +133,7 @@ fun GptScreen(
                     )
 
                     LazyColumn(
+                        reverseLayout = true,
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = colorResource(id = R.color.color_e6f4fa))
@@ -128,35 +141,37 @@ fun GptScreen(
                                 top.linkTo(myTaskHeader.bottom)
                                 bottom.linkTo(gptInputTextField.top)
                                 height = Dimension.fillToConstraints
-                            }
+                            },
                     ) {
                         items(
-                            items = state.gptMessageList,
+                            items = state.currentGptMessages,
                             key = { it.idx },
                         ) { item ->
-                            GptMessageItemComp(item)
+                            val isTarget = item.idx == typingAnimationTargetIdx
+                            val role = state.currentGptChannel?.roleOfAi
+                            GptMessageItemComp(item, isTarget, typingAnimationTrigger, role)
                         }
                     }
 
-                    GptSelectRoleComp(
-                        modifier = Modifier
-                            .constrainAs(selectRoleComp) {
-                                top.linkTo(lazyColumn.top)
-                                end.linkTo(lazyColumn.end)
-                            }
-                            .padding(10.dp),
-                        currentRole = state.currentRole,
-                        isExpanded = state.isRoleExpanded,
-                        roleList = state.roleList,
-                        addRoleInput = viewModel.addRoleInputStateOf.value,
-                        onAddRoleValueChange = viewModel::onChangedAddRoleInput,
-                        onClickExpandIcon = viewModel::onClickRoleExpandIcon,
-                        onClickRole = viewModel::onClickRole,
-                        onClickDeleteRole = viewModel::onClickDeleteRole,
-                        onClickAddRole = viewModel::onClickAddRole,
-                    )
+                    if (state.wasSentMessage) {
+                        GptSelectRoleComp(
+                            modifier = Modifier
+                                .constrainAs(selectRoleComp) {
+                                    top.linkTo(lazyColumn.top)
+                                    end.linkTo(lazyColumn.end)
+                                }
+                                .padding(10.dp),
+                            selectedRole = state.selectedRole,
+                            isExpanded = state.isRoleExpanded,
+                            roleList = state.roleList,
+                            addRoleInput = viewModel.addRoleInputStateOf.value,
+                            onAddRoleValueChange = viewModel::onChangedAddRoleInput,
+                            onClickExpandIcon = viewModel::onClickRoleExpandIcon,
+                            onClickRole = viewModel::onClickRole,
+                            onClickDeleteRole = viewModel::onClickDeleteRole,
+                            onClickAddRole = viewModel::onClickAddRole,
+                        )
 
-                    if (state.isShowSelectGptTypeList) {
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()

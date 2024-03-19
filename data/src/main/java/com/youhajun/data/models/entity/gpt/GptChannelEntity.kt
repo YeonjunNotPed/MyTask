@@ -12,6 +12,8 @@ data class GptChannelEntity(
     val idx:Long = 0,
     @ColumnInfo(name = COLUMN_NAME_GPT_TYPE)
     val gptType: String,
+    @ColumnInfo(name = COLUMN_NAME_ROLE_OF_AI)
+    val roleOfAi: String? = null,
     @ColumnInfo(name = COLUMN_NAME_LAST_QUESTION)
     val lastQuestion: String? = null,
     @ColumnInfo(name = COLUMN_NAME_CREATED_AT_UNIX_TIME)
@@ -21,6 +23,7 @@ data class GptChannelEntity(
     companion object {
         const val COLUMN_NAME_IDX = "idx"
         const val COLUMN_NAME_GPT_TYPE = "gptType"
+        const val COLUMN_NAME_ROLE_OF_AI = "roleOfAi"
         const val COLUMN_NAME_LAST_QUESTION = "lastQuestion"
         const val COLUMN_NAME_CREATED_AT_UNIX_TIME = "createdAt"
     }

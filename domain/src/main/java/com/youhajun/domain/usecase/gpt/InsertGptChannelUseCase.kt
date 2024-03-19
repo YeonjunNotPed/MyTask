@@ -11,11 +11,11 @@ import javax.inject.Inject
 
 class InsertGptChannelUseCase @Inject constructor(
     private val gptRepository: GptRepository
-) : UseCase<GptChannelVo, Flow<UiState<GptChannelVo>>>() {
+) : UseCase<GptChannelVo, Flow<UiState<Long>>>() {
 
-    override suspend fun invoke(request: GptChannelVo): Flow<UiState<GptChannelVo>> {
+    override suspend fun invoke(request: GptChannelVo): Flow<UiState<Long>> {
         return gptRepository.insertGptChannel(GptChannelVo.mapModelToDto(request)).map {
-            it.mapToUiState { GptChannelVo.mapDtoToModel(it) }
+            it.mapToUiState { it }
         }
     }
 }

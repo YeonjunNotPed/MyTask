@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class SelectLatestChannelsUseCase @Inject constructor(
+class SelectGptChannelUseCase @Inject constructor(
     private val gptRepository: GptRepository
-) : UseCase<Unit, Flow<UiState<GptChannelVo>>>() {
+) : UseCase<Long, Flow<UiState<GptChannelVo>>>() {
 
-    override suspend fun invoke(request: Unit): Flow<UiState<GptChannelVo>> {
-        return gptRepository.selectLatestChannel().map {
+    override suspend fun invoke(request: Long): Flow<UiState<GptChannelVo>> {
+        return gptRepository.selectGptChannel(request).map {
             it.mapToUiState { GptChannelVo.mapDtoToModel(it) }
         }
     }

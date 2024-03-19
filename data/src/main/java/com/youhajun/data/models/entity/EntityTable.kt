@@ -5,4 +5,5 @@ object EntityTable {
     const val GPT_ROLE = "GptRole"
     const val GPT_CHANNEL = "GptChannel"
     const val GPT_MESSAGE = "GptMessage"
+    const val GPT_ASSISTANT = "GptAssistant"
 }

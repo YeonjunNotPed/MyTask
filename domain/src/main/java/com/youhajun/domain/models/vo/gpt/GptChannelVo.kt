@@ -7,6 +7,7 @@ import com.youhajun.domain.models.enums.GptType
 data class GptChannelVo(
     val channelIdx: Long = 0,
     val gptType: GptType,
+    val roleOfAi: String? = null,
     val lastQuestion: String? = null,
     val createdAtUnixTimeStamp: Long,
 ) {
@@ -16,6 +17,7 @@ data class GptChannelVo(
                 GptChannelVo(
                     channelIdx = idx,
                     gptType = GptType.typeOf(gptType),
+                    roleOfAi = roleOfAi,
                     lastQuestion = lastQuestion,
                     createdAtUnixTimeStamp = createdAtUnixTimeStamp
                 )
@@ -27,6 +29,7 @@ data class GptChannelVo(
                 GptChannelEntity(
                     idx = channelIdx,
                     gptType = gptType.type,
+                    roleOfAi = roleOfAi,
                     lastQuestion = lastQuestion,
                     createdAtUnixTimeStamp = createdAtUnixTimeStamp
                 )

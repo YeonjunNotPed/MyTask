@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GptMessageDao {
     @Query("SELECT * FROM ${EntityTable.GPT_MESSAGE} WHERE channelIdx = :channelIdx ORDER BY idx DESC")
-    fun getAllMessages(channelIdx:Long): Flow<List<GptMessageEntity>>
+    fun getMessagesByChannelIdx(channelIdx:Long): Flow<List<GptMessageEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertMessage(gptMessageEntity: GptMessageEntity)
+    suspend fun insertMessage(gptMessageEntity: GptMessageEntity): Long
 }

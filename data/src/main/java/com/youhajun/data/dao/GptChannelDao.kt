@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.youhajun.data.models.dto.gpt.UpdateGptChannelInfoRequest
 import com.youhajun.data.models.entity.EntityTable
 import com.youhajun.data.models.entity.gpt.GptChannelEntity
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +21,7 @@ interface GptChannelDao {
     fun getAllChannels(): Flow<List<GptChannelEntity>>
 
     @Query("SELECT * FROM ${EntityTable.GPT_CHANNEL} WHERE idx = :idx")
-    fun getChannelByIdx(idx: Long): Flow<GptChannelEntity>
+    fun getChannelByIdx(idx: Long): Flow<GptChannelEntity?>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertChannel(gptChannelEntity: GptChannelEntity): Long
@@ -28,9 +29,7 @@ interface GptChannelDao {
     @Query("DELETE FROM ${EntityTable.GPT_CHANNEL} WHERE idx = :idx")
     suspend fun deleteChannel(idx: Long)
 
-    @Transaction
-    suspend fun insertAndGetChannel(gptChannelEntity: GptChannelEntity): GptChannelEntity {
-        val idx = insertChannel(gptChannelEntity)
-        return getChannelByIdx(idx).first()
-    }
+    @Query("UPDATE ${EntityTable.GPT_CHANNEL} SET roleOfAi = :roleOfAi, lastQuestion = :lastQuestion, gptType = :gptType WHERE idx = :idx")
+    suspend fun updateGptChannelInfo(idx: Long, roleOfAi:String?, lastQuestion: String, gptType: String)
+
 }

@@ -2,10 +2,12 @@ package com.youhajun.data.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.youhajun.data.dao.GptAssistantDao
 import com.youhajun.data.dao.GptChannelDao
 import com.youhajun.data.dao.GptMessageDao
 import com.youhajun.data.dao.GptRoleDao
 import com.youhajun.data.dao.RecentSearchDao
+import com.youhajun.data.models.entity.gpt.GptAssistantEntity
 import com.youhajun.data.models.entity.gpt.GptChannelEntity
 import com.youhajun.data.models.entity.gpt.GptMessageEntity
 import com.youhajun.data.models.entity.gpt.GptRoleEntity
@@ -16,7 +18,8 @@ import com.youhajun.data.models.entity.search.RecentSearchEntity
         RecentSearchEntity::class,
         GptRoleEntity::class,
         GptChannelEntity::class,
-        GptMessageEntity::class
+        GptMessageEntity::class,
+        GptAssistantEntity::class,
     ],
     version = 1
 )
@@ -28,4 +31,6 @@ abstract class RoomDataBase : RoomDatabase() {
     abstract fun gptChannelDao(): GptChannelDao
 
     abstract fun gptMessageDao(): GptMessageDao
+
+    abstract fun gptAssistantDao(): GptAssistantDao
 }

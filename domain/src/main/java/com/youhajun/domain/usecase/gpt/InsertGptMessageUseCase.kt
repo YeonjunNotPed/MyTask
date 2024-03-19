@@ -4,18 +4,19 @@ import com.youhajun.data.repositories.GptRepository
 import com.youhajun.domain.mapToUiState
 import com.youhajun.domain.models.UiState
 import com.youhajun.domain.models.vo.gpt.GptChannelVo
+import com.youhajun.domain.models.vo.gpt.GptMessageVo
 import com.youhajun.domain.usecase.UseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class SelectLatestChannelsUseCase @Inject constructor(
+class InsertGptMessageUseCase @Inject constructor(
     private val gptRepository: GptRepository
-) : UseCase<Unit, Flow<UiState<GptChannelVo>>>() {
+) : UseCase<GptMessageVo, Flow<UiState<Long>>>() {
 
-    override suspend fun invoke(request: Unit): Flow<UiState<GptChannelVo>> {
-        return gptRepository.selectLatestChannel().map {
-            it.mapToUiState { GptChannelVo.mapDtoToModel(it) }
+    override suspend fun invoke(request: GptMessageVo): Flow<UiState<Long>> {
+        return gptRepository.insertGptMessage(GptMessageVo.mapModelToDto(request)).map {
+            it.mapToUiState { it }
         }
     }
 }

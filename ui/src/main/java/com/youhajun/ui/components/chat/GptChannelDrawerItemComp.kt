@@ -41,19 +41,6 @@ import com.youhajun.domain.models.vo.gpt.GptChannelVo
 import com.youhajun.ui.R
 
 
-@Preview(showBackground = true )
-@Composable
-fun previsew() {
-    GptChannelDrawerItemComp(
-        item = GptChannelVo(
-            2, GptType.NONE, null, 0
-        ),
-        isCurrentChannel = true,
-        onClickChannel = {},
-        onClickDeleteChannel = {}
-    )
-}
-
 @Composable
 fun GptChannelDrawerItemComp(
     item: GptChannelVo,
@@ -72,6 +59,7 @@ fun GptChannelDrawerItemComp(
         if (lastQuestion.isNullOrEmpty()) stringResource(id = R.string.gpt_drawer_item_default_content) else lastQuestion
     val backgroundColor =
         if (isCurrentChannel) colorResource(id = R.color.color_add8e6) else Color.LightGray
+    val title = if(item.roleOfAi.isNullOrEmpty()) gptTypeText else "${item.roleOfAi} - $gptTypeText"
 
     Row(
         modifier = Modifier
@@ -91,7 +79,7 @@ fun GptChannelDrawerItemComp(
                 .weight(1f)
         ) {
             Text(
-                text = gptTypeText,
+                text = title,
                 fontSize = 12.sp,
                 color = Color.Gray,
                 fontWeight = FontWeight.W600,

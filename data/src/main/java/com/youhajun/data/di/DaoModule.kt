@@ -21,4 +21,7 @@ object DaoModule {
 
     @Provides
     fun provideGptMessageDao(@RoomDB db: RoomDataBase) = db.gptMessageDao()
+
+    @Provides
+    fun provideGptAssistantDao(@RoomDB db: RoomDataBase) = db.gptAssistantDao()
 }

@@ -5,6 +5,7 @@ sealed class GptSideEffect {
     object HideKeyboard : GptSideEffect()
     object DrawerMenuOpen : GptSideEffect()
     object DrawerMenuClose : GptSideEffect()
+    data class RunTypingAnimation(val targetIdx: Long) : GptSideEffect()
     sealed class Navigation: GptSideEffect() {
         object NavigateUp : Navigation()
     }

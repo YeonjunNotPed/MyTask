@@ -40,7 +40,7 @@ import com.youhajun.ui.R
 @Composable
 fun GptSelectRoleComp(
     modifier: Modifier = Modifier,
-    currentRole:String,
+    selectedRole:String,
     isExpanded: Boolean,
     roleList: List<String>,
     addRoleInput: String,
@@ -101,7 +101,7 @@ fun GptSelectRoleComp(
                         items = roleList,
                         key = { it },
                     ) {
-                        val isSelected = currentRole == it
+                        val isSelected = selectedRole == it
                         GptRoleListItemComp(it, isSelected, onClickRole = onClickRole, onClickDeleteRole = onClickDeleteRole)
                     }
                 }
