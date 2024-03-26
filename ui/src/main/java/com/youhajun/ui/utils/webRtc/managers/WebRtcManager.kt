@@ -22,7 +22,9 @@ import org.webrtc.MediaStream
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.VideoTrack
+import javax.inject.Singleton
 
+@Singleton
 class WebRtcManager @AssistedInject constructor(
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,
     @Assisted private val signaling: WebRTCContract.Signaling,

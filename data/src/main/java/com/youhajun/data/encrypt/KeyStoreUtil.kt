@@ -7,7 +7,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.inject.Singleton
 
-@Singleton
 object KeyStoreUtil {
     private const val ANDROID_KEY_STORE = "AndroidKeyStore"
     private const val MY_TASK_KEY_ALIAS = "MyTaskKeyAlias"

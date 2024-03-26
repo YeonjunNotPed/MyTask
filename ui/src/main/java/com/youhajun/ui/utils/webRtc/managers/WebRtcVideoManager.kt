@@ -44,7 +44,9 @@ import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class WebRtcVideoManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,

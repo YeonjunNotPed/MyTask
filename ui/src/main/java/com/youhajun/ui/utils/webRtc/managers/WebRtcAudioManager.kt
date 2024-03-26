@@ -22,18 +22,18 @@ import android.media.AudioManager
 import android.os.Build
 import androidx.core.content.getSystemService
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import dagger.hilt.android.qualifiers.ApplicationContext
 import com.youhajun.ui.utils.webRtc.audio.AudioHandler
 import com.youhajun.ui.utils.webRtc.audio.AudioSwitchHandler
 import com.youhajun.ui.utils.webRtc.models.TrackType
-import kotlinx.coroutines.launch
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStreamTrack
-import org.webrtc.PeerConnection
 import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class WebRtcAudioManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,

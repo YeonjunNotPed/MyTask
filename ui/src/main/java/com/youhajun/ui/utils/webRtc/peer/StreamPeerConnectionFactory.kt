@@ -38,7 +38,9 @@ import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import org.webrtc.audio.JavaAudioDeviceModule
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class StreamPeerConnectionFactory @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : WebRTCContract.PeerConnectionFactory {
