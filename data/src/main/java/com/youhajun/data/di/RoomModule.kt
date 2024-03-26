@@ -21,6 +21,7 @@ object RoomModule {
 
     @RoomDB
     @Provides
+    @Singleton
     fun provideRoomDataBase(
         @ApplicationContext context: Context,
         callback: RoomDatabase.Callback
@@ -30,6 +31,7 @@ object RoomModule {
     ).addCallback(callback).build()
 
     @Provides
+    @Singleton
     fun provideDatabaseCallback(): RoomDatabase.Callback {
         return object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {

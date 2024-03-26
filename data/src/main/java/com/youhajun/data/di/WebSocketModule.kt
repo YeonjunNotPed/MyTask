@@ -8,12 +8,14 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 object WebSocketModule {
 
+    @Singleton
     @Provides
     @MyTaskWebSocketOkHttpClient
     fun provideRequest(): Request {
@@ -22,6 +24,7 @@ object WebSocketModule {
             .build()
     }
 
+    @Singleton
     @Provides
     @MyTaskWebSocketOkHttpClient
     fun provideHttpClient(): OkHttpClient {

@@ -8,7 +8,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.youhajun.ui.BuildConfig
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 
+@ActivityScoped
 class GoogleLoginUtil(
     @ActivityContext private var _context: Context?
 ) {

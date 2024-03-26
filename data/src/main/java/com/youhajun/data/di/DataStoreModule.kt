@@ -21,6 +21,7 @@ object DataStoreModule {
     private const val PREFERENCE_KEY = "my_task_ref.reference_pb"
 
     @Provides
+    @Singleton
     fun providePreferenceDataStore(
         @ApplicationContext applicationContext: Context
     ): DataStore<Preferences> = PreferenceDataStoreFactory.create(

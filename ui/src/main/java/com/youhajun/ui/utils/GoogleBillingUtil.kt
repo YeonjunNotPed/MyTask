@@ -29,6 +29,7 @@ import com.youhajun.domain.models.vo.PurchaseItemVo
 import com.youhajun.ui.di.IoDispatcher
 import com.youhajun.ui.di.MainImmediateDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@ViewModelScoped
 class GoogleBillingUtil @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

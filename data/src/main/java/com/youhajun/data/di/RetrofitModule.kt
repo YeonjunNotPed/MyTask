@@ -15,6 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 
 @Module
@@ -23,6 +24,7 @@ object RetrofitModule {
 
     @Provides
     @MyTaskRetrofit
+    @Singleton
     fun provideMyTaskRetrofit(
         @MyTaskOkHttpClient okHttpClient: OkHttpClient,
         gson: GsonConverterFactory
@@ -36,6 +38,7 @@ object RetrofitModule {
 
     @Provides
     @MyTaskOkHttpClient
+    @Singleton
     fun provideMyTaskHttpClient(
         authenticator: TokenAuthenticator,
         authenticationInterceptor: AuthenticationInterceptor,
@@ -54,6 +57,7 @@ object RetrofitModule {
 
     @Provides
     @ChatGptRetrofit
+    @Singleton
     fun provideChatGptRetrofit(
         @GptOkHttpClient okHttpClient: OkHttpClient,
         gson: GsonConverterFactory
@@ -67,6 +71,7 @@ object RetrofitModule {
 
     @Provides
     @GeminiRetrofit
+    @Singleton
     fun provideGeminiRetrofit(
         @GptOkHttpClient okHttpClient: OkHttpClient,
         gson: GsonConverterFactory
@@ -80,6 +85,7 @@ object RetrofitModule {
 
     @Provides
     @GptOkHttpClient
+    @Singleton
     fun provideGptHttpClient(
         gptInterceptor: GptInterceptor
     ): OkHttpClient {
@@ -93,6 +99,7 @@ object RetrofitModule {
 
 
     @Provides
+    @Singleton
     fun provideGson(): GsonConverterFactory {
         val gson = GsonBuilder().setLenient().create()
         return GsonConverterFactory.create(gson)

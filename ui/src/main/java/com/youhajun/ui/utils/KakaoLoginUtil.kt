@@ -6,7 +6,9 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 
+@ActivityScoped
 class KakaoLoginUtil(
     @ActivityContext private var _context: Context?
 ) {
