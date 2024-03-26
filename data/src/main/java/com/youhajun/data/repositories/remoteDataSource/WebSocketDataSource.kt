@@ -28,7 +28,7 @@ import javax.inject.Singleton
 @Singleton
 class WebSocketDataSource @AssistedInject constructor(
     @MyTaskWebSocketOkHttpClient private val client: OkHttpClient,
-    @Assisted @MyTaskWebSocketOkHttpClient private val request: Request,
+    @MyTaskWebSocketOkHttpClient private val request: Request,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
 

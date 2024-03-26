@@ -8,9 +8,7 @@ import dagger.Lazy
 import okhttp3.Interceptor
 import okhttp3.Request
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class AuthenticationInterceptor @Inject constructor(
     private val authRepository: Lazy<AuthRepository>
 ) : Interceptor {

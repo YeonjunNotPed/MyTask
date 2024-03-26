@@ -11,7 +11,6 @@ import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class StoreRemoteDataSource @Inject constructor(
     private val storeService: StoreService
 ) {

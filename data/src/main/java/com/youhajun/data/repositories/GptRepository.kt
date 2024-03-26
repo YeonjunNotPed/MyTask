@@ -8,7 +8,6 @@ import com.youhajun.data.models.entity.gpt.GptAssistantEntity
 import com.youhajun.data.models.entity.gpt.GptChannelEntity
 import com.youhajun.data.models.entity.gpt.GptMessageEntity
 import com.youhajun.data.models.entity.gpt.GptRoleEntity
-import com.youhajun.data.network.NetworkBound
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.localDataSource.GptLocalDataSource
 import com.youhajun.data.repositories.remoteDataSource.GptRemoteDataSource
@@ -16,9 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class GptRepository @Inject constructor(
     private val gptRemoteDataSource: GptRemoteDataSource,
     private val gptLocalDataSource: GptLocalDataSource

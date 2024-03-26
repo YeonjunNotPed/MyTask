@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class StoreRepository @Inject constructor(
     private val storeRemoteDataSource: StoreRemoteDataSource,
 ) : BaseRepository() {

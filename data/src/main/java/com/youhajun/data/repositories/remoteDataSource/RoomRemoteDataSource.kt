@@ -10,7 +10,6 @@ import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class RoomRemoteDataSource @Inject constructor(
     private val roomService: RoomService,
 ) {

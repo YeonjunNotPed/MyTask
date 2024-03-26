@@ -6,7 +6,6 @@ import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class StoreLocalDataSource @Inject constructor() {
     suspend fun getPurchaseItemInfo(): Flow<Response<PurchaseItemInfo>> = TODO()
 }

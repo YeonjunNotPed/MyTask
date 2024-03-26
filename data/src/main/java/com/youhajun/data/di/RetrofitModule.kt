@@ -38,7 +38,6 @@ object RetrofitModule {
 
     @Provides
     @MyTaskOkHttpClient
-    @Singleton
     fun provideMyTaskHttpClient(
         authenticator: TokenAuthenticator,
         authenticationInterceptor: AuthenticationInterceptor,
@@ -85,7 +84,6 @@ object RetrofitModule {
 
     @Provides
     @GptOkHttpClient
-    @Singleton
     fun provideGptHttpClient(
         gptInterceptor: GptInterceptor
     ): OkHttpClient {
@@ -99,7 +97,6 @@ object RetrofitModule {
 
 
     @Provides
-    @Singleton
     fun provideGson(): GsonConverterFactory {
         val gson = GsonBuilder().setLenient().create()
         return GsonConverterFactory.create(gson)

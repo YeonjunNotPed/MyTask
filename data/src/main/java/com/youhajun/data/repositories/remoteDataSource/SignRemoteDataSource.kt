@@ -12,7 +12,6 @@ import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class SignRemoteDataSource @Inject constructor(
     private val signService: SignService
 ) {

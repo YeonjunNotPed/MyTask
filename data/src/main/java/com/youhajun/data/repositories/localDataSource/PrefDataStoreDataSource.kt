@@ -19,7 +19,6 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class PrefDataStoreDataSource @Inject constructor(
     private val dataStorePref: DataStore<Preferences>
 ) {

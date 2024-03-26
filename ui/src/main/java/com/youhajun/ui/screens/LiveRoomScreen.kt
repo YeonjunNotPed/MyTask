@@ -18,8 +18,7 @@ import com.youhajun.ui.viewModels.LiveRoomViewModel
 
 @Composable
 fun LiveRoomScreen(
-    viewModel: LiveRoomViewModel = hiltViewModel(),
-    idx:Long,
+    viewModel: LiveRoomViewModel,
     onNavigate: (LiveRoomSideEffect.Navigation) -> Unit = {}
 ) {
 
@@ -33,8 +32,6 @@ fun LiveRoomScreen(
                 is LiveRoomSideEffect.Navigation -> onNavigate(it)
             }
         }
-
-        viewModel.setRoomIdx(idx)
     }
 
     Column(

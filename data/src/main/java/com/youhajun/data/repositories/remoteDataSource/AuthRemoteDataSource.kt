@@ -10,7 +10,6 @@ import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class AuthRemoteDataSource @Inject constructor(
     private val authService: AuthService
 ) {

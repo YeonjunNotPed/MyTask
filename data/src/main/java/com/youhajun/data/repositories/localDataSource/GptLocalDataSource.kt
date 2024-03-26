@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class GptLocalDataSource @Inject constructor(
     private val gptRoleDao: GptRoleDao,
     private val gptChannelDao: GptChannelDao,

@@ -15,6 +15,9 @@ import com.youhajun.domain.usecase.room.SendLiveRoomSignalingMsgUseCase
 import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.models.states.LiveRoomState
 import com.youhajun.ui.utils.webRtc.WebRTCContract
+import com.youhajun.ui.utils.webRtc.managers.WebRtcManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,12 +32,12 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 interface LiveRoomIntent {
-    fun setRoomIdx(idx: Long)
     fun onClickHeaderBackIcon()
 }
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = LiveRoomViewModel.LiveRoomViewModelFactory::class)
 class LiveRoomViewModel @Inject constructor(
+    @Assisted private val roomIdx: Long,
     private val connectLiveRoomUseCase: ConnectLiveRoomUseCase,
     private val disposeLiveRoomUseCase: DisposeLiveRoomUseCase,
     private val sendLiveRoomSignalingMsgUseCase: SendLiveRoomSignalingMsgUseCase,
@@ -43,6 +46,11 @@ class LiveRoomViewModel @Inject constructor(
     private val getRoomWebRTCSessionUseCase: GetRoomWebRTCSessionUseCase,
     webRtcSessionManagerFactory: WebRTCContract.Factory
 ) : ContainerHost<LiveRoomState, LiveRoomSideEffect>, ViewModel(), LiveRoomIntent, WebRTCContract.Signaling {
+
+    @AssistedFactory
+    interface LiveRoomViewModelFactory {
+        fun create(roomIdx: Long): LiveRoomViewModel
+    }
 
     override val container: Container<LiveRoomState, LiveRoomSideEffect> = container(LiveRoomState()) {
         onGetRoomSocketState()
@@ -58,15 +66,10 @@ class LiveRoomViewModel @Inject constructor(
     override val signalingCommandFlow: Flow<Pair<SignalingType, String>> = _signalingCommandFlow
 
     private val sessionManager: WebRTCContract.SessionManager = webRtcSessionManagerFactory.createSessionManager(this)
-
-    private var idx by Delegates.notNull<Long>()
-
     override fun onClickHeaderBackIcon() {
         intent { postSideEffect(LiveRoomSideEffect.Navigation.NavigateUp) }
     }
-    override fun setRoomIdx(idx: Long) {
-        this.idx = idx
-    }
+
     override fun sendCommand(signalingCommand: SignalingType, message: String) {
         viewModelScope.launch {
             sendLiveRoomSignalingMsgUseCase(signalingCommand to message)

@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class RoomRepository @Inject constructor(
     private val roomRemoteDataSource: RoomRemoteDataSource,
     private val webSocketDataSource: WebSocketDataSource,
