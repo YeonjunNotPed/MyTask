@@ -1,6 +1,7 @@
 package com.youhajun.data.di
 
 import com.youhajun.data.BuildConfig
+import com.youhajun.data.Endpoint
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,7 @@ object WebSocketModule {
     @MyTaskWebSocketOkHttpClient
     fun provideRequest(): Request {
         return Request.Builder()
-            .url(BuildConfig.WEBSOCKET_BASE_URL)
+            .url(BuildConfig.WEBSOCKET_BASE_URL + Endpoint.Socket.RTC)
             .build()
     }
 

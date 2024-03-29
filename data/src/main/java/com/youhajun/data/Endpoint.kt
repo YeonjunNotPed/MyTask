@@ -12,7 +12,7 @@ object Endpoint {
     }
 
     object Socket {
-        const val LIVE_ROOM = "LIVE_ROOM"
+        const val RTC = "/rtc"
     }
 
     object Auth {
