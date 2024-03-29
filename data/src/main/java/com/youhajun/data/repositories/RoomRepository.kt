@@ -16,12 +16,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class RoomRepository @Inject constructor(
     private val roomRemoteDataSource: RoomRemoteDataSource,
@@ -33,7 +32,7 @@ class RoomRepository @Inject constructor(
 
     val socketFlow: Flow<Resource<WebSocketStateDTO>> = webSocketDataSource.socketFlow
         .onEach { if(it is WebSocketStateDTO.Message) onMessage(it.text) }
-        .filter { it is WebSocketStateDTO.Message }
+        .filterNot { it is WebSocketStateDTO.Message }
         .map { socketConverter(it) }
 
     private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingCommand, String>>()

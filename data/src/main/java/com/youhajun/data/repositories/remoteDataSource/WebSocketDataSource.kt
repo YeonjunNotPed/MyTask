@@ -26,7 +26,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WebSocketDataSource @AssistedInject constructor(
+class WebSocketDataSource @Inject constructor(
     @MyTaskWebSocketOkHttpClient private val client: OkHttpClient,
     @MyTaskWebSocketOkHttpClient private val request: Request,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
@@ -72,7 +72,6 @@ class WebSocketDataSource @AssistedInject constructor(
 
     fun connect() {
         webSocket = client.newWebSocket(request, webSocketListener)
-        client.dispatcher.executorService.shutdown()
     }
 
     fun disconnect() {
