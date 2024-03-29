@@ -3,15 +3,13 @@ package com.youhajun.ui.utils.webRtc
 import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.ui.utils.webRtc.managers.WebRtcManager
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
-import com.youhajun.ui.utils.webRtc.models.VideoTrackListVo
 import com.youhajun.ui.utils.webRtc.models.VideoTrackVo
 import com.youhajun.ui.utils.webRtc.peer.StreamPeerConnection
 import dagger.assisted.AssistedFactory
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
-import org.webrtc.EglBase
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
@@ -22,9 +20,15 @@ import org.webrtc.VideoTrack
 
 interface WebRTCContract {
 
+    companion object {
+        const val ICE_SEPARATOR = '$'
+        const val SESSION_SEPARATOR = ':'
+    }
+
     interface PeerConnectionFactory {
 
-        val eglBaseContext: EglBase.Context
+        val sessionId: String
+
         fun makePeerConnection(
             type: StreamPeerType,
             mediaConstraints: MediaConstraints,
@@ -62,9 +66,9 @@ interface WebRTCContract {
     }
 
     interface SessionManager {
-        val localVideoTrackFlow: SharedFlow<VideoTrack>
+        val sessionId: String
 
-        val remoteVideoTrackFlow: SharedFlow<Map<String, VideoTrackListVo>>
+        val videoTrackFlow: StateFlow<Map<String, List<VideoTrackVo>>>
         fun flipCamera()
         fun enableCamera(enabled: Boolean)
         fun enableMicrophone(enabled: Boolean)
@@ -80,9 +84,7 @@ interface WebRTCContract {
 
     interface VideoManager {
 
-        val localVideoTrackFlow: SharedFlow<VideoTrack>
-
-        val remoteVideoTrackFlow: SharedFlow<Map<String, VideoTrackListVo>>
+        val videoTrackFlow: StateFlow<Map<String, List<VideoTrackVo>>>
         fun onVideoTrack(sessionId:String, videoTrackVo: VideoTrackVo)
         fun flipCamera()
         fun enableCamera(enabled: Boolean)

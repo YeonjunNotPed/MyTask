@@ -15,6 +15,8 @@
     <string name="room_preview_current_people">현재 인원 : %d</string>
     <string name="room_preview_create_at">생성일 : %s</string>
     <string name="create_room">Create Room</string>
+    <string name="room_stage_title">대화 상대를 기다리고 있어요!</string>
+    <string name="room_permission_denied">권한을 허용하지 않으면 Room을 이용할 수 없어요</string>
 
     <string name="item_count">%d개</string>
     <string name="item_price">%s원</string>

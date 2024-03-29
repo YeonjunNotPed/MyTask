@@ -6,8 +6,10 @@ import com.youhajun.ui.utils.webRtc.managers.WebRtcVideoManager
 import com.youhajun.ui.utils.webRtc.peer.StreamPeerConnectionFactory
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import org.webrtc.EglBase
 import javax.inject.Singleton
 
 @Module
@@ -19,10 +21,16 @@ abstract class WebRTCModule {
     abstract fun bindPeerConnectionFactory(impl: StreamPeerConnectionFactory): WebRTCContract.PeerConnectionFactory
 
     @Binds
-    @Singleton
     abstract fun bindVideoManager(impl: WebRtcVideoManager): WebRTCContract.VideoManager
 
     @Binds
-    @Singleton
     abstract fun bindAudioManager(impl: WebRtcAudioManager): WebRTCContract.AudioManager
+
+    companion object {
+        @Provides
+        @Singleton
+        fun providesEglBaseContext(): EglBase.Context {
+            return EglBase.create().eglBaseContext
+        }
+    }
 }

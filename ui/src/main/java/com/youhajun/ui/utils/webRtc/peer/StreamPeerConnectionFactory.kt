@@ -37,17 +37,17 @@ import org.webrtc.SoftwareVideoEncoderFactory
 import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import org.webrtc.audio.JavaAudioDeviceModule
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StreamPeerConnectionFactory @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val eglBaseContext: EglBase.Context
 ) : WebRTCContract.PeerConnectionFactory {
 
-    override val eglBaseContext: EglBase.Context by lazy {
-        EglBase.create().eglBaseContext
-    }
+    override val sessionId: String = UUID.randomUUID().toString()
 
     private val videoDecoderFactory by lazy {
         DefaultVideoDecoderFactory(eglBaseContext)

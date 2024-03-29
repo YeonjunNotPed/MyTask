@@ -3,9 +3,10 @@ package com.youhajun.ui.utils.webRtc.managers
 import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.ui.utils.webRtc.Loggers
 import com.youhajun.ui.utils.webRtc.WebRTCContract
+import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ICE_SEPARATOR
+import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.SESSION_SEPARATOR
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import com.youhajun.ui.utils.webRtc.models.TrackType
-import com.youhajun.ui.utils.webRtc.models.VideoTrackListVo
 import com.youhajun.ui.utils.webRtc.models.VideoTrackVo
 import com.youhajun.ui.utils.webRtc.peer.StreamPeerConnection
 import dagger.assisted.Assisted
@@ -13,7 +14,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
@@ -30,14 +31,11 @@ class WebRtcManager @AssistedInject constructor(
     private val videoManager: WebRTCContract.VideoManager,
 ) : WebRTCContract.SessionManager {
 
-    companion object {
-        private const val ICE_SEPARATOR = '$'
-    }
-
-    override val localVideoTrackFlow: SharedFlow<VideoTrack> = videoManager.localVideoTrackFlow
-    override val remoteVideoTrackFlow: SharedFlow<Map<String, VideoTrackListVo>> = videoManager.remoteVideoTrackFlow
-
     private val sessionManagerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    override val sessionId: String = peerConnectionFactory.sessionId
+
+    override val videoTrackFlow: StateFlow<Map<String, List<VideoTrackVo>>> = videoManager.videoTrackFlow
 
     private val mediaConstraints = MediaConstraints().apply {
         mandatory.addAll(
@@ -56,7 +54,7 @@ class WebRtcManager @AssistedInject constructor(
             mediaConstraints = mediaConstraints,
             peerConnectionListener = object : WebRTCContract.PeerConnectionListener {
                 override fun onStreamAdded(stream: MediaStream) {
-                    val (trackType, sessionId) = stream.id.split(':').let {
+                    val (trackType, sessionId) = stream.id.split(SESSION_SEPARATOR).let {
                         TrackType.typeOf(it.first()) to it.last()
                     }
 
@@ -83,15 +81,14 @@ class WebRtcManager @AssistedInject constructor(
 
     init {
         sessionManagerScope.launch {
-            signaling.signalingCommandFlow
-                .collect { commandToValue ->
-                    when (commandToValue.first) {
-                        SignalingType.OFFER -> handleOffer(commandToValue.second)
-                        SignalingType.ANSWER -> handleAnswer(commandToValue.second)
-                        SignalingType.ICE -> handleIce(commandToValue.second)
-                        else -> Unit
-                    }
+            signaling.signalingCommandFlow.collect { commandToValue ->
+                when (commandToValue.first) {
+                    SignalingType.OFFER -> handleOffer(commandToValue.second)
+                    SignalingType.ANSWER -> handleAnswer(commandToValue.second)
+                    SignalingType.ICE -> handleIce(commandToValue.second)
+                    else -> Unit
                 }
+            }
         }
     }
 
@@ -127,6 +124,7 @@ class WebRtcManager @AssistedInject constructor(
     override fun disconnect() {
         videoManager.dispose()
         audioManager.dispose()
+        peerConnection.dispose()
         signaling.dispose()
     }
 
@@ -188,7 +186,11 @@ class WebRtcManager @AssistedInject constructor(
         audioTrack.setEnabled(true)
     }
 
-    private fun handleOnAddedVideoTrack(sessionId:String, videoTrack:VideoTrack, trackType: TrackType) {
+    private fun handleOnAddedVideoTrack(
+        sessionId: String,
+        videoTrack: VideoTrack,
+        trackType: TrackType
+    ) {
         videoTrack.setEnabled(true)
         val videoTrackVo = VideoTrackVo(trackType, videoTrack)
         videoManager.onVideoTrack(sessionId, videoTrackVo)

@@ -52,6 +52,10 @@ class StreamPeerConnection(
         this.connection = peerConnection
     }
 
+    fun dispose() {
+        connection.dispose()
+    }
+
     suspend fun createOffer(): Result<SessionDescription> {
         Loggers.StreamConnection.createOffer()
         return SDPManager.observeCreatedSDP { connection.createOffer(it, mediaConstraints) }
