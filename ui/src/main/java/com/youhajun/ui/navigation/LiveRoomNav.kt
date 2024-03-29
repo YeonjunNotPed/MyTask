@@ -14,7 +14,7 @@ import com.youhajun.ui.viewModels.LiveRoomViewModel
 fun NavGraphBuilder.liveRoomNav(navController: NavHostController) {
     composable(MyTaskDestination.LiveRoom.routeWithArg,
         arguments = listOf(navArgument(MyTaskDestination.LiveRoom.IDX_ARG_KEY) {
-            type = NavType.IntType
+            type = NavType.LongType
         })
     ) {
         val idx = it.arguments?.getLong(MyTaskDestination.LiveRoom.IDX_ARG_KEY) ?: -1

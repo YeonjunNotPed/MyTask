@@ -1,6 +1,6 @@
 package com.youhajun.ui.models.states
 
-import com.youhajun.domain.models.vo.RoomPreviewVo
+import com.youhajun.domain.models.vo.room.RoomPreviewVo
 
 data class SelectRoomState(
     val onProgress: Boolean = false,

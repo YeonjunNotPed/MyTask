@@ -1,4 +1,4 @@
-package com.youhajun.domain.models.vo
+package com.youhajun.domain.models.vo.room
 
 import com.youhajun.data.models.dto.room.RoomPreview
 import com.youhajun.domain.models.Mapper
