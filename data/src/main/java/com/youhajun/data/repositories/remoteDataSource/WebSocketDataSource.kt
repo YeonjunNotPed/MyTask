@@ -4,8 +4,7 @@ import com.youhajun.data.di.DefaultDispatcher
 import com.youhajun.data.di.MyTaskWebSocketOkHttpClient
 import com.youhajun.data.models.MyTaskCode
 import com.youhajun.data.models.sealeds.WebSocketStateDTO
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -25,7 +24,7 @@ import java.util.Queue
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
+@ViewModelScoped
 class WebSocketDataSource @Inject constructor(
     @MyTaskWebSocketOkHttpClient private val client: OkHttpClient,
     @MyTaskWebSocketOkHttpClient private val request: Request,

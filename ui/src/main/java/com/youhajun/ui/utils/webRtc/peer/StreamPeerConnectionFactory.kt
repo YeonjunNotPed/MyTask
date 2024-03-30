@@ -23,6 +23,7 @@ import com.youhajun.ui.utils.webRtc.Loggers
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.DefaultVideoDecoderFactory
@@ -39,9 +40,9 @@ import org.webrtc.VideoTrack
 import org.webrtc.audio.JavaAudioDeviceModule
 import java.util.UUID
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+
+@ViewModelScoped
 class StreamPeerConnectionFactory @Inject constructor(
     @ApplicationContext private val context: Context,
     private val eglBaseContext: EglBase.Context

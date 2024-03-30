@@ -29,6 +29,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.Camera2Capturer
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerationAndroid
@@ -40,6 +41,7 @@ import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import javax.inject.Inject
 
+@ViewModelScoped
 class WebRtcVideoManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,

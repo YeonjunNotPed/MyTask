@@ -9,6 +9,7 @@ import com.youhajun.data.models.sealeds.WebSocketStateDTO
 import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.remoteDataSource.RoomRemoteDataSource
 import com.youhajun.data.repositories.remoteDataSource.WebSocketDataSource
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ViewModelScoped
 class RoomRepository @Inject constructor(
     private val roomRemoteDataSource: RoomRemoteDataSource,
     private val webSocketDataSource: WebSocketDataSource,
