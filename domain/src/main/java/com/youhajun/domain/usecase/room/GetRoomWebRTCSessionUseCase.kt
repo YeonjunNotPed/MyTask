@@ -12,7 +12,7 @@ class GetRoomWebRTCSessionUseCase @Inject constructor(
 ) : UseCase<Unit, Flow<WebRTCSessionType>>() {
     override suspend fun invoke(request: Unit): Flow<WebRTCSessionType> {
         return roomRepository.sessionStateFlow.map {
-            WebRTCSessionType.typeOf(it.type)
+            WebRTCSessionType.sessionStateOf(it)
         }
     }
 }
