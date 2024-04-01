@@ -17,9 +17,13 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,40 +34,48 @@ class RoomRepository @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : BaseRepository() {
 
-    private val scope = CoroutineScope(SupervisorJob() + defaultDispatcher)
-
-    val socketFlow: Flow<Resource<WebSocketStateDTO>> = webSocketDataSource.socketFlow
-        .onEach { if(it is WebSocketStateDTO.Message) onMessage(it.text) }
-        .filterNot { it is WebSocketStateDTO.Message }
-        .map { socketConverter(it) }
+    private lateinit var scope: CoroutineScope
 
     private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingCommand, String>>()
-    val signalingCommandFlow: Flow<Pair<SignalingCommand, String>> = _signalingCommandFlow
+    val signalingCommandFlow: SharedFlow<Pair<SignalingCommand, String>> = _signalingCommandFlow.asSharedFlow()
 
     private val _sessionStateFlow = MutableStateFlow(WebRTCSessionState.Offline)
-    val sessionStateFlow: Flow<WebRTCSessionState> = _sessionStateFlow
+    val sessionStateFlow: StateFlow<WebRTCSessionState> = _sessionStateFlow.asStateFlow()
     suspend fun getRoomPreviewInfo(): Flow<Resource<RoomPreviewInfo>> =
         roomRemoteDataSource.getRoomPreviewInfo().map { myTaskApiConverter(it) }
 
     fun connectLiveRoom() {
+        scope = CoroutineScope(SupervisorJob() + defaultDispatcher)
+        collectSocket()
         webSocketDataSource.connect()
     }
 
     fun dispose() {
-        _sessionStateFlow.value = WebRTCSessionState.Offline
+        _sessionStateFlow.update { WebRTCSessionState.Offline }
         scope.cancel()
         webSocketDataSource.disconnect()
     }
 
     fun sendSignalingMessage(signalingCommand: SignalingCommand, message: String) {
-        webSocketDataSource.sendMessage("$signalingCommand $message")
+        val totalMessage = "$signalingCommand $message"
+        sendMessage(totalMessage)
     }
 
     fun sendMessage(message: String) {
         webSocketDataSource.sendMessage(message)
     }
 
-    private fun onMessage(text: String) {
+    private fun collectSocket() {
+        scope.launch {
+            webSocketDataSource.socketFlow
+                .filter { it is WebSocketStateDTO.Message }
+                .collect {
+                    if (it is WebSocketStateDTO.Message) onMessage(it.text)
+                }
+        }
+    }
+
+    private suspend fun onMessage(text: String) {
         when {
             text.startsWith(SignalingCommand.STATE.toString(), true) ->
                 handleStateMessage(text)
@@ -81,17 +93,14 @@ class RoomRepository @Inject constructor(
 
     private fun handleStateMessage(message: String) {
         val state = getSeparatedMessage(message)
-        _sessionStateFlow.value = WebRTCSessionState.valueOf(state)
+        val sessionState = WebRTCSessionState.typeOf(state)
+        _sessionStateFlow.update { sessionState }
     }
 
-    private fun handleSignalingCommand(command: SignalingCommand, text: String) {
+    private suspend fun handleSignalingCommand(command: SignalingCommand, text: String) {
         val value = getSeparatedMessage(text)
-        scope.launch {
-            _signalingCommandFlow.emit(command to value)
-        }
+        _signalingCommandFlow.emit(command to value)
     }
 
     private fun getSeparatedMessage(text: String) = text.substringAfter(' ')
-
-
 }

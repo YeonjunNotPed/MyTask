@@ -9,8 +9,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -32,14 +35,14 @@ class WebSocketDataSource @Inject constructor(
 ) {
 
     private lateinit var webSocket:WebSocket
-    private val mutex = Mutex()
     private val scope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
     private val _socketFlow = MutableSharedFlow<WebSocketStateDTO>()
-    val socketFlow: SharedFlow<WebSocketStateDTO> = _socketFlow
-
-    private val pendingMessagesQueue:Queue<String> = LinkedList()
-    private var isConnect = false
+    val socketFlow: SharedFlow<WebSocketStateDTO> = _socketFlow.asSharedFlow()
+    private val sendMessageFlow = MutableSharedFlow<String>(
+        replay = 10,
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.SUSPEND)
 
     private val webSocketListener = object : WebSocketListener() {
         override fun onMessage(webSocket: WebSocket, text: String) {
@@ -49,8 +52,7 @@ class WebSocketDataSource @Inject constructor(
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            isConnect = true
-            consumePendingMessage()
+            collectMessage()
             scope.launch {
                 _socketFlow.emit(WebSocketStateDTO.Open(response))
             }
@@ -74,8 +76,6 @@ class WebSocketDataSource @Inject constructor(
     }
 
     fun disconnect() {
-        isConnect = false
-        pendingMessagesQueue.clear()
         val callSuccess = webSocket.close(MyTaskCode.WEB_SOCKET_SUCCESS_CODE, null)
         if(!callSuccess) webSocket.cancel()
         scope.cancel()
@@ -83,23 +83,14 @@ class WebSocketDataSource @Inject constructor(
 
     fun sendMessage(message: String) {
         scope.launch {
-            mutex.withLock {
-                if(isConnect) {
-                    webSocket.send(message)
-                } else {
-                    pendingMessagesQueue.add(message)
-                }
-            }
+            sendMessageFlow.emit(message)
         }
     }
 
-    private fun consumePendingMessage() {
+    private fun collectMessage() {
         scope.launch {
-            mutex.withLock {
-                while(pendingMessagesQueue.isNotEmpty()) {
-                    val msg = pendingMessagesQueue.poll()
-                    msg?.let { webSocket.send(it) }
-                }
+            sendMessageFlow.collect {
+                webSocket.send(it)
             }
         }
     }
