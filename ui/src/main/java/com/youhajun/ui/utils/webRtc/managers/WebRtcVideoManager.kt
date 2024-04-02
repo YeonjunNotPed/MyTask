@@ -22,13 +22,9 @@ import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import androidx.core.content.getSystemService
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.SESSION_SEPARATOR
+import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
 import com.youhajun.ui.utils.webRtc.models.TrackType
-import com.youhajun.ui.utils.webRtc.models.VideoTrackVo
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.Camera2Capturer
 import org.webrtc.Camera2Enumerator
@@ -45,11 +41,8 @@ import javax.inject.Inject
 class WebRtcVideoManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,
-    eglBaseContext: EglBase.Context
+    eglBaseContext: EglBase.Context,
 ) : WebRTCContract.VideoManager {
-
-    private val _videoTrackFlow = MutableStateFlow<HashMap<String, List<VideoTrackVo>>>(hashMapOf())
-    override val videoTrackFlow: StateFlow<Map<String, List<VideoTrackVo>>> = _videoTrackFlow
 
     private val frontCameraId: String by lazy { getFrontCameraElseFirstId() }
     private val videoCapturer: VideoCapturer by lazy {
@@ -72,7 +65,7 @@ class WebRtcVideoManager @Inject constructor(
     private val localVideoTrack: VideoTrack by lazy {
         peerConnectionFactory.makeVideoTrack(
             source = videoSource,
-            trackId = "${TrackType.VIDEO.type}$SESSION_SEPARATOR${peerConnectionFactory.sessionId}"
+            trackId = "${TrackType.VIDEO.type}$ID_SEPARATOR${peerConnectionFactory.sessionId}"
         )
     }
 
@@ -95,32 +88,12 @@ class WebRtcVideoManager @Inject constructor(
     }
 
     override fun dispose() {
-        videoTrackFlow.value.values.forEach { listVo ->
-            listVo.forEach { trackVo ->
-                trackVo.videoTrack.dispose()
-            }
-        }
-
         videoCapturer.stopCapture()
         videoCapturer.dispose()
     }
 
-    override fun addLocalTrackToPeerConnection(addTrack: (MediaStreamTrack) -> Unit) {
+    override fun addLocalVideoTrack(addTrack: (MediaStreamTrack) -> Unit) {
         addTrack(localVideoTrack)
-        val sessionId = peerConnectionFactory.sessionId
-        val videoTrackVo = VideoTrackVo(TrackType.VIDEO, localVideoTrack)
-        updateVideoTrackFlow(sessionId, videoTrackVo)
-    }
-
-    override fun onVideoTrack(sessionId: String, videoTrackVo: VideoTrackVo) {
-        updateVideoTrackFlow(sessionId, videoTrackVo)
-    }
-
-    private fun updateVideoTrackFlow(sessionId: String, videoTrackVo: VideoTrackVo) {
-        val newMap = HashMap(videoTrackFlow.value)
-        val sessionTracks = newMap.getOrDefault(sessionId, emptyList())
-        newMap[sessionId] = sessionTracks.toMutableList().apply { add(videoTrackVo) }
-        _videoTrackFlow.update { newMap }
     }
 
     private fun findMatchingResolution(supportedFormats: List<CameraEnumerationAndroid.CaptureFormat>): CameraEnumerationAndroid.CaptureFormat {

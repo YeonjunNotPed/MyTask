@@ -22,6 +22,7 @@ import android.media.AudioManager
 import android.os.Build
 import androidx.core.content.getSystemService
 import com.youhajun.ui.utils.webRtc.WebRTCContract
+import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
 import com.youhajun.ui.utils.webRtc.audio.AudioHandler
 import com.youhajun.ui.utils.webRtc.audio.AudioSwitchHandler
 import com.youhajun.ui.utils.webRtc.models.TrackType
@@ -30,7 +31,6 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStreamTrack
-import java.util.UUID
 import javax.inject.Inject
 
 @ViewModelScoped
@@ -58,7 +58,7 @@ class WebRtcAudioManager @Inject constructor(
     private val localAudioTrack: AudioTrack by lazy {
         peerConnectionFactory.makeAudioTrack(
             source = audioSource,
-            trackId = "${TrackType.AUDIO.type}${UUID.randomUUID()}"
+            trackId = "${TrackType.AUDIO.type}${ID_SEPARATOR}${peerConnectionFactory.sessionId}"
         )
     }
 
@@ -66,7 +66,7 @@ class WebRtcAudioManager @Inject constructor(
         audioManager?.isMicrophoneMute = !enabled
     }
 
-    override fun addLocalTrackToPeerConnection(addTrack:(MediaStreamTrack)-> Unit) {
+    override fun addLocalAudioTrack(addTrack:(MediaStreamTrack)-> Unit) {
         setupAudio()
         addTrack(localAudioTrack)
     }

@@ -1,41 +1,54 @@
 package com.youhajun.ui.utils.webRtc.managers
 
 import com.youhajun.domain.models.enums.SignalingType
-import com.youhajun.ui.utils.webRtc.Loggers
+import com.youhajun.ui.di.DefaultDispatcher
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ICE_SEPARATOR
-import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.SESSION_SEPARATOR
+import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import com.youhajun.ui.utils.webRtc.models.TrackType
-import com.youhajun.ui.utils.webRtc.models.VideoTrackVo
+import com.youhajun.ui.utils.webRtc.models.TrackVo
 import com.youhajun.ui.utils.webRtc.peer.StreamPeerConnection
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
-import org.webrtc.MediaStream
+import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.VideoTrack
 
 class WebRtcManager @AssistedInject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,
     @Assisted private val signaling: WebRTCContract.Signaling,
     private val audioManager: WebRTCContract.AudioManager,
     private val videoManager: WebRTCContract.VideoManager,
 ) : WebRTCContract.SessionManager {
 
-    private val sessionManagerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val sessionManagerScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
-    override val sessionId: String = peerConnectionFactory.sessionId
+    private var iceCollectJob:Job? = null
+    private val pendingIceSharedFlow = MutableSharedFlow<String>(
+        replay = 10,
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.SUSPEND)
 
-    override val videoTrackFlow: StateFlow<Map<String, List<VideoTrackVo>>> = videoManager.videoTrackFlow
+    override val mySessionId: String = peerConnectionFactory.sessionId
+
+    private val _trackFlow = MutableStateFlow<Map<String, List<TrackVo>>>(hashMapOf())
+    override val trackFlow: StateFlow<Map<String, List<TrackVo>>> = _trackFlow.asStateFlow()
 
     private val mediaConstraints = MediaConstraints().apply {
         mandatory.addAll(
@@ -46,32 +59,23 @@ class WebRtcManager @AssistedInject constructor(
         )
     }
 
-    private var receivedOfferSdp: String? = null
-
     private val peerConnection: StreamPeerConnection by lazy {
         peerConnectionFactory.makePeerConnection(
             type = StreamPeerType.SUBSCRIBER,
             mediaConstraints = mediaConstraints,
             peerConnectionListener = object : WebRTCContract.PeerConnectionListener {
-                override fun onStreamAdded(stream: MediaStream) {
-                    val (trackType, sessionId) = stream.id.split(SESSION_SEPARATOR).let {
+                override fun onStreamAdded(id: String, track: MediaStreamTrack) {
+                    val (trackType, sessionId) = id.split(ID_SEPARATOR).let {
                         TrackType.typeOf(it.first()) to it.last()
                     }
-
-                    stream.audioTracks?.forEach {
-                        handleOnAddedAudioTrack(it)
-                    }
-
-                    stream.videoTracks?.forEach {
-                        handleOnAddedVideoTrack(sessionId, it, trackType)
-                    }
+                    handleOnAddedTrack(sessionId, track, trackType)
                 }
                 override fun onNegotiationNeeded(streamPeerConnection: StreamPeerConnection, peerType: StreamPeerType) {}
                 override fun onIceConnectionConnected() {}
                 override fun onIceConnectionCanceled() {}
 
                 override fun onIceCandidate(ice: IceCandidate, peerType: StreamPeerType) {
-                    signaling.sendCommand(SignalingType.ICE, "${ice.sdpMid}$ICE_SEPARATOR${ice.sdpMLineIndex}$ICE_SEPARATOR${ice.sdp}")
+                    emitPendingIce(ice)
                 }
 
                 override fun onTrack(rtpTransceiver: RtpTransceiver?) {}
@@ -105,19 +109,27 @@ class WebRtcManager @AssistedInject constructor(
     }
 
     /**
-     * 준비 완료되면 localTrack 을 add하고
-     * 받은 Offer의 sdp가 있으면 Answer로서 sendAnswer()
-     * 없으면 Offer로서 sendOffer()
+     * 로컬 화면 준비 완료되면 localTrack 을 add
      */
-    override fun onSessionScreenReady() {
-        audioManager.addLocalTrackToPeerConnection { peerConnection.connection.addTrack(it) }
-        videoManager.addLocalTrackToPeerConnection { peerConnection.connection.addTrack(it) }
+
+    override fun onScreenReady() {
+        audioManager.addLocalAudioTrack {
+            peerConnection.connection.addTrack(it, listOf(it.id()))
+            handleOnAddedTrack(mySessionId, it, trackType = TrackType.AUDIO)
+        }
+        videoManager.addLocalVideoTrack {
+            peerConnection.connection.addTrack(it, listOf(it.id()))
+            handleOnAddedTrack(mySessionId, it, trackType = TrackType.VIDEO)
+        }
+    }
+
+    /**
+     * Signaling 타입이 Impossible(인원 미충족)일 때 sendOffer
+     */
+
+    override fun onSignalingImpossible() {
         sessionManagerScope.launch {
-            if (receivedOfferSdp != null) {
-                sendAnswer()
-            } else {
-                sendOffer()
-            }
+            sendOffer()
         }
     }
 
@@ -125,7 +137,6 @@ class WebRtcManager @AssistedInject constructor(
         videoManager.dispose()
         audioManager.dispose()
         peerConnection.dispose()
-        signaling.dispose()
     }
 
     /**
@@ -135,30 +146,32 @@ class WebRtcManager @AssistedInject constructor(
         val offer = peerConnection.createOffer().getOrThrow()
         val result = peerConnection.setLocalDescription(offer)
         result.onSuccess {
+            collectPendingIce()
             signaling.sendCommand(SignalingType.OFFER, offer.description)
         }
     }
 
     /**
-     * 받은 offer sdp, remoteDescription 에 저장
      * answer sdp 생성 및 localDescription 에 저장 후 answer 전송
      */
     private suspend fun sendAnswer() {
-        peerConnection.setRemoteDescription(
-            SessionDescription(SessionDescription.Type.OFFER, receivedOfferSdp)
-        )
         val answer = peerConnection.createAnswer().getOrThrow()
         val result = peerConnection.setLocalDescription(answer)
         result.onSuccess {
+            collectPendingIce()
             signaling.sendCommand(SignalingType.ANSWER, answer.description)
         }
     }
 
     /**
-     * 받은 offer sdp set
+     * 받은 offer sdp, remoteDescription 에 저장 및 sendAnswer
      */
-    private fun handleOffer(sdp: String) {
-        receivedOfferSdp = sdp
+    private suspend fun handleOffer(sdp: String) {
+        peerConnection.setRemoteDescription(
+            SessionDescription(SessionDescription.Type.OFFER, sdp)
+        ).onSuccess {
+            sendAnswer()
+        }
     }
 
     /**
@@ -180,19 +193,57 @@ class WebRtcManager @AssistedInject constructor(
             )
         )
     }
-
-    private fun handleOnAddedAudioTrack(audioTrack: AudioTrack) {
-        Loggers.Connection.onAddTrackAudioTrack(audioTrack)
-        audioTrack.setEnabled(true)
+    private fun handleOnAddedTrack(sessionId: String, track: MediaStreamTrack, trackType: TrackType) {
+        track.setEnabled(true)
+        val trackVo:TrackVo = when(track.kind()) {
+            MediaStreamTrack.VIDEO_TRACK_KIND -> {
+                track as VideoTrack
+                TrackVo(trackType, videoTrack = track)
+            }
+            MediaStreamTrack.AUDIO_TRACK_KIND -> {
+                track as AudioTrack
+                TrackVo(trackType, audioTrack = track)
+            }
+            else -> throw RuntimeException("Unknown Track Kind")
+        }
+        addTrack(sessionId, trackVo)
+    }
+    private fun addTrack(sessionId: String, trackVo: TrackVo) {
+        editSessionTrack(sessionId) {
+            it.apply { add(trackVo) }
+        }
     }
 
-    private fun handleOnAddedVideoTrack(
-        sessionId: String,
-        videoTrack: VideoTrack,
-        trackType: TrackType
-    ) {
-        videoTrack.setEnabled(true)
-        val videoTrackVo = VideoTrackVo(trackType, videoTrack)
-        videoManager.onVideoTrack(sessionId, videoTrackVo)
+    private fun removeTrack(sessionId: String, trackType: TrackType) {
+        editSessionTrack(sessionId) {
+            it.filterNot { it.trackType == trackType}
+        }
+    }
+
+    private fun editSessionTrack(sessionId: String, editBlock: (MutableList<TrackVo>) -> List<TrackVo>) {
+        val newMap = trackFlow.value.toMutableMap().apply {
+            val sessionTrackList = this.getOrDefault(sessionId, emptyList()).toMutableList()
+            this[sessionId] = editBlock(sessionTrackList)
+        }
+        sessionManagerScope.launch {
+            _trackFlow.emit(newMap)
+        }
+    }
+
+    private fun emitPendingIce(ice: IceCandidate) {
+        sessionManagerScope.launch {
+            val iceMessage = "${ice.sdpMid}$ICE_SEPARATOR${ice.sdpMLineIndex}$ICE_SEPARATOR${ice.sdp}"
+            pendingIceSharedFlow.emit(iceMessage)
+        }
+    }
+
+    private fun collectPendingIce() {
+        if(iceCollectJob?.isActive == true) return
+
+        iceCollectJob = sessionManagerScope.launch {
+            pendingIceSharedFlow.collect {
+                signaling.sendCommand(SignalingType.ICE, it)
+            }
+        }
     }
 }

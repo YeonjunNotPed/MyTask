@@ -53,6 +53,12 @@ class PeerConnectionObserver(
         peerConnectionListener.onIceCandidate(candidate, type)
     }
 
+    override fun onTrack(transceiver: RtpTransceiver?) {
+        Loggers.Connection.onTrack(transceiver)
+
+        peerConnectionListener.onTrack(transceiver)
+    }
+
     /**
      * 새로운 미디어 스트림이 생길 때마다 트리거됨
      * 최신 WebRTC에서 더 이상 사용되지 않음
@@ -67,12 +73,10 @@ class PeerConnectionObserver(
      */
     override fun onAddTrack(receiver: RtpReceiver?, mediaStreams: Array<out MediaStream>?) {
         Loggers.Connection.onAddTrack(receiver, mediaStreams)
+        val id = mediaStreams?.firstOrNull()?.id ?: return
+        val track = receiver?.track() ?: return
 
-        mediaStreams?.forEach { mediaStream ->
-            Loggers.Connection.onAddTrackMediaStream(mediaStream)
-
-            peerConnectionListener.onStreamAdded(mediaStream)
-        }
+        peerConnectionListener.onStreamAdded(id, track)
     }
 
     /**
@@ -99,13 +103,6 @@ class PeerConnectionObserver(
             else -> Unit
         }
     }
-
-    override fun onTrack(transceiver: RtpTransceiver?) {
-        Loggers.Connection.onTrack(transceiver)
-
-        peerConnectionListener.onTrack(transceiver)
-    }
-
 
     override fun onRemoveTrack(receiver: RtpReceiver?) {
         Loggers.Connection.onRemoveTrack(receiver)

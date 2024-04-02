@@ -18,10 +18,8 @@ package com.youhajun.ui.utils.webRtc.peer
 
 import com.youhajun.ui.utils.webRtc.Loggers
 import com.youhajun.ui.utils.webRtc.addRtcIceCandidate
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import com.youhajun.ui.utils.webRtc.managers.SDPManager
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
@@ -39,9 +37,6 @@ class StreamPeerConnection(
 ) {
     lateinit var connection: PeerConnection
         private set
-
-    private val pendingIceMutex = Mutex()
-    private val pendingIceCandidates = mutableListOf<IceCandidate>()
 
     init {
         Loggers.StreamConnection.setTypeTag(type)
@@ -72,9 +67,7 @@ class StreamPeerConnection(
             sessionDescription.type,
             sessionDescription.description.mungeCodecs()
         )
-        return SDPManager.observeSetSDP { connection.setLocalDescription(it, sdp) }.also {
-            consumePendingIceCandidate()
-        }
+        return SDPManager.observeSetSDP { connection.setLocalDescription(it, sdp) }
     }
 
     suspend fun setRemoteDescription(sessionDescription: SessionDescription): Result<Unit> {
@@ -83,46 +76,16 @@ class StreamPeerConnection(
             sessionDescription.type,
             sessionDescription.description.mungeCodecs()
         )
-        return SDPManager.observeSetSDP { connection.setRemoteDescription(it, sdp) }.also {
-            consumePendingIceCandidate()
-        }
+        return SDPManager.observeSetSDP { connection.setRemoteDescription(it, sdp) }
     }
 
     suspend fun addIceCandidate(iceCandidate: IceCandidate): Result<Unit> {
         Loggers.StreamConnection.addIceCandidate(iceCandidate)
-
-        return if (connection.signalingState() == PeerConnection.SignalingState.STABLE) {
-            addPendingIceCandidate(iceCandidate)
-            Result.failure(RuntimeException("RemoteDescription is not set"))
-        } else {
-            connection.addRtcIceCandidate(iceCandidate).also {
-                Loggers.StreamConnection.successAddIceCandidate(it)
-            }
+        return connection.addRtcIceCandidate(iceCandidate).also {
+            Loggers.StreamConnection.successAddIceCandidate(it)
         }
     }
 
-    private suspend fun addPendingIceCandidate(iceCandidate: IceCandidate) {
-        Loggers.StreamConnection.pendingIceCandidate(iceCandidate)
-        pendingIceMutex.withLock {
-            pendingIceCandidates.add(iceCandidate)
-        }
-    }
-
-    /**
-     * local, remote Description이 모두 set 되어 signalingState가 Stable이면
-     * pending되어 있던 iceCandidate를 소비한다
-     */
-    private suspend fun consumePendingIceCandidate() {
-        if (connection.signalingState() == PeerConnection.SignalingState.STABLE) {
-            pendingIceMutex.withLock {
-                pendingIceCandidates.forEach { iceCandidate ->
-                    Loggers.StreamConnection.consumePendingIceCandidate(iceCandidate)
-                    connection.addRtcIceCandidate(iceCandidate)
-                }
-                pendingIceCandidates.clear()
-            }
-        }
-    }
 
     private fun String.mungeCodecs(): String {
         return this.replace("vp9", "VP9").replace("vp8", "VP8").replace("h264", "H264")
