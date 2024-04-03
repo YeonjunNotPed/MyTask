@@ -2,14 +2,11 @@ package com.youhajun.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.domain.models.UiStateErrorVo
 import com.youhajun.domain.models.enums.SignalingType
-import com.youhajun.domain.models.inspectUiState
-import com.youhajun.domain.models.sealeds.WebSocketState
+import com.youhajun.domain.models.enums.WebRTCSessionType
 import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
 import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
 import com.youhajun.domain.usecase.room.GetRoomSignalingCommandUseCase
-import com.youhajun.domain.usecase.room.GetRoomSocketStateUseCase
 import com.youhajun.domain.usecase.room.GetRoomWebRTCSessionUseCase
 import com.youhajun.domain.usecase.room.SendLiveRoomSignalingMsgUseCase
 import com.youhajun.ui.R
@@ -17,6 +14,8 @@ import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.models.states.LiveRoomState
 import com.youhajun.ui.utils.ResourceProviderUtil
 import com.youhajun.ui.utils.webRtc.WebRTCContract
+import com.youhajun.ui.utils.webRtc.models.TrackType
+import com.youhajun.ui.utils.webRtc.models.TrackVo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -46,7 +45,6 @@ class LiveRoomViewModel @AssistedInject constructor(
     private val connectLiveRoomUseCase: ConnectLiveRoomUseCase,
     private val disposeLiveRoomUseCase: DisposeLiveRoomUseCase,
     private val sendLiveRoomSignalingMsgUseCase: SendLiveRoomSignalingMsgUseCase,
-    private val getRoomSocketStateUseCase: GetRoomSocketStateUseCase,
     private val getRoomSignalingCommandUseCase: GetRoomSignalingCommandUseCase,
     private val getRoomWebRTCSessionUseCase: GetRoomWebRTCSessionUseCase,
     webRtcSessionManagerFactory: WebRTCContract.Factory,
@@ -66,10 +64,11 @@ class LiveRoomViewModel @AssistedInject constructor(
     private val sessionManager: WebRTCContract.SessionManager = webRtcSessionManagerFactory.createSessionManager(this)
 
     override val container: Container<LiveRoomState, LiveRoomSideEffect> = container(
-        LiveRoomState(eglContext = eglBaseContext, mySessionId = sessionManager.sessionId)
+        LiveRoomState(eglContext = eglBaseContext, mySessionId = sessionManager.mySessionId)
     ) {
         onCollectSignaling()
         onCollectMediaTrack()
+        sessionManager.onScreenReady()
         onLiveRoomSignalingConnect()
     }
 
@@ -87,9 +86,7 @@ class LiveRoomViewModel @AssistedInject constructor(
     override fun onLiveRoomSignalingConnect() {
         intent {
             postSideEffect(LiveRoomSideEffect.LivePermissionLauncher {
-                viewModelScope.launch {
-                    connectLiveRoomUseCase(Unit)
-                }
+                connectLiveRoomUseCase(Unit)
             })
         }
     }
@@ -102,23 +99,25 @@ class LiveRoomViewModel @AssistedInject constructor(
         }
     }
 
-    override fun dispose() {
-        viewModelScope.launch {
-            disposeLiveRoomUseCase(Unit)
-        }
-    }
-
     override fun onCleared() {
         super.onCleared()
-
         sessionManager.disconnect()
+        disposeLiveRoomUseCase(Unit)
     }
 
     private fun onCollectMediaTrack() {
         intent {
             viewModelScope.launch {
-                sessionManager.videoTrackFlow.collect {
-                    reduce { state.copy(videoTrackMap = it) }
+                sessionManager.trackFlow.collect {
+                    val myVideoTrack = findTrack(it, state.mySessionId, TrackType.VIDEO)?.videoTrack
+                    val partnerVideoTrack = findPartnerTrack(it, state.mySessionId, TrackType.VIDEO)?.videoTrack
+
+                    reduce {
+                        state.copy(
+                            myVideoTrack = myVideoTrack,
+                            partnerVideoTrack = partnerVideoTrack
+                        )
+                    }
                 }
             }
         }
@@ -127,23 +126,11 @@ class LiveRoomViewModel @AssistedInject constructor(
     private fun onCollectSignaling() {
         viewModelScope.launch {
             launch {
-                onGetRoomSocketState()
-            }
-            launch {
                 onGetRoomSignalingCommand()
             }
             launch {
                 onGetRoomWebRTCSession()
             }
-        }
-    }
-
-    private suspend fun onGetRoomSocketState() {
-        getRoomSocketStateUseCase(Unit).collect {
-            it.inspectUiState(
-                onError = ::handleWebSocketStateError,
-                onSuccess = ::handleWebSocketStateSuccess
-            )
         }
     }
 
@@ -157,35 +144,29 @@ class LiveRoomViewModel @AssistedInject constructor(
     private suspend fun onGetRoomWebRTCSession() {
         getRoomWebRTCSessionUseCase(Unit).collect {
             logger.d { "webRTCSessionType : ${it.type}" }
+            if (it == WebRTCSessionType.Ready) sessionManager.onSignalingImpossible()
+
             intent {
                 reduce {
-                    state.copy(
-                        webRTCSessionType = it
-                    )
+                    state.copy(webRTCSessionType = it)
                 }
             }
         }
     }
 
-    private fun handleWebSocketStateSuccess(wss: WebSocketState) {
-        logger.d { "socketStateSuccess : $wss" }
-        when (wss as WebSocketState.Success) {
-            WebSocketState.Success.Close,
-            is WebSocketState.Success.Message -> Unit
-
-            WebSocketState.Success.Open -> sessionManager.onSessionScreenReady()
-        }
+    private fun findTrack(
+        tracks: Map<String, List<TrackVo>>,
+        sessionId: String,
+        trackType: TrackType
+    ): TrackVo? {
+        return tracks[sessionId]?.find { it.trackType == trackType }
     }
 
-    private fun handleWebSocketStateError(errorVo: UiStateErrorVo<WebSocketState>) {
-        logger.d { "socketStateError : ${errorVo.message}" }
-        when (errorVo.data as? WebSocketState.Error) {
-            WebSocketState.Error.Close,
-            null -> Unit
-
-            WebSocketState.Error.Failure -> {
-
-            }
-        }
+    private fun findPartnerTrack(
+        tracks: Map<String, List<TrackVo>>,
+        sessionId: String,
+        trackType: TrackType
+    ): TrackVo? {
+        return tracks.filterKeys { it != sessionId }.values.firstOrNull()?.find { it.trackType == trackType }
     }
 }
