@@ -60,9 +60,10 @@ fun LiveRoomScreen(
             viewModel.onClickHeaderBackIcon()
         }
 
-        when(state.webRTCSessionType) {
+        when (state.webRTCSessionType) {
             WebRTCSessionType.Offline,
-            WebRTCSessionType.Active,
+            WebRTCSessionType.Creating,
+            WebRTCSessionType.Ready,
             WebRTCSessionType.Impossible -> RoomStageComp(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -70,8 +71,15 @@ fun LiveRoomScreen(
                 state.myVideoTrack,
                 state.eglContext
             )
-            WebRTCSessionType.Creating,
-            WebRTCSessionType.Ready -> RoomCallingComp()
+
+            WebRTCSessionType.Active -> RoomCallingComp(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                state.myVideoTrack,
+                state.partnerVideoTrack,
+                state.eglContext
+            )
         }
     }
 }

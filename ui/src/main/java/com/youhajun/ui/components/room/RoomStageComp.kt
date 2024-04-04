@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youhajun.ui.R
 import com.youhajun.ui.components.modifier.infinityProgressCircleBorder
-import com.youhajun.ui.utils.webRtc.models.VideoTrackVo
 import io.getstream.webrtc.android.compose.VideoRenderer
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
@@ -29,7 +28,7 @@ import org.webrtc.VideoTrack
 @Composable
 fun RoomStageComp(
     modifier: Modifier,
-    myVideoTrackVo: VideoTrackVo?,
+    myVideoTrack: VideoTrack?,
     eglBaseContext: EglBase.Context
 ) {
     val rendererEvents = object : RendererCommon.RendererEvents {
@@ -54,9 +53,9 @@ fun RoomStageComp(
             modifier = Modifier.wrapContentSize()
         )
 
-        if (myVideoTrackVo != null && myVideoTrackVo.isCameraEnabled) {
+        if (myVideoTrack != null && myVideoTrack.enabled()) {
             VideoRenderer(
-                videoTrack = myVideoTrackVo.videoTrack,
+                videoTrack = myVideoTrack,
                 eglBaseContext = eglBaseContext,
                 rendererEvents = rendererEvents,
                 modifier = Modifier
