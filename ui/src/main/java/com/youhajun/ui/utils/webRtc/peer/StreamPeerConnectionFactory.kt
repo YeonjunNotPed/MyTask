@@ -26,14 +26,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
-import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.EglBase
-import org.webrtc.HardwareVideoEncoderFactory
 import org.webrtc.Logging
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
-import org.webrtc.SimulcastVideoEncoderFactory
+import org.webrtc.SoftwareVideoDecoderFactory
 import org.webrtc.SoftwareVideoEncoderFactory
 import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
@@ -51,12 +49,14 @@ class StreamPeerConnectionFactory @Inject constructor(
     override val sessionId: String = UUID.randomUUID().toString()
 
     private val videoDecoderFactory by lazy {
-        DefaultVideoDecoderFactory(eglBaseContext)
+//        DefaultVideoDecoderFactory(eglBaseContext)
+        SoftwareVideoDecoderFactory()
     }
 
     private val videoEncoderFactory by lazy {
-        val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
-        SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
+        SoftwareVideoEncoderFactory()
+//        val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
+//        SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
     }
 
 
@@ -64,7 +64,13 @@ class StreamPeerConnectionFactory @Inject constructor(
         listOf(
             PeerConnection
                 .IceServer
-                .builder(BuildConfig.STUN_SERVER_URL)
+                .builder(listOf(
+                    BuildConfig.STUN_SERVER_URL1,
+                    BuildConfig.STUN_SERVER_URL2,
+                    BuildConfig.STUN_SERVER_URL3,
+                    BuildConfig.STUN_SERVER_URL4,
+                    BuildConfig.STUN_SERVER_URL5,
+                ))
                 .createIceServer()
         )
     ).apply {
