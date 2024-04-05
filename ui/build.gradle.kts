@@ -20,7 +20,11 @@ android {
 
         manifestPlaceholders["KAKAO_NATIVE_KEY"] = getProperty("KAKAO_NATIVE_KEY")
         buildConfigField("String", "GOOGLE_API_SERVER_ID", getProperty("GOOGLE_API_SERVER_ID"))
-        buildConfigField("String", "STUN_SERVER_URL", getProperty("STUN_SERVER_URL"))
+        buildConfigField("String", "STUN_SERVER_URL1", getProperty("STUN_SERVER_URL1"))
+        buildConfigField("String", "STUN_SERVER_URL2", getProperty("STUN_SERVER_URL2"))
+        buildConfigField("String", "STUN_SERVER_URL3", getProperty("STUN_SERVER_URL3"))
+        buildConfigField("String", "STUN_SERVER_URL4", getProperty("STUN_SERVER_URL4"))
+        buildConfigField("String", "STUN_SERVER_URL5", getProperty("STUN_SERVER_URL5"))
     }
 
     buildTypes {
@@ -98,9 +102,9 @@ dependencies {
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
-    implementation("io.getstream:stream-webrtc-android:1.1.1")
-    implementation("io.getstream:stream-webrtc-android-compose:1.1.1")
-    implementation("io.getstream:stream-webrtc-android-ui:1.1.1")
+    implementation("io.getstream:stream-webrtc-android:1.1.2")
+    implementation("io.getstream:stream-webrtc-android-compose:1.1.2")
+    implementation("io.getstream:stream-webrtc-android-ui:1.1.2")
     implementation("io.getstream:stream-log:1.1.4")
 }
 
