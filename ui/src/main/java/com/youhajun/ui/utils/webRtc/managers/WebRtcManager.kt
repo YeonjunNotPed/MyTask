@@ -5,6 +5,7 @@ import com.youhajun.ui.di.DefaultDispatcher
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ICE_SEPARATOR
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
+import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import com.youhajun.ui.utils.webRtc.models.TrackType
 import com.youhajun.ui.utils.webRtc.models.TrackVo
@@ -45,9 +46,8 @@ class WebRtcManager @AssistedInject constructor(
 
     override val mySessionId: String = peerConnectionFactory.sessionId
 
-    private val _trackFlow = MutableStateFlow<Map<String, List<TrackVo>>>(hashMapOf())
-    override val trackFlow: StateFlow<Map<String, List<TrackVo>>> = _trackFlow.asStateFlow()
-
+    private val _sessionFlow = MutableStateFlow<Map<String, SessionInfoVo>>(hashMapOf())
+    override val sessionFlow: StateFlow<Map<String, SessionInfoVo>> = _sessionFlow.asStateFlow()
 
     private val peerConnection: StreamPeerConnection by lazy {
         peerConnectionFactory.makePeerConnection(
@@ -86,10 +86,16 @@ class WebRtcManager @AssistedInject constructor(
 
     override fun enableCamera(enabled: Boolean) {
         videoManager.enableCamera(enabled)
+        editSessionInfo(mySessionId) {
+            it.copy(callMediaStateVo = it.callMediaStateVo.copy(isCameraEnable = enabled))
+        }
     }
 
     override fun enableMicrophone(enabled: Boolean) {
         audioManager.enableMicrophone(enabled)
+        editSessionInfo(mySessionId) {
+            it.copy(callMediaStateVo = it.callMediaStateVo.copy(isMicEnable = enabled))
+        }
     }
 
     /**
@@ -193,24 +199,24 @@ class WebRtcManager @AssistedInject constructor(
         addTrack(sessionId, trackVo)
     }
     private fun addTrack(sessionId: String, trackVo: TrackVo) {
-        editSessionTrack(sessionId) {
-            it.apply { add(trackVo) }
+        editSessionInfo(sessionId) {
+            it.copy(trackList = it.trackList + trackVo)
         }
     }
 
     private fun removeTrack(sessionId: String, trackType: TrackType) {
-        editSessionTrack(sessionId) {
-            it.filterNot { it.trackType == trackType}
+        editSessionInfo(sessionId) {
+            it.copy(trackList = it.trackList.filterNot { it.trackType == trackType })
         }
     }
 
-    private fun editSessionTrack(sessionId: String, editBlock: (MutableList<TrackVo>) -> List<TrackVo>) {
-        val newMap = trackFlow.value.toMutableMap().apply {
-            val sessionTrackList = this.getOrDefault(sessionId, emptyList()).toMutableList()
-            this[sessionId] = editBlock(sessionTrackList)
+    private fun editSessionInfo(sessionId: String, editBlock: (SessionInfoVo) -> SessionInfoVo) {
+        val newMap = sessionFlow.value.toMutableMap().apply {
+            val sessionInfo = this.getOrDefault(sessionId, SessionInfoVo())
+            this[sessionId] = editBlock(sessionInfo)
         }
         sessionManagerScope.launch {
-            _trackFlow.emit(newMap)
+            _sessionFlow.emit(newMap)
         }
     }
 
