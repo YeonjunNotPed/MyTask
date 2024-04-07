@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.domain.models.enums.WebRTCSessionType
+import com.youhajun.domain.models.vo.CallMediaStateVo
 import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
 import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
 import com.youhajun.domain.usecase.room.GetRoomSignalingCommandUseCase
@@ -14,8 +15,7 @@ import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.models.states.LiveRoomState
 import com.youhajun.ui.utils.ResourceProviderUtil
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import com.youhajun.ui.utils.webRtc.models.TrackType
-import com.youhajun.ui.utils.webRtc.models.TrackVo
+import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -101,21 +101,19 @@ class LiveRoomViewModel @AssistedInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        sessionManager.disconnect()
-        disposeLiveRoomUseCase(Unit)
+        callingEnd()
     }
-
     private fun onCollectMediaTrack() {
         intent {
             viewModelScope.launch {
-                sessionManager.trackFlow.collect {
-                    val myVideoTrack = findTrack(it, state.mySessionId, TrackType.VIDEO)?.videoTrack
-                    val partnerVideoTrack = findPartnerTrack(it, state.mySessionId, TrackType.VIDEO)?.videoTrack
+                sessionManager.sessionFlow.collect {
+                    val mySessionInfo = findSessionInfo(it, state.mySessionId)
+                    val partnerSessionInfo = findPartnerSessionInfo(it, state.mySessionId)
 
                     reduce {
                         state.copy(
-                            myVideoTrack = myVideoTrack,
-                            partnerVideoTrack = partnerVideoTrack
+                            mySessionInfoVo = mySessionInfo,
+                            partnerSessionInfoVo = partnerSessionInfo
                         )
                     }
                 }
@@ -153,20 +151,23 @@ class LiveRoomViewModel @AssistedInject constructor(
             }
         }
     }
+    private fun findPartnerSessionInfo(session: Map<String, SessionInfoVo>, mySessionId: String) =
+        session.filterKeys { it != mySessionId }.values.firstOrNull()
 
-    private fun findTrack(
-        tracks: Map<String, List<TrackVo>>,
-        sessionId: String,
-        trackType: TrackType
-    ): TrackVo? {
-        return tracks[sessionId]?.find { it.trackType == trackType }
+    private fun findSessionInfo(session: Map<String, SessionInfoVo>, sessionId: String) = session[sessionId]
+
+    private fun callingEnd() {
+        sessionManager.disconnect()
+        disposeLiveRoomUseCase(Unit)
     }
 
-    private fun findPartnerTrack(
-        tracks: Map<String, List<TrackVo>>,
-        sessionId: String,
-        trackType: TrackType
-    ): TrackVo? {
-        return tracks.filterKeys { it != sessionId }.values.firstOrNull()?.find { it.trackType == trackType }
+
+    private fun updateMediaState(mediaStateVo: CallMediaStateVo?) {
+        intent {
+            reduce {
+                val updatedSessionInfoVo = state.mySessionInfoVo?.copy(callMediaStateVo = mediaStateVo ?: CallMediaStateVo())
+                state.copy(mySessionInfoVo = updatedSessionInfoVo)
+            }
+        }
     }
 }
