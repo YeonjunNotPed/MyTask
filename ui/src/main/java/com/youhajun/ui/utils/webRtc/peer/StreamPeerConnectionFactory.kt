@@ -59,6 +59,15 @@ class StreamPeerConnectionFactory @Inject constructor(
 //        SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
     }
 
+    private val mediaConstraints = MediaConstraints().apply {
+        mandatory.addAll(
+            listOf(
+                MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"),
+                MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true")
+            )
+        )
+    }
+
 
     private val rtcConfig: PeerConnection.RTCConfiguration = PeerConnection.RTCConfiguration(
         listOf(
@@ -113,8 +122,7 @@ class StreamPeerConnectionFactory @Inject constructor(
         trackId: String
     ): VideoTrack = factory.createVideoTrack(trackId, source)
 
-    override fun makeAudioSource(constraints: MediaConstraints): AudioSource =
-        factory.createAudioSource(constraints)
+    override fun makeAudioSource(constraints: MediaConstraints): AudioSource = factory.createAudioSource(constraints)
 
     override fun makeAudioTrack(
         source: AudioSource,
@@ -123,25 +131,21 @@ class StreamPeerConnectionFactory @Inject constructor(
 
     override fun makePeerConnection(
         type: StreamPeerType,
-        mediaConstraints: MediaConstraints,
         peerConnectionListener: WebRTCContract.PeerConnectionListener
     ): StreamPeerConnection {
-        val streamPeerConnection = StreamPeerConnection(
-            type = type,
-            mediaConstraints = mediaConstraints,
-        )
         val peerConnectionObserver = PeerConnectionObserver(
             type = type,
             peerConnectionListener = peerConnectionListener,
-            streamPeerConnection = streamPeerConnection
         )
         val peerConnection = makePeerConnectionInternal(
             configuration = rtcConfig,
             observer = peerConnectionObserver
         )
-        return streamPeerConnection.apply {
-            initialize(peerConnection)
-        }
+        return StreamPeerConnection(
+            type = type,
+            mediaConstraints = mediaConstraints,
+            connection = peerConnection
+        )
     }
 
     private fun makePeerConnectionInternal(

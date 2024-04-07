@@ -35,7 +35,6 @@ import org.webrtc.RtpTransceiver
 class PeerConnectionObserver(
     private val type: StreamPeerType,
     private val peerConnectionListener: WebRTCContract.PeerConnectionListener,
-    private val streamPeerConnection: StreamPeerConnection
 ) : PeerConnection.Observer {
 
     init {
@@ -55,8 +54,6 @@ class PeerConnectionObserver(
 
     override fun onTrack(transceiver: RtpTransceiver?) {
         Loggers.Connection.onTrack(transceiver)
-
-        peerConnectionListener.onTrack(transceiver)
     }
 
     /**
@@ -84,8 +81,6 @@ class PeerConnectionObserver(
      */
     override fun onRenegotiationNeeded() {
         Loggers.Connection.onRenegotiationNeeded()
-
-        peerConnectionListener.onNegotiationNeeded(streamPeerConnection, type)
     }
 
     /**
@@ -98,8 +93,8 @@ class PeerConnectionObserver(
         when (newState) {
             PeerConnection.IceConnectionState.CLOSED,
             PeerConnection.IceConnectionState.FAILED,
-            PeerConnection.IceConnectionState.DISCONNECTED -> peerConnectionListener.onIceConnectionCanceled()
-            PeerConnection.IceConnectionState.CONNECTED -> peerConnectionListener.onIceConnectionConnected()
+            PeerConnection.IceConnectionState.DISCONNECTED,
+            PeerConnection.IceConnectionState.CONNECTED -> Unit
             else -> Unit
         }
     }

@@ -22,6 +22,7 @@ import com.youhajun.ui.utils.webRtc.managers.SDPManager
 import com.youhajun.ui.utils.webRtc.models.StreamPeerType
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
+import org.webrtc.MediaStreamTrack
 import org.webrtc.PeerConnection
 import org.webrtc.SessionDescription
 
@@ -34,17 +35,11 @@ import org.webrtc.SessionDescription
 class StreamPeerConnection(
     private val type: StreamPeerType,
     private val mediaConstraints: MediaConstraints,
+    private val connection: PeerConnection
 ) {
-    lateinit var connection: PeerConnection
-        private set
 
     init {
         Loggers.StreamConnection.setTypeTag(type)
-    }
-
-    fun initialize(peerConnection: PeerConnection) {
-        Loggers.StreamConnection.initialize(peerConnection)
-        this.connection = peerConnection
     }
 
     fun dispose() {
@@ -84,6 +79,10 @@ class StreamPeerConnection(
         return connection.addRtcIceCandidate(iceCandidate).also {
             Loggers.StreamConnection.successAddIceCandidate(it)
         }
+    }
+
+    fun addTrack(track: MediaStreamTrack, streamId: String) {
+        connection.addTrack(track, listOf(streamId))
     }
 
 

@@ -23,9 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
-import org.webrtc.MediaConstraints
 import org.webrtc.MediaStreamTrack
-import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.VideoTrack
 
@@ -50,19 +48,10 @@ class WebRtcManager @AssistedInject constructor(
     private val _trackFlow = MutableStateFlow<Map<String, List<TrackVo>>>(hashMapOf())
     override val trackFlow: StateFlow<Map<String, List<TrackVo>>> = _trackFlow.asStateFlow()
 
-    private val mediaConstraints = MediaConstraints().apply {
-        mandatory.addAll(
-            listOf(
-                MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"),
-                MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true")
-            )
-        )
-    }
 
     private val peerConnection: StreamPeerConnection by lazy {
         peerConnectionFactory.makePeerConnection(
             type = StreamPeerType.SUBSCRIBER,
-            mediaConstraints = mediaConstraints,
             peerConnectionListener = object : WebRTCContract.PeerConnectionListener {
                 override fun onStreamAdded(id: String, track: MediaStreamTrack) {
                     val (trackType, sessionId) = id.split(ID_SEPARATOR).let {
@@ -70,15 +59,10 @@ class WebRtcManager @AssistedInject constructor(
                     }
                     handleOnAddedTrack(sessionId, track, trackType)
                 }
-                override fun onNegotiationNeeded(streamPeerConnection: StreamPeerConnection, peerType: StreamPeerType) {}
-                override fun onIceConnectionConnected() {}
-                override fun onIceConnectionCanceled() {}
 
                 override fun onIceCandidate(ice: IceCandidate, peerType: StreamPeerType) {
                     emitPendingIce(ice)
                 }
-
-                override fun onTrack(rtpTransceiver: RtpTransceiver?) {}
             }
         )
     }
@@ -114,11 +98,11 @@ class WebRtcManager @AssistedInject constructor(
 
     override fun onScreenReady() {
         audioManager.addLocalAudioTrack {
-            peerConnection.connection.addTrack(it, listOf(it.id()))
+            peerConnection.addTrack(it, it.id())
             handleOnAddedTrack(mySessionId, it, trackType = TrackType.AUDIO)
         }
         videoManager.addLocalVideoTrack {
-            peerConnection.connection.addTrack(it, listOf(it.id()))
+            peerConnection.addTrack(it, it.id())
             handleOnAddedTrack(mySessionId, it, trackType = TrackType.VIDEO)
         }
     }

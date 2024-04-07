@@ -30,27 +30,19 @@ interface WebRTCContract {
 
         fun makePeerConnection(
             type: StreamPeerType,
-            mediaConstraints: MediaConstraints,
             peerConnectionListener: PeerConnectionListener
         ): StreamPeerConnection
 
         fun makeVideoSource(isScreencast: Boolean): VideoSource
         fun makeVideoTrack(source: VideoSource, trackId: String): VideoTrack
-        fun makeAudioSource(constraints: MediaConstraints = MediaConstraints()): AudioSource
+        fun makeAudioSource(constraints: MediaConstraints): AudioSource
         fun makeAudioTrack(source: AudioSource, trackId: String): AudioTrack
     }
 
     interface PeerConnectionListener {
         fun onStreamAdded(id: String, track:MediaStreamTrack)
-        fun onNegotiationNeeded(
-            streamPeerConnection: StreamPeerConnection,
-            peerType: StreamPeerType
-        )
 
         fun onIceCandidate(ice: IceCandidate, peerType: StreamPeerType)
-        fun onTrack(rtpTransceiver: RtpTransceiver?)
-        fun onIceConnectionConnected()
-        fun onIceConnectionCanceled()
     }
 
     interface Signaling {
