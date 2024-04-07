@@ -58,8 +58,8 @@ interface WebRTCContract {
 
     interface SessionManager {
         val mySessionId: String
-        fun flipCamera()
         val sessionFlow: StateFlow<Map<String, SessionInfoVo>>
+        fun flipCamera(result: (Result<Boolean>) -> Unit)
         fun enableCamera(enabled: Boolean)
         fun enableMicrophone(enabled: Boolean)
         fun onScreenReady()
@@ -75,7 +75,7 @@ interface WebRTCContract {
 
     interface VideoManager {
 
-        fun flipCamera()
+        fun flipCamera(result: (Result<Boolean>) -> Unit)
         fun enableCamera(enabled: Boolean)
         fun addLocalVideoTrack(addTrack:(MediaStreamTrack)-> Unit)
         fun dispose()

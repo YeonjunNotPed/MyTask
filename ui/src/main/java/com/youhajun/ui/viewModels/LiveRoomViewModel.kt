@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.domain.models.enums.WebRTCSessionType
+import com.youhajun.domain.models.sealeds.CallControlAction
 import com.youhajun.domain.models.vo.CallMediaStateVo
 import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
 import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
@@ -34,8 +35,10 @@ import org.webrtc.EglBase
 
 interface LiveRoomIntent {
     fun onClickHeaderBackIcon()
+    fun onClickCallControlAction(action: CallControlAction)
     fun onLiveRoomSignalingConnect()
     fun onLiveRoomPermissionDenied()
+    fun onTabCallingScreen()
 }
 
 @HiltViewModel(assistedFactory = LiveRoomViewModel.LiveRoomViewModelFactory::class)
@@ -77,6 +80,23 @@ class LiveRoomViewModel @AssistedInject constructor(
         intent { postSideEffect(LiveRoomSideEffect.Navigation.NavigateUp) }
     }
 
+    override fun onClickCallControlAction(action: CallControlAction) {
+        intent {
+            when(action) {
+                CallControlAction.CallingEnd -> {
+                }
+                CallControlAction.FlipCamera -> sessionManager.flipCamera {
+                    it.onSuccess {
+                        val mediaState = state.mySessionInfoVo?.callMediaStateVo?.copy(isFrontCamera = it)
+                        updateMediaState(mediaState)
+                    }
+                }
+                is CallControlAction.ToggleCamera -> sessionManager.enableCamera(!action.isEnabled)
+                is CallControlAction.ToggleMicroPhone -> sessionManager.enableMicrophone(!action.isEnabled)
+            }
+        }
+    }
+
     override fun sendCommand(signalingCommand: SignalingType, message: String) {
         viewModelScope.launch {
             sendLiveRoomSignalingMsgUseCase(signalingCommand to message)
@@ -96,6 +116,12 @@ class LiveRoomViewModel @AssistedInject constructor(
             val msg = resourceProviderUtil.string(R.string.room_permission_denied)
             postSideEffect(LiveRoomSideEffect.Toast(msg))
             postSideEffect(LiveRoomSideEffect.Navigation.NavigateUp)
+        }
+    }
+
+    override fun onTabCallingScreen() {
+        intent {
+            reduce { state.copy(isVisibleBottomAction = !state.isVisibleBottomAction) }
         }
     }
 

@@ -80,8 +80,8 @@ class WebRtcManager @AssistedInject constructor(
         }
     }
 
-    override fun flipCamera() {
-        videoManager.flipCamera()
+    override fun flipCamera(result: (Result<Boolean>) -> Unit) {
+        videoManager.flipCamera(result)
     }
 
     override fun enableCamera(enabled: Boolean) {

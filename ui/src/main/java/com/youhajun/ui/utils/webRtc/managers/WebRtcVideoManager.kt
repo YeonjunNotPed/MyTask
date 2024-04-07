@@ -29,6 +29,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.Camera2Capturer
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerationAndroid
+import org.webrtc.CameraVideoCapturer
 import org.webrtc.EglBase
 import org.webrtc.MediaStreamTrack
 import org.webrtc.SurfaceTextureHelper
@@ -43,6 +44,9 @@ class WebRtcVideoManager @Inject constructor(
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,
     eglBaseContext: EglBase.Context,
 ) : WebRTCContract.VideoManager {
+    companion object {
+        private const val FPS = 60
+    }
 
     private val frontCameraId: String by lazy { getFrontCameraElseFirstId() }
     private val videoCapturer: VideoCapturer by lazy {
@@ -58,7 +62,7 @@ class WebRtcVideoManager @Inject constructor(
     private val videoSource: VideoSource by lazy {
         peerConnectionFactory.makeVideoSource(videoCapturer.isScreencast).apply {
             videoCapturer.initialize(surfaceTextureHelper, context, this.capturerObserver)
-            videoCapturer.startCapture(resolution.width, resolution.height, 30)
+            videoCapturer.startCapture(resolution.width, resolution.height, FPS)
         }
     }
 
@@ -75,13 +79,21 @@ class WebRtcVideoManager @Inject constructor(
             return findMatchingResolution(supportedFormats)
         }
 
-    override fun flipCamera() {
-        (videoCapturer as? Camera2Capturer)?.switchCamera(null)
+    override fun flipCamera(result: (Result<Boolean>) -> Unit) {
+        (videoCapturer as? Camera2Capturer)?.switchCamera(object : CameraVideoCapturer.CameraSwitchHandler {
+            override fun onCameraSwitchDone(isFrontCamera: Boolean) {
+                result(Result.success(isFrontCamera))
+            }
+
+            override fun onCameraSwitchError(errorDescription: String) {
+                result(Result.failure(RuntimeException(errorDescription)))
+            }
+        })
     }
 
     override fun enableCamera(enabled: Boolean) {
         if (enabled) {
-            videoCapturer.startCapture(resolution.width, resolution.height, 30)
+            videoCapturer.startCapture(resolution.width, resolution.height, FPS)
         } else {
             videoCapturer.stopCapture()
         }
