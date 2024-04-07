@@ -5,20 +5,27 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.domain.models.enums.WebRTCSessionType
+import com.youhajun.domain.models.vo.CallMediaStateVo
 import com.youhajun.ui.R
 import com.youhajun.ui.components.MyTaskHeader
+import com.youhajun.ui.components.call.CallBottomComp
 import com.youhajun.ui.components.room.RoomCallingComp
 import com.youhajun.ui.components.room.RoomStageComp
 import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
@@ -54,7 +61,7 @@ fun LiveRoomScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().background(colorResource(id = R.color.color_292929))
     ) {
         MyTaskHeader(title = stringResource(id = R.string.header_title_select_room)) {
             viewModel.onClickHeaderBackIcon()
@@ -80,6 +87,13 @@ fun LiveRoomScreen(
                 state.partnerVideoTrack,
                 state.eglContext
             )
+        }
+
+        AnimatedVisibility(visible = state.isVisibleBottomAction) {
+            val myMediaState = state.mySessionInfoVo?.callMediaStateVo ?: CallMediaStateVo()
+            CallBottomComp(modifier = Modifier.fillMaxWidth().height(74.dp), mediaStateVo = myMediaState) {
+                viewModel.onClickCallControlAction(it)
+            }
         }
     }
 }

@@ -14,4 +14,5 @@ data class LiveRoomState(
     val webRTCSessionType: WebRTCSessionType = WebRTCSessionType.Offline,
     val mySessionInfoVo: SessionInfoVo? = null,
     val partnerSessionInfoVo: SessionInfoVo? = null,
+    val isVisibleBottomAction: Boolean = true,
 )
