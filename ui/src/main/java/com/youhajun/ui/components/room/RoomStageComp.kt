@@ -1,8 +1,11 @@
 package com.youhajun.ui.components.room
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -19,18 +22,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youhajun.ui.R
+import com.youhajun.ui.components.call.MyTaskVideoRenderer
+import com.youhajun.ui.components.call.VoiceRecognizerComp
 import com.youhajun.ui.components.modifier.infinityProgressCircleBorder
-import io.getstream.webrtc.android.compose.VideoRenderer
+import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
+import com.youhajun.ui.utils.webRtc.models.TrackType
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
-import org.webrtc.VideoTrack
 
 @Composable
 fun RoomStageComp(
     modifier: Modifier,
-    myVideoTrack: VideoTrack?,
+    mySessionInfoVo: SessionInfoVo?,
     eglBaseContext: EglBase.Context
 ) {
+    val myVideoTrack = mySessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
+    val myMediaStateVo = mySessionInfoVo?.callMediaStateVo
+
     val rendererEvents = object : RendererCommon.RendererEvents {
         override fun onFirstFrameRendered() {
 
@@ -41,48 +49,60 @@ fun RoomStageComp(
         }
     }
 
-    Column(
-        modifier = modifier.background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(id = R.string.room_stage_title),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.W800,
-            color = Color.Black,
-            modifier = Modifier.wrapContentSize()
+    Box(modifier) {
+        VoiceRecognizerComp(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            isMicEnable = myMediaStateVo?.isMicEnable == true
         )
 
-        if (myVideoTrack != null && myVideoTrack.enabled()) {
-            VideoRenderer(
-                videoTrack = myVideoTrack,
-                eglBaseContext = eglBaseContext,
-                rendererEvents = rendererEvents,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(shape = CircleShape)
-                    .infinityProgressCircleBorder(
-                        progressColor = Color.Blue,
-                        borderColor = Color.White,
-                        progressSweep = 360f,
-                        strokeWidth = 5.dp
-                    )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Text(
+                text = stringResource(id = R.string.room_stage_title),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.W800,
+                color = Color.White,
+                modifier = Modifier.wrapContentSize()
             )
-        } else {
-            Image(
-                painter = painterResource(id = R.drawable.img_avatar),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(shape = CircleShape)
-                    .infinityProgressCircleBorder(
-                        progressColor = Color.Blue,
-                        borderColor = Color.White,
-                        progressSweep = 360f,
-                        strokeWidth = 5.dp
-                    )
-            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (myVideoTrack != null && myMediaStateVo?.isCameraEnable == true) {
+                MyTaskVideoRenderer(
+                    videoTrack = myVideoTrack,
+                    eglBaseContext = eglBaseContext,
+                    rendererEvents = rendererEvents,
+                    isFrontCamera = myMediaStateVo.isFrontCamera,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(shape = CircleShape)
+                        .infinityProgressCircleBorder(
+                            progressColor = Color.Blue,
+                            borderColor = Color.White,
+                            progressSweep = 360f,
+                            strokeWidth = 5.dp
+                        )
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.img_avatar),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(shape = CircleShape)
+                        .infinityProgressCircleBorder(
+                            progressColor = Color.Blue,
+                            borderColor = Color.White,
+                            progressSweep = 360f,
+                            strokeWidth = 5.dp
+                        )
+                )
+            }
         }
     }
 }

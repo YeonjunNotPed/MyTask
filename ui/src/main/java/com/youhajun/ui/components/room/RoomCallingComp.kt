@@ -1,12 +1,10 @@
 package com.youhajun.ui.components.room
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,64 +12,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import io.getstream.webrtc.android.compose.FloatingVideoRenderer
-import io.getstream.webrtc.android.compose.VideoRenderer
+import com.youhajun.ui.components.call.CallVideoComp
+import com.youhajun.ui.components.call.FloatingCallVideoComp
+import com.youhajun.ui.components.call.VoiceRecognizerComp
+import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
+import com.youhajun.ui.utils.webRtc.models.TrackType
 import org.webrtc.EglBase
-import org.webrtc.RendererCommon
-import org.webrtc.VideoTrack
 
 @Composable
 fun RoomCallingComp(
     modifier: Modifier,
-    myVideoTrack: VideoTrack?,
-    partnerVideoTrack: VideoTrack?,
+    mySessionInfoVo: SessionInfoVo?,
+    partnerSessionInfoVo: SessionInfoVo?,
     eglBaseContext: EglBase.Context
 ) {
-    val rendererEvents = object : RendererCommon.RendererEvents {
-        override fun onFirstFrameRendered() {
+    val myVideoTrack = mySessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
+    val myMediaStateVo = mySessionInfoVo?.callMediaStateVo
+    val partnerVideoTrack = partnerSessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
+    val partnerMediaStateVo = partnerSessionInfoVo?.callMediaStateVo
 
-        }
-
-        override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
-
-        }
-    }
     var parentSize: IntSize by remember { mutableStateOf(IntSize(0, 0)) }
 
-    Box {
-        Column(
-            modifier = modifier.background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Box(modifier = modifier.padding(10.dp)) {
+        VoiceRecognizerComp(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            isMicEnable = myMediaStateVo?.isMicEnable == true
+        )
 
-            if (partnerVideoTrack != null && partnerVideoTrack.enabled()) {
-                VideoRenderer(
-                    videoTrack = partnerVideoTrack,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .onSizeChanged { parentSize = it },
-                    eglBaseContext = eglBaseContext,
-                    rendererEvents = rendererEvents,
-                )
-            }
+        if (partnerVideoTrack != null && partnerMediaStateVo != null) {
+            CallVideoComp(
+                modifier = Modifier.onSizeChanged { parentSize = it }.fillMaxSize(),
+                videoTrack = partnerVideoTrack,
+                mediaStateVo = partnerMediaStateVo,
+                eglBaseContext = eglBaseContext
+            )
         }
-        if (myVideoTrack != null && myVideoTrack.enabled()) {
-            FloatingVideoRenderer(
-                modifier = Modifier
-                    .size(width = 150.dp, height = 210.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .align(Alignment.BottomEnd),
+
+        if (myVideoTrack != null && myMediaStateVo != null) {
+            FloatingCallVideoComp(
+                modifier = Modifier.size(width = 100.dp, height = 150.dp),
                 videoTrack = myVideoTrack,
+                mediaStateVo = myMediaStateVo,
                 eglBaseContext = eglBaseContext,
-                rendererEvents = rendererEvents,
                 parentBounds = parentSize,
-                paddingValues = PaddingValues(0.dp)
+                paddingValues = PaddingValues(10.dp)
             )
         }
     }
