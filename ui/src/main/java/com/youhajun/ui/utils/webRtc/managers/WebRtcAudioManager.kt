@@ -92,34 +92,21 @@ class WebRtcAudioManager @Inject constructor(
     }
 
     private fun buildAudioConstraints(): MediaConstraints {
-        val mediaConstraints = MediaConstraints()
-        val items = listOf(
-            MediaConstraints.KeyValuePair(
-                "googEchoCancellation",
-                true.toString()
-            ),
-            MediaConstraints.KeyValuePair(
-                "googAutoGainControl",
-                true.toString()
-            ),
-            MediaConstraints.KeyValuePair(
-                "googHighpassFilter",
-                true.toString()
-            ),
-            MediaConstraints.KeyValuePair(
-                "googNoiseSuppression",
-                true.toString()
-            ),
-            MediaConstraints.KeyValuePair(
-                "googTypingNoiseDetection",
-                true.toString()
+        val mediaConstraints = MediaConstraints().apply {
+            mandatory.addAll(
+                listOf(
+                    MediaConstraints.KeyValuePair("googEchoCancellation", "true"),
+                    MediaConstraints.KeyValuePair("googAutoGainControl", "true"),
+                    MediaConstraints.KeyValuePair("googHighpassFilter", "true"),
+                    MediaConstraints.KeyValuePair("googNoiseSuppression", "true"),
+                    MediaConstraints.KeyValuePair("googTypingNoiseDetection", "true")
+                )
             )
-        )
+        }
 
         return mediaConstraints.apply {
             with(optional) {
                 add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
-                addAll(items)
             }
         }
     }
