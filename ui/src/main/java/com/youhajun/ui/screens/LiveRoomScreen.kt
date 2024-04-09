@@ -39,9 +39,12 @@ fun LiveRoomScreen(
     onNavigate: (LiveRoomSideEffect.Navigation) -> Unit = {}
 ) {
 
-    val permissionLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) viewModel.onLiveRoomSignalingConnect()
+    val permissionsLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val cameraPermissionGranted = permissions[Manifest.permission.CAMERA] ?: false
+            val audioPermissionGranted = permissions[Manifest.permission.RECORD_AUDIO] ?: false
+
+            if (cameraPermissionGranted && audioPermissionGranted) viewModel.onLiveRoomSignalingConnect()
             else viewModel.onLiveRoomPermissionDenied()
         }
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
@@ -52,10 +55,11 @@ fun LiveRoomScreen(
             when (it) {
                 is LiveRoomSideEffect.Toast -> Toast.makeText(context, it.text, Toast.LENGTH_SHORT).show()
                 is LiveRoomSideEffect.LivePermissionLauncher -> {
-                    when (PackageManager.PERMISSION_GRANTED) {
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> it.granted()
-                        else -> permissionLauncher.launch(Manifest.permission.CAMERA)
-                    }
+                    val cameraPermissionGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    val audioPermissionGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+
+                    if (cameraPermissionGranted && audioPermissionGranted) it.granted()
+                    else permissionsLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
                 }
                 is LiveRoomSideEffect.Navigation -> onNavigate(it)
             }
