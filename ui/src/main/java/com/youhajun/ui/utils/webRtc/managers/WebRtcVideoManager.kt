@@ -91,7 +91,7 @@ class WebRtcVideoManager @Inject constructor(
         })
     }
 
-    override fun enableCamera(enabled: Boolean) {
+    override fun setEnableCamera(enabled: Boolean) {
         if (enabled) {
             videoCapturer.startCapture(resolution.width, resolution.height, FPS)
         } else {

@@ -80,21 +80,42 @@ class WebRtcManager @AssistedInject constructor(
         }
     }
 
-    override fun flipCamera(result: (Result<Boolean>) -> Unit) {
-        videoManager.flipCamera(result)
-    }
-
-    override fun enableCamera(enabled: Boolean) {
-        videoManager.enableCamera(enabled)
-        editSessionInfo(mySessionId) {
-            it.copy(callMediaStateVo = it.callMediaStateVo.copy(isCameraEnable = enabled))
+    override fun flipCamera() {
+        videoManager.flipCamera {
+            it.onSuccess { isFrontCamera ->
+                editSessionInfo(mySessionId) {
+                    it.copy(
+                        callMediaStateVo = it.callMediaStateVo.copy(isFrontCamera = isFrontCamera)
+                    )
+                }
+            }
         }
     }
 
-    override fun enableMicrophone(enabled: Boolean) {
-        audioManager.enableMicrophone(enabled)
+    override fun setEnableCamera(enabled: Boolean) {
+        videoManager.setEnableCamera(enabled)
         editSessionInfo(mySessionId) {
-            it.copy(callMediaStateVo = it.callMediaStateVo.copy(isMicEnable = enabled))
+            it.copy(
+                callMediaStateVo = it.callMediaStateVo.copy(isCameraEnable = enabled)
+            )
+        }
+    }
+
+    override fun setEnableSpeakerphone(enabled: Boolean) {
+        audioManager.setEnableSpeakerphone(enabled)
+        editSessionInfo(mySessionId) {
+            it.copy(
+                callMediaStateVo = it.callMediaStateVo.copy(isSpeakerEnable = enabled)
+            )
+        }
+    }
+
+    override fun setMicMute(isMute: Boolean) {
+        audioManager.setMicMute(isMute)
+        editSessionInfo(mySessionId) {
+            it.copy(
+                callMediaStateVo = it.callMediaStateVo.copy(isMicMute = isMute)
+            )
         }
     }
 

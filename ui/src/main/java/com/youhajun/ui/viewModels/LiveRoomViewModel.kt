@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.youhajun.domain.models.enums.SignalingType
 import com.youhajun.domain.models.enums.WebRTCSessionType
 import com.youhajun.domain.models.sealeds.CallControlAction
-import com.youhajun.domain.models.vo.CallMediaStateVo
 import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
 import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
 import com.youhajun.domain.usecase.room.GetRoomSignalingCommandUseCase
@@ -82,17 +81,12 @@ class LiveRoomViewModel @AssistedInject constructor(
 
     override fun onClickCallControlAction(action: CallControlAction) {
         intent {
-            when(action) {
-                CallControlAction.CallingEnd -> {
-                }
-                CallControlAction.FlipCamera -> sessionManager.flipCamera {
-                    it.onSuccess {
-                        val mediaState = state.mySessionInfoVo?.callMediaStateVo?.copy(isFrontCamera = it)
-                        updateMediaState(mediaState)
-                    }
-                }
-                is CallControlAction.ToggleCamera -> sessionManager.enableCamera(!action.isEnabled)
-                is CallControlAction.ToggleMicroPhone -> sessionManager.enableMicrophone(!action.isEnabled)
+            when (action) {
+                CallControlAction.CallingEnd -> postSideEffect(LiveRoomSideEffect.Navigation.NavigateUp)
+                CallControlAction.FlipCamera -> sessionManager.flipCamera()
+                is CallControlAction.ToggleCamera -> sessionManager.setEnableCamera(!action.isEnabled)
+                is CallControlAction.ToggleSpeakerphone -> sessionManager.setEnableSpeakerphone(!action.isEnabled)
+                is CallControlAction.ToggleMicMute -> sessionManager.setMicMute(!action.isMute)
             }
         }
     }
@@ -185,15 +179,5 @@ class LiveRoomViewModel @AssistedInject constructor(
     private fun callingEnd() {
         sessionManager.disconnect()
         disposeLiveRoomUseCase(Unit)
-    }
-
-
-    private fun updateMediaState(mediaStateVo: CallMediaStateVo?) {
-        intent {
-            reduce {
-                val updatedSessionInfoVo = state.mySessionInfoVo?.copy(callMediaStateVo = mediaStateVo ?: CallMediaStateVo())
-                state.copy(mySessionInfoVo = updatedSessionInfoVo)
-            }
-        }
     }
 }
