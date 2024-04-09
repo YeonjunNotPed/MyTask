@@ -25,7 +25,7 @@ fun VoiceRecognizerComp(
         } else {
             Box(
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(20.dp)
                     .clip(CircleShape)
                     .background(Color.Black)
             ) {

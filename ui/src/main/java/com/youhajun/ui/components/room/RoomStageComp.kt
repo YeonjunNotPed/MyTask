@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -50,10 +51,6 @@ fun RoomStageComp(
     }
 
     Box(modifier) {
-        VoiceRecognizerComp(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            isMicEnable = myMediaStateVo?.isMicEnable == true
-        )
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -104,5 +101,10 @@ fun RoomStageComp(
                 )
             }
         }
+
+        VoiceRecognizerComp(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+            isMicEnable = myMediaStateVo?.isMicMute == false
+        )
     }
 }

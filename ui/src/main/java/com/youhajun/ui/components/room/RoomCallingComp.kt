@@ -10,14 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.youhajun.ui.components.call.CallVideoComp
 import com.youhajun.ui.components.call.FloatingCallVideoComp
-import com.youhajun.ui.components.call.VoiceRecognizerComp
 import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
 import com.youhajun.ui.utils.webRtc.models.TrackType
 import org.webrtc.EglBase
@@ -37,11 +35,6 @@ fun RoomCallingComp(
     var parentSize: IntSize by remember { mutableStateOf(IntSize(0, 0)) }
 
     Box(modifier = modifier.padding(10.dp)) {
-        VoiceRecognizerComp(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            isMicEnable = myMediaStateVo?.isMicEnable == true
-        )
-
         if (partnerVideoTrack != null && partnerMediaStateVo != null) {
             CallVideoComp(
                 modifier = Modifier.onSizeChanged { parentSize = it }.fillMaxSize(),

@@ -39,12 +39,10 @@ fun CallVideoComp(
     }
 
     Box(
-        modifier = modifier.background(colorResource(id = R.color.color_292929)),
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(colorResource(id = R.color.color_292929)),
     ) {
-        VoiceRecognizerComp(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            isMicEnable = mediaStateVo.isMicEnable
-        )
 
         if(mediaStateVo.isCameraEnable) {
             MyTaskVideoRenderer(
@@ -65,5 +63,10 @@ fun CallVideoComp(
                     .clip(shape = RoundedCornerShape(24.dp))
             )
         }
+
+        VoiceRecognizerComp(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            isMicEnable = !mediaStateVo.isMicMute
+        )
     }
 }

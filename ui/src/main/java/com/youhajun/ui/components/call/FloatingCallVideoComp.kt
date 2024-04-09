@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -123,10 +124,6 @@ fun FloatingCallVideoComp(
             .background(colorResource(id = R.color.color_292929))
             .onGloballyPositioned { currentCompSize = it.size },
     ) {
-        VoiceRecognizerComp(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            isMicEnable = mediaStateVo.isMicEnable
-        )
 
         if (mediaStateVo.isCameraEnable) {
             MyTaskVideoRenderer(
@@ -147,6 +144,11 @@ fun FloatingCallVideoComp(
                     .clip(shape = RoundedCornerShape(24.dp))
             )
         }
+
+        VoiceRecognizerComp(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(3.dp),
+            isMicEnable = !mediaStateVo.isMicMute
+        )
     }
 }
 
