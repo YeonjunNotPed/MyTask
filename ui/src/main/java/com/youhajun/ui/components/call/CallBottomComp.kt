@@ -31,10 +31,11 @@ fun CallBottomComp(
     ) {
         buildCallControlActions(
             listOf(
-                CallControlAction.ToggleCamera(mediaStateVo.isCameraEnable),
-                CallControlAction.ToggleMicroPhone(mediaStateVo.isMicEnable),
-                CallControlAction.FlipCamera,
+                CallControlAction.ToggleSpeakerphone(mediaStateVo.isSpeakerEnable),
+                CallControlAction.ToggleMicMute(mediaStateVo.isMicMute),
                 CallControlAction.CallingEnd,
+                CallControlAction.FlipCamera,
+                CallControlAction.ToggleCamera(mediaStateVo.isCameraEnable),
             ),
             callMediaStateVo = mediaStateVo
         ).forEach {
@@ -50,11 +51,18 @@ fun buildCallControlActions(
 ): List<CallControlActionHolder> {
     return callControlActions.map {
         when (it) {
-            is CallControlAction.ToggleMicroPhone -> CallControlActionHolder(
-                backgroundColor = if (callMediaStateVo.isMicEnable) colorResource(id = R.color.color_292929) else Color.White,
-                iconTint = if (callMediaStateVo.isMicEnable) Color.LightGray else Color.Black,
-                icon = if (callMediaStateVo.isMicEnable) R.drawable.ic_call_mic_on else R.drawable.ic_call_mic_off,
-                callAction = CallControlAction.ToggleMicroPhone(callMediaStateVo.isMicEnable),
+            is CallControlAction.ToggleMicMute -> CallControlActionHolder(
+                backgroundColor = if (callMediaStateVo.isMicMute) Color.White else colorResource(id = R.color.color_292929),
+                iconTint = if (callMediaStateVo.isMicMute) Color.Black else Color.LightGray,
+                icon = if (callMediaStateVo.isMicMute) R.drawable.ic_call_mic_off else R.drawable.ic_call_mic_on,
+                callAction = CallControlAction.ToggleMicMute(callMediaStateVo.isMicMute),
+            )
+
+            is CallControlAction.ToggleSpeakerphone -> CallControlActionHolder(
+                backgroundColor = if (callMediaStateVo.isSpeakerEnable) Color.White else colorResource(id = R.color.color_292929),
+                iconTint = if (callMediaStateVo.isSpeakerEnable) Color.Black else Color.LightGray,
+                icon = if (callMediaStateVo.isSpeakerEnable) R.drawable.ic_call_speaker_on else R.drawable.ic_call_speaker_off,
+                callAction = CallControlAction.ToggleSpeakerphone(callMediaStateVo.isSpeakerEnable),
             )
 
             is CallControlAction.ToggleCamera -> CallControlActionHolder(
