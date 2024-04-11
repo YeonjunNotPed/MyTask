@@ -16,17 +16,10 @@
 
 package com.youhajun.ui.utils.webRtc.managers
 
-import android.content.Context
-import android.media.AudioDeviceInfo
-import android.media.AudioManager
-import android.os.Build
-import androidx.core.content.getSystemService
+import com.youhajun.ui.utils.audio.AudioController
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
-import com.youhajun.ui.utils.webRtc.audio.AudioHandler
-import com.youhajun.ui.utils.webRtc.audio.AudioSwitchHandler
 import com.youhajun.ui.utils.webRtc.models.TrackType
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
@@ -35,17 +28,9 @@ import javax.inject.Inject
 
 @ViewModelScoped
 class WebRtcAudioManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,
+    private val audioController: AudioController
 ) : WebRTCContract.AudioManager {
-
-    private val audioHandler: AudioHandler by lazy {
-        AudioSwitchHandler(context)
-    }
-
-    private val audioManager by lazy {
-        context.getSystemService<AudioManager>()
-    }
 
     private val audioConstraints: MediaConstraints by lazy {
         buildAudioConstraints()
@@ -63,32 +48,19 @@ class WebRtcAudioManager @Inject constructor(
     }
 
     override fun setMicMute(isMute: Boolean) {
+        localAudioTrack.setEnabled(!isMute)
     }
     override fun setEnableSpeakerphone(enabled: Boolean) {
+        audioController.setEnableSpeakerphone(enabled)
     }
 
-    override fun addLocalAudioTrack(addTrack:(MediaStreamTrack)-> Unit) {
-        setupAudio()
+    override fun addLocalAudioTrack(addTrack: (MediaStreamTrack) -> Unit) {
+        audioController.switcherStart()
         addTrack(localAudioTrack)
     }
 
     override fun dispose() {
-        localAudioTrack.dispose()
-        audioHandler.stop()
-    }
-
-    private fun setupAudio() {
-        audioHandler.start()
-        audioManager?.mode = AudioManager.MODE_IN_COMMUNICATION
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val devices = audioManager?.availableCommunicationDevices ?: return
-            val deviceType = AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
-
-            val device = devices.firstOrNull { it.type == deviceType } ?: return
-
-            audioManager?.setCommunicationDevice(device)
-        }
+        audioController.switcherStop()
     }
 
     private fun buildAudioConstraints(): MediaConstraints {
