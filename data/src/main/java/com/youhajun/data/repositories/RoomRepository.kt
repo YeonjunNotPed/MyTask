@@ -4,6 +4,7 @@ import com.youhajun.data.Resource
 import com.youhajun.data.di.DefaultDispatcher
 import com.youhajun.data.models.dto.room.RoomPreviewInfo
 import com.youhajun.data.models.enums.SignalingCommand
+import com.youhajun.data.models.enums.SocketMessage
 import com.youhajun.data.models.enums.WebRTCSessionState
 import com.youhajun.data.models.sealeds.WebSocketStateDTO
 import com.youhajun.data.repositories.base.BaseRepository
@@ -61,7 +62,12 @@ class RoomRepository @Inject constructor(
         sendMessage(totalMessage)
     }
 
-    fun sendMessage(message: String) {
+    fun sendSocketMessage(socketMessage: SocketMessage, message: String) {
+        val totalMessage = "$socketMessage $message"
+        sendMessage(totalMessage)
+    }
+
+    private fun sendMessage(message: String) {
         webSocketDataSource.sendMessage(message)
     }
 
