@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
@@ -102,9 +103,13 @@ fun RoomStageComp(
             }
         }
 
-        VoiceRecognizerComp(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-            isMicEnable = myMediaStateVo?.isMicMute == false
-        )
+        if (myMediaStateVo != null) {
+            VoiceRecognizerComp(
+                modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+                waveModifier = Modifier.width(60.dp).height(45.dp),
+                isMicEnable = !myMediaStateVo.isMicMute,
+                audioLevels = myMediaStateVo.audioLevelList,
+            )
+        }
     }
 }

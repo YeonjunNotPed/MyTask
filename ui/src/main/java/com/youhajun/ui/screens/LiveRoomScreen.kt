@@ -101,10 +101,12 @@ fun LiveRoomScreen(
         }
 
         AnimatedVisibility(visible = state.isVisibleBottomAction) {
-            val myMediaState = state.mySessionInfoVo?.callMediaStateVo ?: CallMediaStateVo()
-            CallBottomComp(modifier = Modifier.fillMaxWidth().height(74.dp), mediaStateVo = myMediaState) {
-                viewModel.onClickCallControlAction(it)
-            }
+            val myMediaState = state.mySessionInfoVo?.callMediaStateHolder ?: CallMediaStateHolder()
+            CallBottomComp(
+                modifier = Modifier.fillMaxWidth().height(74.dp),
+                mediaStateVo = myMediaState,
+                onClickCallAction = viewModel::onClickCallControlAction
+            )
         }
     }
 }
