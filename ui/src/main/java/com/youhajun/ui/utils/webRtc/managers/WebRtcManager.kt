@@ -17,10 +17,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
@@ -36,15 +38,15 @@ class WebRtcManager @AssistedInject constructor(
     private val videoManager: WebRTCContract.VideoManager,
 ) : WebRTCContract.SessionManager {
 
+    override val mySessionId: String = peerConnectionFactory.sessionId
     private val sessionManagerScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
     private var iceCollectJob:Job? = null
-    private val pendingIceSharedFlow = MutableSharedFlow<String>(
-        replay = 10,
-        extraBufferCapacity = 10,
-        onBufferOverflow = BufferOverflow.SUSPEND)
+    private val pendingIceSharedFlow = MutableSharedFlow<String>(replay = 10, extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    override val mySessionId: String = peerConnectionFactory.sessionId
+    override val audioLevelListFlow: Flow<List<Float>> = audioManager.audioLevelPerTimeSharedFlow.onEach {
+        updateAudioLevelList(mySessionId, it)
+    }
 
     private val _sessionFlow = MutableStateFlow<Map<String, SessionInfoVo>>(hashMapOf())
     override val sessionFlow: StateFlow<Map<String, SessionInfoVo>> = _sessionFlow.asStateFlow()
@@ -68,16 +70,7 @@ class WebRtcManager @AssistedInject constructor(
     }
 
     init {
-        sessionManagerScope.launch {
-            signaling.signalingCommandFlow.collect { commandToValue ->
-                when (commandToValue.first) {
-                    SignalingType.OFFER -> handleOffer(commandToValue.second)
-                    SignalingType.ANSWER -> handleAnswer(commandToValue.second)
-                    SignalingType.ICE -> handleIce(commandToValue.second)
-                    else -> Unit
-                }
-            }
-        }
+        onCollectSignalingCommand()
     }
 
     override fun flipCamera() {
@@ -255,6 +248,27 @@ class WebRtcManager @AssistedInject constructor(
             pendingIceSharedFlow.collect {
                 signaling.sendCommand(SignalingType.ICE, it)
             }
+        }
+    }
+
+    private fun onCollectSignalingCommand() {
+        sessionManagerScope.launch {
+            signaling.signalingCommandFlow.collect { commandToValue ->
+                when (commandToValue.first) {
+                    SignalingType.OFFER -> handleOffer(commandToValue.second)
+                    SignalingType.ANSWER -> handleAnswer(commandToValue.second)
+                    SignalingType.ICE -> handleIce(commandToValue.second)
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    override fun updateAudioLevelList(sessionId: String, audioLevelList: List<Float>) {
+        editSessionInfo(sessionId) {
+            it.copy(
+                callMediaStateHolder = it.callMediaStateHolder.copy(audioLevelList = audioLevelList)
+            )
         }
     }
 }

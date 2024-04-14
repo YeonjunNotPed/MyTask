@@ -58,6 +58,7 @@ interface WebRTCContract {
     interface SessionManager {
         val mySessionId: String
         val sessionFlow: StateFlow<Map<String, SessionInfoVo>>
+        val audioLevelListFlow: Flow<List<Float>>
         fun flipCamera()
         fun setEnableCamera(enabled: Boolean)
         fun setMicMute(isMute: Boolean)
@@ -65,6 +66,7 @@ interface WebRTCContract {
         fun onScreenReady()
         fun onSignalingImpossible()
         fun disconnect()
+        fun updateAudioLevelList(sessionId: String, audioLevelList: List<Float>)
     }
 
     interface AudioManager {
