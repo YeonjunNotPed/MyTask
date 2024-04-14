@@ -17,10 +17,12 @@
 package com.youhajun.ui.utils.webRtc.managers
 
 import com.youhajun.ui.utils.audio.AudioController
+import com.youhajun.ui.utils.audio.AudioRecorder
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
 import com.youhajun.ui.utils.webRtc.models.TrackType
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.flow.SharedFlow
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStreamTrack
@@ -29,8 +31,11 @@ import javax.inject.Inject
 @ViewModelScoped
 class WebRtcAudioManager @Inject constructor(
     private val peerConnectionFactory: WebRTCContract.PeerConnectionFactory,
-    private val audioController: AudioController
+    private val audioController: AudioController,
+    private val audioRecorder: AudioRecorder
 ) : WebRTCContract.AudioManager {
+
+    override val audioLevelPerTimeSharedFlow: SharedFlow<List<Float>> = audioRecorder.audioLevelListSharedFlow
 
     private val audioConstraints: MediaConstraints by lazy {
         buildAudioConstraints()
@@ -55,11 +60,13 @@ class WebRtcAudioManager @Inject constructor(
     }
 
     override fun addLocalAudioTrack(addTrack: (MediaStreamTrack) -> Unit) {
+        audioRecorder.startCapturing()
         audioController.switcherStart()
         addTrack(localAudioTrack)
     }
 
     override fun dispose() {
+        audioRecorder.stopCapturing()
         audioController.switcherStop()
     }
 
