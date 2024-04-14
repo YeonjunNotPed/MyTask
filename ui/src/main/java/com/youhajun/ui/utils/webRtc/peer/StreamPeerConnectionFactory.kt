@@ -35,6 +35,7 @@ import org.webrtc.SoftwareVideoDecoderFactory
 import org.webrtc.SoftwareVideoEncoderFactory
 import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
+import org.webrtc.audio.AudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule
 import java.util.UUID
 import javax.inject.Inject
@@ -68,50 +69,56 @@ class StreamPeerConnectionFactory @Inject constructor(
         )
     }
 
+    private val iceServerUrls = listOf(
+        BuildConfig.STUN_SERVER_URL1,
+        BuildConfig.STUN_SERVER_URL2,
+        BuildConfig.STUN_SERVER_URL3,
+        BuildConfig.STUN_SERVER_URL4,
+        BuildConfig.STUN_SERVER_URL5
+    )
 
-    private val rtcConfig: PeerConnection.RTCConfiguration = PeerConnection.RTCConfiguration(
-        listOf(
-            PeerConnection
-                .IceServer
-                .builder(listOf(
-                    BuildConfig.STUN_SERVER_URL1,
-                    BuildConfig.STUN_SERVER_URL2,
-                    BuildConfig.STUN_SERVER_URL3,
-                    BuildConfig.STUN_SERVER_URL4,
-                    BuildConfig.STUN_SERVER_URL5,
-                ))
-                .createIceServer()
-        )
-    ).apply {
+    private val iceServers: List<PeerConnection.IceServer> by lazy {
+        listOf(PeerConnection.IceServer.builder(iceServerUrls).createIceServer())
+    }
+
+    private val rtcConfig: PeerConnection.RTCConfiguration = PeerConnection.RTCConfiguration(iceServers).apply {
         sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
     }
 
     private val factory: PeerConnectionFactory by lazy {
-        PeerConnectionFactory.initialize(
-            PeerConnectionFactory
-                .InitializationOptions.builder(context)
-                .setInjectableLogger(Loggers.webRTCLog(), Logging.Severity.LS_VERBOSE)
-                .createInitializationOptions()
-        )
+        initializePeerConnectionFactory()
+        createPeerConnectionFactory()
+    }
 
+    private fun initializePeerConnectionFactory() {
+        val options = PeerConnectionFactory.InitializationOptions.builder(context)
+            .setInjectableLogger(Loggers.webRTCLog(), Logging.Severity.LS_VERBOSE)
+            .createInitializationOptions()
+        PeerConnectionFactory.initialize(options)
+    }
+
+    private fun createPeerConnectionFactory(): PeerConnectionFactory =
         PeerConnectionFactory.builder()
             .setVideoDecoderFactory(videoDecoderFactory)
             .setVideoEncoderFactory(videoEncoderFactory)
-            .setAudioDeviceModule(
-                JavaAudioDeviceModule
-                    .builder(context)
-                    .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    .setAudioRecordErrorCallback(Loggers.Audio.audioRecordErrorLog())
-                    .setAudioTrackErrorCallback(Loggers.Audio.audioTrackErrorLog())
-                    .setAudioRecordStateCallback(Loggers.Audio.audioRecordStateLog())
-                    .setAudioTrackStateCallback(Loggers.Audio.audioTrackStateLog())
-                    .createAudioDeviceModule().also {
-                        it.setMicrophoneMute(false)
-                        it.setSpeakerMute(false)
-                    }
-            )
+            .setAudioDeviceModule(createAudioDeviceModule())
             .createPeerConnectionFactory()
+
+    private fun createAudioDeviceModule(): AudioDeviceModule {
+        val isAssistedHardwareAcousticEchoCanceler = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        val isAssistedHardwareNoiseSuppressor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+        return JavaAudioDeviceModule.builder(context)
+            .setUseHardwareAcousticEchoCanceler(isAssistedHardwareAcousticEchoCanceler)
+            .setUseHardwareNoiseSuppressor(isAssistedHardwareNoiseSuppressor)
+            .setAudioRecordErrorCallback(Loggers.Audio.audioRecordErrorLog())
+            .setAudioTrackErrorCallback(Loggers.Audio.audioTrackErrorLog())
+            .setAudioRecordStateCallback(Loggers.Audio.audioRecordStateLog())
+            .setAudioTrackStateCallback(Loggers.Audio.audioTrackStateLog())
+            .createAudioDeviceModule().also {
+                it.setMicrophoneMute(false)
+                it.setSpeakerMute(false)
+            }
     }
 
     override fun makeVideoSource(isScreencast: Boolean): VideoSource =
