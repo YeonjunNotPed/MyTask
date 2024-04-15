@@ -115,7 +115,6 @@ class WebRtcManager @AssistedInject constructor(
     /**
      * 로컬 화면 준비 완료되면 localTrack 을 add
      */
-
     override fun onScreenReady() {
         audioManager.addLocalAudioTrack {
             peerConnection.addTrack(it, it.id())
@@ -141,6 +140,9 @@ class WebRtcManager @AssistedInject constructor(
         videoManager.dispose()
         audioManager.dispose()
         peerConnection.dispose()
+
+        iceCollectJob?.cancel()
+        iceCollectJob = null
     }
 
     /**
