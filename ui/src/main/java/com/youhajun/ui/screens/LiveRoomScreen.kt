@@ -69,9 +69,7 @@ fun LiveRoomScreen(
     Column(
         modifier = Modifier.fillMaxSize().background(colorResource(id = R.color.color_292929))
     ) {
-        MyTaskHeader(title = stringResource(id = R.string.header_title_select_room)) {
-            viewModel.onClickHeaderBackIcon()
-        }
+        MyTaskHeader(title = stringResource(id = R.string.header_title_select_room), onClickLeftIcon = viewModel::onClickHeaderBackIcon)
 
         when (state.webRTCSessionType) {
             WebRTCSessionType.Offline,

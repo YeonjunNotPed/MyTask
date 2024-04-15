@@ -188,9 +188,7 @@ fun GptScreen(
                                 key = { it.type },
                             ) { gptType ->
                                 val isSelected = gptType == state.selectedGptType
-                                GptTypeItemComp(gptType, isSelected) {
-                                    viewModel.onClickGptType(it)
-                                }
+                                GptTypeItemComp(gptType, isSelected, viewModel::onClickGptType)
                             }
                         }
                     }
