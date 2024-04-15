@@ -3,6 +3,7 @@ package com.youhajun.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.domain.models.enums.SignalingType
+import com.youhajun.domain.models.enums.SocketMessageType
 import com.youhajun.domain.models.enums.WebRTCSessionType
 import com.youhajun.domain.models.sealeds.CallControlAction
 import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
@@ -10,6 +11,7 @@ import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
 import com.youhajun.domain.usecase.room.GetRoomSignalingCommandUseCase
 import com.youhajun.domain.usecase.room.GetRoomWebRTCSessionUseCase
 import com.youhajun.domain.usecase.room.SendLiveRoomSignalingMsgUseCase
+import com.youhajun.domain.usecase.room.SendSocketMsgUseCase
 import com.youhajun.ui.R
 import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.models.states.LiveRoomState
@@ -47,6 +49,7 @@ class LiveRoomViewModel @AssistedInject constructor(
     private val connectLiveRoomUseCase: ConnectLiveRoomUseCase,
     private val disposeLiveRoomUseCase: DisposeLiveRoomUseCase,
     private val sendLiveRoomSignalingMsgUseCase: SendLiveRoomSignalingMsgUseCase,
+    private val sendSocketMsgUseCase: SendSocketMsgUseCase,
     private val getRoomSignalingCommandUseCase: GetRoomSignalingCommandUseCase,
     private val getRoomWebRTCSessionUseCase: GetRoomWebRTCSessionUseCase,
     webRtcSessionManagerFactory: WebRTCContract.Factory,
@@ -69,7 +72,7 @@ class LiveRoomViewModel @AssistedInject constructor(
         LiveRoomState(eglContext = eglBaseContext, mySessionId = sessionManager.mySessionId)
     ) {
         onCollectSignaling()
-        onCollectMediaTrack()
+        onCollectMedia()
         sessionManager.onScreenReady()
         onLiveRoomSignalingConnect()
     }
@@ -92,9 +95,7 @@ class LiveRoomViewModel @AssistedInject constructor(
     }
 
     override fun sendCommand(signalingCommand: SignalingType, message: String) {
-        viewModelScope.launch {
-            sendLiveRoomSignalingMsgUseCase(signalingCommand to message)
-        }
+        sendLiveRoomSignalingMsgUseCase(signalingCommand to message)
     }
 
     override fun onLiveRoomSignalingConnect() {
@@ -123,21 +124,39 @@ class LiveRoomViewModel @AssistedInject constructor(
         super.onCleared()
         callingEnd()
     }
-    private fun onCollectMediaTrack() {
+    private fun onCollectMedia() {
         intent {
             viewModelScope.launch {
-                sessionManager.sessionFlow.collect {
-                    val mySessionInfo = findSessionInfo(it, state.mySessionId)
-                    val partnerSessionInfo = findPartnerSessionInfo(it, state.mySessionId)
-
-                    reduce {
-                        state.copy(
-                            mySessionInfoVo = mySessionInfo,
-                            partnerSessionInfoVo = partnerSessionInfo
-                        )
-                    }
+                launch {
+                    onCollectSession()
+                }
+                launch {
+                    onCollectAudioLevels()
                 }
             }
+        }
+    }
+
+    private suspend fun onCollectSession() {
+        sessionManager.sessionFlow.collect {
+            intent {
+                val mySessionInfo = findSessionInfo(it, state.mySessionId)
+                val partnerSessionInfo = findPartnerSessionInfo(it, state.mySessionId)
+
+                reduce {
+                    state.copy(
+                        mySessionInfoVo = mySessionInfo,
+                        partnerSessionInfoVo = partnerSessionInfo
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun onCollectAudioLevels() {
+        sessionManager.audioLevelListFlow.collect {
+            val msg = SocketMessageType.AUDIO_LEVELS to it.toString()
+            sendSocketMsgUseCase(msg)
         }
     }
 
@@ -171,8 +190,7 @@ class LiveRoomViewModel @AssistedInject constructor(
             }
         }
     }
-    private fun findPartnerSessionInfo(session: Map<String, SessionInfoVo>, mySessionId: String) =
-        session.filterKeys { it != mySessionId }.values.firstOrNull()
+    private fun findPartnerSessionInfo(session: Map<String, SessionInfoVo>, mySessionId: String) = session.filterKeys { it != mySessionId }.values.firstOrNull()
 
     private fun findSessionInfo(session: Map<String, SessionInfoVo>, sessionId: String) = session[sessionId]
 
