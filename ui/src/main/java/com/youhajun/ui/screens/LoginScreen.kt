@@ -115,9 +115,7 @@ fun LoginScreen(
             })
         }) {
 
-        MyTaskHeader(title = stringResource(id = R.string.header_title_login)) {
-            viewModel.onClickHeaderBackIcon()
-        }
+        MyTaskHeader(title = stringResource(id = R.string.header_title_login), onClickLeftIcon = viewModel::onClickHeaderBackIcon)
 
         Column(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 30.dp)
@@ -135,7 +133,7 @@ fun LoginScreen(
             TopTitleInput(
                 R.string.login_email_title,
                 R.string.login_email_hint,
-                KeyboardType.Text, viewModel.emailStateOf.value,
+                KeyboardType.Text, { viewModel.emailStateOf.value },
                 viewModel::onChangedEmail
             )
 
@@ -144,7 +142,7 @@ fun LoginScreen(
             TopTitleInput(
                 R.string.login_password_title,
                 R.string.login_password_hint,
-                KeyboardType.Password, viewModel.passwordStateOf.value,
+                KeyboardType.Password, { viewModel.passwordStateOf.value },
                 viewModel::onChangedPassword
             )
 
@@ -153,7 +151,7 @@ fun LoginScreen(
             Text(
                 modifier = Modifier
                     .align(Alignment.End)
-                    .clickable { viewModel.onClickForgotPassword() },
+                    .clickable(onClick = viewModel::onClickForgotPassword),
                 text = stringResource(id = R.string.login_forgot_password),
                 fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.W400,
                 textAlign = TextAlign.End
@@ -185,7 +183,7 @@ fun LoginScreen(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { viewModel.onClickSignUp() },
+                    .clickable(onClick = viewModel::onClickSignUp),
                 text = stringResource(id = R.string.login_sign_up),
                 fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.W600,
                 textAlign = TextAlign.Center

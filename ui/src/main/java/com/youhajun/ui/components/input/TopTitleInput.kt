@@ -42,8 +42,8 @@ fun TopTitleInput(
     @StringRes titleTextRes: Int = R.string.login_email_title,
     @StringRes hintTextRes: Int = R.string.login_email_hint,
     keyboardType: KeyboardType = KeyboardType.Password,
-    content: String = "",
-    onValueChange: (String) -> Unit = {},
+    content: () -> String,
+    onValueChange: (String) -> Unit,
 ) {
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -66,7 +66,7 @@ fun TopTitleInput(
             fontWeight = FontWeight.W400
         )
         MyTaskTextField(
-            value = content,
+            value = content(),
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
