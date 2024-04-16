@@ -126,12 +126,11 @@ fun StoreScreen(
         }
         HorizontalPager(pagerState) { page ->
             if (page == 0) PurchasePage(state,
-                onClickCheckItemHistory = { viewModel.onClickCheckItemHistory() },
-                onClickInAppPurchaseItem = { viewModel.onClickInAppPurchaseItem(it.productId, false) },
-                onClickInAppMultiplePurchaseItem = { viewModel.onClickInAppPurchaseItem(it.productId, true) },
-                onClickSubsPurchaseItem = { viewModel.onClickSubsPurchaseItem(it.productId, it.basePlanId) },
-                onClickMultipleItemMinus = { viewModel.onClickMultipleItemCountControl(false) },
-                onClickMultipleItemPlus = { viewModel.onClickMultipleItemCountControl(true) })
+                onClickCheckItemHistory = viewModel::onClickCheckItemHistory,
+                onClickInAppPurchaseItem = viewModel::onClickInAppPurchaseItem,
+                onClickSubsPurchaseItem = viewModel::onClickSubsPurchaseItem,
+                onClickMultipleItemCount = viewModel::onClickMultipleItemCountControl
+            )
             else ChargePage()
         }
     }
@@ -141,11 +140,9 @@ fun StoreScreen(
 @Composable
 fun PurchasePage(
     state: StoreState,
-    onClickInAppPurchaseItem: (PurchaseInAppItemVo) -> Unit,
-    onClickInAppMultiplePurchaseItem: (PurchaseInAppItemVo) -> Unit,
-    onClickSubsPurchaseItem: (PurchaseSubsItemVo) -> Unit,
-    onClickMultipleItemPlus: () -> Unit,
-    onClickMultipleItemMinus: () -> Unit,
+    onClickInAppPurchaseItem: (String, Boolean) -> Unit,
+    onClickSubsPurchaseItem: (String, String) -> Unit,
+    onClickMultipleItemCount: (Boolean) -> Unit,
     onClickCheckItemHistory: () -> Unit
 ) {
     Column(
@@ -215,14 +212,17 @@ fun PurchasePage(
                 key = { it.idx },
             ) {
                 if (it.purchaseType == PurchaseType.IN_APP) {
-                    PurchaseInAppItemComp(it, onClickInAppPurchaseItem)
+                    PurchaseInAppItemComp(it, onClickItem = {
+                        onClickInAppPurchaseItem(it.productId, false)
+                    })
                 } else {
                     PurchaseInAppMultipleItemComp(
                         it,
                         state.multiplePurchaseCount,
-                        onClickInAppMultiplePurchaseItem,
-                        onClickMultipleItemPlus,
-                        onClickMultipleItemMinus
+                        onClickItem = {
+                            onClickInAppPurchaseItem(it.productId, true)
+                        },
+                        onClickMultipleItemCount,
                     )
                 }
             }

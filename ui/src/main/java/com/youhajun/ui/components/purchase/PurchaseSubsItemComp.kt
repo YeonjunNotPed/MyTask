@@ -35,11 +35,13 @@ import com.youhajun.ui.graphics.modifier.shimmerBadgeModifier
 fun PurchaseSubsItemComp(
     isCurrentSubs: Boolean,
     purchaseSubsItemVo: PurchaseSubsItemVo,
-    onClickItem: (PurchaseSubsItemVo) -> Unit
+    onClickItem: (String, String) -> Unit
 ) {
     ConstraintLayout(
         modifier = Modifier
-            .clickable { onClickItem.invoke(purchaseSubsItemVo) }
+            .clickable {
+                onClickItem(purchaseSubsItemVo.productId, purchaseSubsItemVo.basePlanId)
+            }
             .fillMaxWidth()
             .wrapContentHeight()
             .border(1.dp, colorResource(id = R.color.color_b9b9b9), RoundedCornerShape(12.dp))

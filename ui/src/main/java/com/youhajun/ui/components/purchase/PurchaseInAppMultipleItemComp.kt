@@ -45,8 +45,7 @@ fun PurchaseInAppMultipleItemComp(
     purchaseInAppItemVo: PurchaseInAppItemVo,
     multiplePurchaseCount: Int,
     onClickItem: (PurchaseInAppItemVo) -> Unit,
-    onClickMultipleCountControlPlus: () -> Unit,
-    onClickMultipleCountControlMinus: () -> Unit,
+    onClickMultipleCount: (Boolean) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -122,11 +121,11 @@ fun PurchaseInAppMultipleItemComp(
                 Icon(imageVector = Icons.Outlined.AddCircleOutline,
                     null,
                     tint = colorResource(id = R.color.color_b9b9b9),
-                    modifier = Modifier.clickable { onClickMultipleCountControlPlus() })
+                    modifier = Modifier.clickable { onClickMultipleCount(true) })
                 Icon(imageVector = Icons.Outlined.RemoveCircleOutline,
                     null,
                     tint = colorResource(id = R.color.color_b9b9b9),
-                    modifier = Modifier.clickable { onClickMultipleCountControlMinus() })
+                    modifier = Modifier.clickable { onClickMultipleCount(false) })
             }
         }
     }
