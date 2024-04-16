@@ -1,10 +1,8 @@
 package com.youhajun.ui.models.states
 
 import com.youhajun.domain.models.enums.WebRTCSessionType
-import com.youhajun.domain.models.vo.CallMediaStateVo
 import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
 import org.webrtc.EglBase
-import org.webrtc.VideoTrack
 
 data class LiveRoomState(
     val eglContext: EglBase.Context,

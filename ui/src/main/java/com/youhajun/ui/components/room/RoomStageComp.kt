@@ -39,7 +39,7 @@ fun RoomStageComp(
     eglBaseContext: EglBase.Context
 ) {
     val myVideoTrack = mySessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
-    val myMediaStateVo = mySessionInfoVo?.callMediaStateVo
+    val myMediaStateVo = mySessionInfoVo?.callMediaStateHolder
 
     val rendererEvents = object : RendererCommon.RendererEvents {
         override fun onFirstFrameRendered() {

@@ -1,6 +1,7 @@
-package com.youhajun.domain.models.vo
+package com.youhajun.ui.models.holder
 
-data class CallMediaStateVo(
+data class CallMediaStateHolder(
+    val audioLevelList: List<Float> = emptyList(),
     val isFrontCamera: Boolean = true,
     val isCameraEnable: Boolean = true,
     val isSpeakerEnable: Boolean = false,

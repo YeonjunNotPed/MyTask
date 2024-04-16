@@ -28,9 +28,9 @@ fun RoomCallingComp(
     eglBaseContext: EglBase.Context
 ) {
     val myVideoTrack = mySessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
-    val myMediaStateVo = mySessionInfoVo?.callMediaStateVo
+    val myMediaStateVo = mySessionInfoVo?.callMediaStateHolder
     val partnerVideoTrack = partnerSessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
-    val partnerMediaStateVo = partnerSessionInfoVo?.callMediaStateVo
+    val partnerMediaStateVo = partnerSessionInfoVo?.callMediaStateHolder
 
     var parentSize: IntSize by remember { mutableStateOf(IntSize(0, 0)) }
 

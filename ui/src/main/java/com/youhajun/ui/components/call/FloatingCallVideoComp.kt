@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.youhajun.domain.models.vo.CallMediaStateVo
+import com.youhajun.ui.models.holder.CallMediaStateHolder
 import com.youhajun.ui.R
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
@@ -43,7 +43,7 @@ import org.webrtc.VideoTrack
 fun FloatingCallVideoComp(
     modifier: Modifier = Modifier,
     videoTrack: VideoTrack,
-    mediaStateVo: CallMediaStateVo,
+    mediaStateVo: CallMediaStateHolder,
     eglBaseContext: EglBase.Context,
     parentBounds: IntSize,
     paddingValues: PaddingValues = PaddingValues(0.dp, 0.dp)

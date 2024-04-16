@@ -4,7 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,7 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.youhajun.domain.models.vo.CallMediaStateVo
+import com.youhajun.ui.models.holder.CallMediaStateHolder
 import com.youhajun.ui.R
 import org.webrtc.EglBase
 import org.webrtc.RendererCommon
@@ -24,7 +26,7 @@ import org.webrtc.VideoTrack
 fun CallVideoComp(
     modifier: Modifier = Modifier,
     videoTrack: VideoTrack,
-    mediaStateVo: CallMediaStateVo,
+    mediaStateVo: CallMediaStateHolder,
     eglBaseContext: EglBase.Context,
 ) {
 
@@ -66,7 +68,9 @@ fun CallVideoComp(
 
         VoiceRecognizerComp(
             modifier = Modifier.align(Alignment.BottomEnd),
-            isMicEnable = !mediaStateVo.isMicMute
+            waveModifier = Modifier.width(60.dp).height(45.dp),
+            isMicEnable = !mediaStateVo.isMicMute,
+            audioLevels = mediaStateVo.audioLevelList
         )
     }
 }

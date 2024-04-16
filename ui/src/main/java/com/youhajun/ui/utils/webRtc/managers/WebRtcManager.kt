@@ -78,7 +78,7 @@ class WebRtcManager @AssistedInject constructor(
             it.onSuccess { isFrontCamera ->
                 editSessionInfo(mySessionId) {
                     it.copy(
-                        callMediaStateVo = it.callMediaStateVo.copy(isFrontCamera = isFrontCamera)
+                        callMediaStateHolder = it.callMediaStateHolder.copy(isFrontCamera = isFrontCamera)
                     )
                 }
             }
@@ -89,7 +89,7 @@ class WebRtcManager @AssistedInject constructor(
         videoManager.setEnableCamera(enabled)
         editSessionInfo(mySessionId) {
             it.copy(
-                callMediaStateVo = it.callMediaStateVo.copy(isCameraEnable = enabled)
+                callMediaStateHolder = it.callMediaStateHolder.copy(isCameraEnable = enabled)
             )
         }
     }
@@ -98,7 +98,7 @@ class WebRtcManager @AssistedInject constructor(
         audioManager.setEnableSpeakerphone(enabled)
         editSessionInfo(mySessionId) {
             it.copy(
-                callMediaStateVo = it.callMediaStateVo.copy(isSpeakerEnable = enabled)
+                callMediaStateHolder = it.callMediaStateHolder.copy(isSpeakerEnable = enabled)
             )
         }
     }
@@ -107,7 +107,7 @@ class WebRtcManager @AssistedInject constructor(
         audioManager.setMicMute(isMute)
         editSessionInfo(mySessionId) {
             it.copy(
-                callMediaStateVo = it.callMediaStateVo.copy(isMicMute = isMute)
+                callMediaStateHolder = it.callMediaStateHolder.copy(isMicMute = isMute)
             )
         }
     }
