@@ -22,6 +22,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.domain.models.enums.WebRTCSessionType
 import com.youhajun.ui.models.holder.CallMediaStateHolder
@@ -35,7 +36,7 @@ import com.youhajun.ui.viewModels.LiveRoomViewModel
 
 @Composable
 fun LiveRoomScreen(
-    viewModel: LiveRoomViewModel,
+    viewModel: LiveRoomViewModel = hiltViewModel(),
     onNavigate: (LiveRoomSideEffect.Navigation) -> Unit = {}
 ) {
 
@@ -67,7 +68,9 @@ fun LiveRoomScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(colorResource(id = R.color.color_292929))
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.color_292929))
     ) {
         MyTaskHeader(title = stringResource(id = R.string.header_title_select_room), onClickLeftIcon = viewModel::onClickHeaderBackIcon)
 
@@ -101,7 +104,9 @@ fun LiveRoomScreen(
         AnimatedVisibility(visible = state.isVisibleBottomAction) {
             val myMediaState = state.mySessionInfoVo?.callMediaStateHolder ?: CallMediaStateHolder()
             CallBottomComp(
-                modifier = Modifier.fillMaxWidth().height(74.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(74.dp),
                 mediaStateVo = myMediaState,
                 onClickCallAction = viewModel::onClickCallControlAction
             )

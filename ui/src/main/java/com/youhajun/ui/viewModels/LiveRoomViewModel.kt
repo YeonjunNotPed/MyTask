@@ -1,5 +1,6 @@
 package com.youhajun.ui.viewModels
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.domain.models.enums.SignalingType
@@ -13,14 +14,12 @@ import com.youhajun.domain.usecase.room.GetRoomWebRTCSessionUseCase
 import com.youhajun.domain.usecase.room.SendLiveRoomSignalingMsgUseCase
 import com.youhajun.domain.usecase.room.SendSocketMsgUseCase
 import com.youhajun.ui.R
+import com.youhajun.ui.models.destinations.MyTaskDestination
 import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.models.states.LiveRoomState
 import com.youhajun.ui.utils.ResourceProviderUtil
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.log.taggedLogger
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +32,7 @@ import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import org.webrtc.EglBase
+import javax.inject.Inject
 
 interface LiveRoomIntent {
     fun onClickHeaderBackIcon()
@@ -42,9 +42,9 @@ interface LiveRoomIntent {
     fun onTabCallingScreen()
 }
 
-@HiltViewModel(assistedFactory = LiveRoomViewModel.LiveRoomViewModelFactory::class)
-class LiveRoomViewModel @AssistedInject constructor(
-    @Assisted private val roomIdx: Long,
+@HiltViewModel
+class LiveRoomViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val resourceProviderUtil: ResourceProviderUtil,
     private val connectLiveRoomUseCase: ConnectLiveRoomUseCase,
     private val disposeLiveRoomUseCase: DisposeLiveRoomUseCase,
@@ -59,11 +59,7 @@ class LiveRoomViewModel @AssistedInject constructor(
 
     private val logger by taggedLogger("LiveRoomViewModel")
 
-    @AssistedFactory
-    interface LiveRoomViewModelFactory {
-        fun create(roomIdx: Long): LiveRoomViewModel
-    }
-
+    private val roomIdx: Long = checkNotNull(savedStateHandle[MyTaskDestination.LiveRoom.IDX_ARG_KEY])
     private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingType, String>>()
     override val signalingCommandFlow: Flow<Pair<SignalingType, String>> = _signalingCommandFlow
     private val sessionManager: WebRTCContract.SessionManager = webRtcSessionManagerFactory.createSessionManager(this)
