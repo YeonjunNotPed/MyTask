@@ -61,9 +61,9 @@ fun SelectRoomScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            MyTaskHeader(title = stringResource(id = R.string.header_title_select_room)) {
-                viewModel.onClickHeaderBackIcon()
-            }
+            MyTaskHeader(
+                title = stringResource(id = R.string.header_title_select_room),
+                onClickLeftIcon = viewModel::onClickHeaderBackIcon)
 
             LazyColumn(
                 modifier = Modifier
@@ -76,16 +76,14 @@ fun SelectRoomScreen(
                     items = state.roomList,
                     key = { it.idx },
                 ) {
-                    RoomPreviewItemComp(roomPreviewVo = it, onClickItem = {
-                        viewModel.onClickRoom(it.idx)
-                    })
+                    RoomPreviewItemComp(roomPreviewVo = it, onClickItem = viewModel::onClickRoom)
                 }
             }
         }
 
         ExtendedFloatingActionButton(
             modifier = Modifier.align(Alignment.BottomEnd).padding(horizontal = 20.dp, vertical = 20.dp),
-            onClick = { viewModel.onClickCreateRoom() },
+            onClick = viewModel::onClickCreateRoom,
             icon = { Icon(Icons.Filled.Edit, null) },
             text = { Text(text = stringResource(id = R.string.create_room)) },
         )

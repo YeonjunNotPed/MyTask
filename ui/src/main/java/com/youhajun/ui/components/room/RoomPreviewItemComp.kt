@@ -28,11 +28,11 @@ import com.youhajun.ui.R
 @Composable
 fun RoomPreviewItemComp(
     roomPreviewVo: RoomPreviewVo,
-    onClickItem: (RoomPreviewVo) -> Unit
+    onClickItem: (Long) -> Unit
 ) {
     Column(
         modifier = Modifier
-            .clickable { onClickItem.invoke(roomPreviewVo) }
+            .clickable { onClickItem(roomPreviewVo.idx) }
             .border(1.dp, Color.White, RoundedCornerShape(12.dp))
             .padding(0.5.dp)
             .clip(shape = RoundedCornerShape(12.dp))
