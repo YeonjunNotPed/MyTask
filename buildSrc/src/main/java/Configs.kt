@@ -1,6 +1,7 @@
 object Configs {
     //Android Config
     const val COMPILE_SDK = 34
+    const val JVM_TARGET = "1.8"
 
     //Android Default Config
     const val MIN_SDK = 26
