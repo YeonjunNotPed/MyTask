@@ -1,21 +1,17 @@
 package com.youhajun.data.repositories.localDataSource
 
-import com.youhajun.data.Resource
-import com.youhajun.data.dao.GptAssistantDao
-import com.youhajun.data.dao.GptChannelDao
-import com.youhajun.data.dao.GptMessageDao
-import com.youhajun.data.dao.GptRoleDao
-import com.youhajun.data.models.dto.gpt.UpdateGptChannelInfoRequest
-import com.youhajun.data.models.entity.gpt.GptAssistantEntity
-import com.youhajun.data.models.entity.gpt.GptChannelEntity
-import com.youhajun.data.models.entity.gpt.GptMessageEntity
-import com.youhajun.data.models.entity.gpt.GptRoleEntity
-import com.youhajun.data.network.safeResourceFlow
+import com.youhajun.model_data.gpt.UpdateGptChannelInfoRequest
+import com.youhajun.room.dao.GptAssistantDao
+import com.youhajun.room.dao.GptChannelDao
+import com.youhajun.room.dao.GptMessageDao
+import com.youhajun.room.dao.GptRoleDao
+import com.youhajun.room.entity.gpt.GptAssistantEntity
+import com.youhajun.room.entity.gpt.GptChannelEntity
+import com.youhajun.room.entity.gpt.GptMessageEntity
+import com.youhajun.room.entity.gpt.GptRoleEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class GptLocalDataSource @Inject constructor(
     private val gptRoleDao: GptRoleDao,
@@ -24,60 +20,37 @@ class GptLocalDataSource @Inject constructor(
     private val gptAssistantDao: GptAssistantDao
 ) {
 
-    fun insertGptRole(role: String) = flow {
-        emit(Resource.Success(gptRoleDao.insertRole(GptRoleEntity(role))))
-    }.safeResourceFlow()
+    suspend fun insertGptRole(role: String): Unit = gptRoleDao.insertRole(GptRoleEntity(role))
 
-    fun insertGptMessage(gptMessageEntity: GptMessageEntity) = flow {
-        emit(Resource.Success(gptMessageDao.insertMessage(gptMessageEntity)))
-    }.safeResourceFlow()
+    suspend fun insertGptMessage(gptMessageEntity: GptMessageEntity): Long =
+        gptMessageDao.insertMessage(gptMessageEntity)
 
-    fun insertGptChannel(gptChannelEntity: GptChannelEntity) = flow {
-        emit(Resource.Success(gptChannelDao.insertChannel(gptChannelEntity)))
-    }.safeResourceFlow()
+    suspend fun insertGptChannel(gptChannelEntity: GptChannelEntity): Long =
+        gptChannelDao.insertChannel(gptChannelEntity)
 
-    fun insertGptAssistant(gptAssistantEntity: GptAssistantEntity) = flow {
-        emit(Resource.Success(gptAssistantDao.insertAssistantAndDeleteOldest(gptAssistantEntity)))
-    }.safeResourceFlow()
+    suspend fun insertGptAssistant(gptAssistantEntity: GptAssistantEntity): Unit =
+        gptAssistantDao.insertAssistantAndDeleteOldest(gptAssistantEntity)
 
-    fun deleteGptRole(role: String) = flow {
-        emit(Resource.Success(gptRoleDao.deleteRole(role)))
-    }.safeResourceFlow()
+    suspend fun deleteGptRole(role: String): Unit = gptRoleDao.deleteRole(role)
 
-    fun deleteGptChannel(idx: Long) = flow {
-        emit(Resource.Success(gptChannelDao.deleteChannel(idx)))
-    }.safeResourceFlow()
+    suspend fun deleteGptChannel(idx: Long): Unit = gptChannelDao.deleteChannel(idx)
 
-    fun updateGptChannelInfo(request: UpdateGptChannelInfoRequest) = flow {
-        request.run {
-            emit(Resource.Success(gptChannelDao.updateGptChannelInfo(idx, roleOfAi, lastQuestion, gptType)))
-        }
-    }.safeResourceFlow()
+    suspend fun updateGptChannelInfo(request: UpdateGptChannelInfoRequest): Unit = with(request) {
+        gptChannelDao.updateGptChannelInfo(idx, roleOfAi, lastQuestion, gptType)
+    }
 
-    fun selectAllGptRoles() = gptRoleDao.getAllRoles()
-        .map { Resource.Success(it) }
-        .safeResourceFlow()
+    fun selectAllGptRoles(): Flow<List<GptRoleEntity>> = gptRoleDao.getAllRoles()
+    fun selectAllGptChannels(): Flow<List<GptChannelEntity>> = gptChannelDao.getAllChannels()
 
-    fun selectAllGptChannels() = gptChannelDao.getAllChannels()
-        .map { Resource.Success(it) }
-        .safeResourceFlow()
+    fun selectLatestChannel(): Flow<GptChannelEntity> =
+        gptChannelDao.getLatestChannel().filterNotNull()
 
-    fun selectLatestChannel() = gptChannelDao.getLatestChannel()
-        .filterNotNull()
-        .map { Resource.Success(it) }
-        .safeResourceFlow()
+    fun selectGptChannel(idx: Long): Flow<GptChannelEntity> =
+        gptChannelDao.getChannelByIdx(idx).filterNotNull()
 
-    fun selectGptChannel(idx: Long) = gptChannelDao.getChannelByIdx(idx)
-        .filterNotNull()
-        .map { Resource.Success(it) }
-        .safeResourceFlow()
+    fun selectAllGptMessages(channelIdx: Long): Flow<List<GptMessageEntity>> =
+        gptMessageDao.getMessagesByChannelIdx(channelIdx)
 
-    fun selectAllGptMessages(channelIdx: Long) = gptMessageDao.getMessagesByChannelIdx(channelIdx)
-        .map { Resource.Success(it) }
-        .safeResourceFlow()
-
-    fun selectAllGptAssistants(channelIdx: Long) =
+    fun selectAllGptAssistants(channelIdx: Long): Flow<List<GptAssistantEntity>> =
         gptAssistantDao.getAssistantsByChannelIdx(channelIdx)
-            .map { Resource.Success(it) }
-            .safeResourceFlow()
 }
