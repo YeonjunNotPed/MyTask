@@ -7,17 +7,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.youhajun.data.Resource
-import com.youhajun.data.ResourceErrorVo
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class PrefDataStoreDataSource @Inject constructor(
     private val dataStorePref: DataStore<Preferences>
@@ -32,59 +26,42 @@ class PrefDataStoreDataSource @Inject constructor(
         }
     }
 
-    fun getStringSync(key: String): Resource<String> =
-        getSyncPreferencesData(stringPreferencesKey(key))
+    fun getStringSync(key: String): String =
+        getSyncPreferencesData(stringPreferencesKey(key), "")
 
-    fun getBoolean(key: String): Flow<Resource<Boolean>> =
-        getPreferencesData(booleanPreferencesKey(key))
+    fun getBoolean(key: String): Flow<Boolean> =
+        getPreferencesData(booleanPreferencesKey(key), false)
 
-    fun setBoolean(key: String, value: Boolean): Flow<Resource<Unit>> =
+    suspend fun setBoolean(key: String, value: Boolean): Preferences =
         savePreferencesData(booleanPreferencesKey(key), value)
 
-    fun getString(key: String): Flow<Resource<String>> =
-        getPreferencesData(stringPreferencesKey(key))
+    fun getString(key: String): Flow<String> =
+        getPreferencesData(stringPreferencesKey(key), "")
 
-    fun setString(key: String, value: String): Flow<Resource<Unit>> =
+    suspend fun setString(key: String, value: String): Preferences =
         savePreferencesData(stringPreferencesKey(key), value)
 
-    fun getInt(key: String): Flow<Resource<Int>> =
-        getPreferencesData(intPreferencesKey(key))
+    fun getInt(key: String): Flow<Int> =
+        getPreferencesData(intPreferencesKey(key), -1)
 
-    fun setInt(key: String, value: Int): Flow<Resource<Unit>> =
+    suspend fun setInt(key: String, value: Int): Preferences =
         savePreferencesData(intPreferencesKey(key), value)
 
-    fun getByteArray(key: String): Flow<Resource<ByteArray>> {
-        return getString(key).map {
-            when (it) {
-                is Resource.Success -> Resource.Success(base64ToByteArray(it.data))
-                is Resource.Error -> Resource.Error(it.errorVo.convert())
-                is Resource.Loading -> Resource.Loading()
-            }
-        }
-    }
+    fun getByteArray(key: String): Flow<ByteArray> =
+        getString(key).map { base64ToByteArray(it) }
 
-    fun setByteArray(key: String, value: ByteArray): Flow<Resource<Unit>> =
+    suspend fun setByteArray(key: String, value: ByteArray): Preferences =
         setString(key, byteArrayToBase64(value))
 
-    private fun <T> getPreferencesData(key: Preferences.Key<T>): Flow<Resource<T>> {
-        return dataStorePref.data.map { pref ->
-            pref[key]?.let { data ->
-                Resource.Success(data)
-            } ?: Resource.Error(ResourceErrorVo())
-        }
-    }
+    private fun <T> getPreferencesData(key: Preferences.Key<T>, default: T): Flow<T> =
+        dataStorePref.data.map { pref -> pref[key] ?: default }
 
-    private fun <T> savePreferencesData(
+    private suspend fun <T> savePreferencesData(
         key: Preferences.Key<T>,
         value: T
-    ): Flow<Resource<Unit>> = flow<Resource<Unit>> {
-        dataStorePref.edit { pref -> pref[key] = value }
-        emit(Resource.Success(Unit))
-    }.catch { emit(Resource.Error(ResourceErrorVo())) }
+    ) = dataStorePref.edit { pref -> pref[key] = value }
 
-    private fun <T> getSyncPreferencesData(key: Preferences.Key<T>): Resource<T> = runBlocking {
-        dataStorePref.data.first()[key]?.let {
-            Resource.Success(it)
-        } ?: Resource.Error(ResourceErrorVo())
+    private fun <T> getSyncPreferencesData(key: Preferences.Key<T>, default: T): T = runBlocking {
+        return@runBlocking dataStorePref.data.first()[key] ?: default
     }
 }
