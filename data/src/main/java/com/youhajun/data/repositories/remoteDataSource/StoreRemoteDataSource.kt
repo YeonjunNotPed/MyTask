@@ -1,24 +1,18 @@
 package com.youhajun.data.repositories.remoteDataSource
 
-import com.youhajun.data.models.dto.ApiResponse
-import com.youhajun.data.models.dto.store.PurchaseItemInfo
-import com.youhajun.data.models.dto.store.PurchaseVerifyRequest
-import com.youhajun.data.network.safeResponseFlow
-import com.youhajun.data.services.StoreService
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import retrofit2.Response
+import com.youhajun.model_data.store.PurchaseItemInfo
+import com.youhajun.model_data.store.PurchaseVerifyRequest
+import com.youhajun.model_data.ApiResult
+import com.youhajun.remote.myTaskApiHandle
+import com.youhajun.remote.services.StoreService
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class StoreRemoteDataSource @Inject constructor(
     private val storeService: StoreService
 ) {
-    suspend fun getPurchaseItemInfo(): Flow<Response<ApiResponse<PurchaseItemInfo>>> = flow {
-        emit(storeService.getPurchaseItemInfo())
-    }.safeResponseFlow()
+    suspend fun getPurchaseItemInfo(): ApiResult<PurchaseItemInfo> =
+        myTaskApiHandle { storeService.getPurchaseItemInfo() }
 
-    suspend fun postPurchaseVerify(request: PurchaseVerifyRequest): Flow<Response<ApiResponse<Unit>>> = flow {
-        emit(storeService.postPurchaseVerify(request))
-    }.safeResponseFlow()
+    suspend fun postPurchaseVerify(request: PurchaseVerifyRequest): ApiResult<Unit> =
+        myTaskApiHandle { storeService.postPurchaseVerify(request) }
 }
