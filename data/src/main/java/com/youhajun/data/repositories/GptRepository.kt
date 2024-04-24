@@ -1,79 +1,70 @@
 package com.youhajun.data.repositories
 
-import com.youhajun.data.Resource
-import com.youhajun.data.models.dto.gpt.ChatGptRequest
-import com.youhajun.data.models.dto.gpt.ChatGptResponse
-import com.youhajun.data.models.dto.gpt.UpdateGptChannelInfoRequest
-import com.youhajun.data.models.entity.gpt.GptAssistantEntity
-import com.youhajun.data.models.entity.gpt.GptChannelEntity
-import com.youhajun.data.models.entity.gpt.GptMessageEntity
-import com.youhajun.data.models.entity.gpt.GptRoleEntity
-import com.youhajun.data.repositories.base.BaseRepository
 import com.youhajun.data.repositories.localDataSource.GptLocalDataSource
 import com.youhajun.data.repositories.remoteDataSource.GptRemoteDataSource
+import com.youhajun.model_data.gpt.ChatGptRequest
+import com.youhajun.model_data.gpt.ChatGptResponse
+import com.youhajun.model_data.gpt.GptAssistantEntityDto
+import com.youhajun.model_data.gpt.GptChannelEntityDto
+import com.youhajun.model_data.gpt.GptMessageEntityDto
+import com.youhajun.model_data.gpt.GptRoleEntityDto
+import com.youhajun.model_data.gpt.UpdateGptChannelInfoRequest
+import com.youhajun.model_data.ApiResult
+import com.youhajun.room.entity.gpt.GptAssistantEntity.Companion.toDto
+import com.youhajun.room.entity.gpt.GptAssistantEntity.Companion.toEntity
+import com.youhajun.room.entity.gpt.GptChannelEntity.Companion.toDto
+import com.youhajun.room.entity.gpt.GptChannelEntity.Companion.toEntity
+import com.youhajun.room.entity.gpt.GptMessageEntity.Companion.toDto
+import com.youhajun.room.entity.gpt.GptMessageEntity.Companion.toEntity
+import com.youhajun.room.entity.gpt.GptRoleEntity.Companion.toDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class GptRepository @Inject constructor(
     private val gptRemoteDataSource: GptRemoteDataSource,
     private val gptLocalDataSource: GptLocalDataSource
-) : BaseRepository() {
+) {
 
-    fun postChatGptPrompt(request: ChatGptRequest): Flow<Resource<ChatGptResponse>> =
-        gptRemoteDataSource.postChatGptPrompt(request).map { apiConverter(it) }
+    suspend fun postChatGptPrompt(request: ChatGptRequest): ApiResult<ChatGptResponse> =
+        gptRemoteDataSource.postChatGptPrompt(request)
 
-    fun insertGptRole(role: String): Flow<Resource<Unit>> {
-        return gptLocalDataSource.insertGptRole(role)
-    }
+    suspend fun insertGptRole(role: String): Unit =
+        gptLocalDataSource.insertGptRole(role)
 
-    fun insertGptChannel(channelEntity: GptChannelEntity): Flow<Resource<Long>> {
-        return gptLocalDataSource.insertGptChannel(channelEntity).onStart { emit(Resource.Loading()) }
-    }
+    suspend fun insertGptChannel(dto: GptChannelEntityDto): Long =
+        gptLocalDataSource.insertGptChannel(dto.toEntity())
 
-    fun insertGptAssistant(gptAssistantEntity: GptAssistantEntity): Flow<Resource<Unit>> {
-        return gptLocalDataSource.insertGptAssistant(gptAssistantEntity)
-    }
+    suspend fun insertGptAssistant(dto: GptAssistantEntityDto): Unit =
+        gptLocalDataSource.insertGptAssistant(dto.toEntity())
 
-    fun insertGptMessage(gptMessageEntity: GptMessageEntity): Flow<Resource<Long>> {
-        return gptLocalDataSource.insertGptMessage(gptMessageEntity)
-    }
+    suspend fun insertGptMessage(dto: GptMessageEntityDto): Long =
+        gptLocalDataSource.insertGptMessage(dto.toEntity())
 
-    fun deleteGptRole(role: String): Flow<Resource<Unit>> {
-        return gptLocalDataSource.deleteGptRole(role)
-    }
+    suspend fun deleteGptRole(role: String): Unit =
+        gptLocalDataSource.deleteGptRole(role)
 
-    fun deleteGptChannel(idx: Long): Flow<Resource<Unit>> {
-        return gptLocalDataSource.deleteGptChannel(idx)
-    }
+    suspend fun deleteGptChannel(idx: Long): Unit =
+        gptLocalDataSource.deleteGptChannel(idx)
 
-    fun updateGptChannelInfo(request: UpdateGptChannelInfoRequest): Flow<Resource<Unit>> {
-        return gptLocalDataSource.updateGptChannelInfo(request)
-    }
+    suspend fun updateGptChannelInfo(request: UpdateGptChannelInfoRequest) =
+        gptLocalDataSource.updateGptChannelInfo(request)
 
-    fun selectAllGptRoles(): Flow<Resource<List<GptRoleEntity>>> {
-        return gptLocalDataSource.selectAllGptRoles()
-    }
+    fun selectAllGptRoles(): Flow<List<GptRoleEntityDto>> =
+        gptLocalDataSource.selectAllGptRoles().map { it.map { it.toDto() } }
 
-    fun selectAllGptChannels(): Flow<Resource<List<GptChannelEntity>>> {
-        return gptLocalDataSource.selectAllGptChannels()
-    }
+    fun selectAllGptChannels(): Flow<List<GptChannelEntityDto>> =
+        gptLocalDataSource.selectAllGptChannels().map { it.map { it.toDto() } }
 
-    fun selectLatestChannel(): Flow<Resource<GptChannelEntity>> {
-        return gptLocalDataSource.selectLatestChannel()
-    }
+    fun selectLatestChannel(): Flow<GptChannelEntityDto> =
+        gptLocalDataSource.selectLatestChannel().map { it.toDto() }
 
-    fun selectGptChannel(idx: Long): Flow<Resource<GptChannelEntity>> {
-        return gptLocalDataSource.selectGptChannel(idx)
-    }
+    fun selectGptChannel(idx: Long): Flow<GptChannelEntityDto> =
+        gptLocalDataSource.selectGptChannel(idx).map { it.toDto() }
 
-    fun selectAllGptMessages(channelIdx: Long): Flow<Resource<List<GptMessageEntity>>> {
-        return gptLocalDataSource.selectAllGptMessages(channelIdx)
-    }
+    fun selectAllGptMessages(channelIdx: Long): Flow<List<GptMessageEntityDto>> =
+        gptLocalDataSource.selectAllGptMessages(channelIdx).map { it.map { it.toDto() } }
 
-    fun selectAllGptAssistants(channelIdx: Long): Flow<Resource<List<GptAssistantEntity>>> {
-        return gptLocalDataSource.selectAllGptAssistants(channelIdx)
-    }
+    fun selectAllGptAssistants(channelIdx: Long): Flow<List<GptAssistantEntityDto>> =
+        gptLocalDataSource.selectAllGptAssistants(channelIdx).map { it.map { it.toDto() } }
 }
-
