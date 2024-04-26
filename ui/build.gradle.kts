@@ -2,9 +2,9 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     kotlin("kapt")
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.jetbrains.android)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -39,19 +39,25 @@ android {
         }
 
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = Configs.JVM_TARGET
+
+        freeCompilerArgs += listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler"
+        )
+        freeCompilerArgs += listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler"
+        )
     }
     buildFeatures {
         compose = true
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
@@ -61,51 +67,35 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":core:common"))
+    implementation(project(":core:model-ui"))
+    implementation(project(":core:model-data"))
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.material:material-icons-extended:1.6.4")
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.foundation:foundation:1.6.5")
-    implementation("com.google.dagger:hilt-android:2.49")
-    kapt("com.google.dagger:hilt-android-compiler:2.49")
-    implementation("org.orbit-mvi:orbit-core:6.1.0")
-    implementation("org.orbit-mvi:orbit-viewmodel:6.1.0")
-    implementation("org.orbit-mvi:orbit-compose:6.1.0")
-    testImplementation("org.orbit-mvi:orbit-test:6.1.0")
+    implementation(libs.core.ktx)
+    implementation(libs.bundles.lifecycle)
+    implementation(libs.bundles.compose.ui)
+    implementation(libs.bundles.compose.libs)
+    implementation(libs.bundles.orbit)
+    implementation(libs.bundles.webrtc)
 
-    implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation(libs.hilt)
+    kapt(libs.hilt.compiler)
 
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0-alpha02")
+    implementation(libs.kakao.login)
 
-    implementation("com.kakao.sdk:v2-user:2.19.0")
+    implementation(libs.play.services.auth)
 
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation(libs.billing.ktx)
 
-    implementation("com.android.billingclient:billing-ktx:6.2.0")
+    implementation(libs.stream.log)
 
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation(libs.kotlinx.collections.immutable)
 
-    implementation("io.getstream:stream-webrtc-android:1.1.2")
-    implementation("io.getstream:stream-webrtc-android-compose:1.1.2")
-    implementation("io.getstream:stream-webrtc-android-ui:1.1.2")
-    implementation("io.getstream:stream-log:1.1.4")
+    testImplementation(libs.bundles.test)
+    debugImplementation(libs.bundles.debug)
+    androidTestImplementation(libs.bundles.android.test)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
 }
 
 kapt {
@@ -113,5 +103,5 @@ kapt {
 }
 
 fun getProperty(propertyKey: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }

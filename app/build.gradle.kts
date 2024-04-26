@@ -1,10 +1,10 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
     kotlin("kapt")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.android)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -19,8 +19,6 @@ android {
         versionName = Configs.VERSION_NAME
 
         buildConfigField("String", "KAKAO_NATIVE_KEY", getProperty("KAKAO_NATIVE_KEY"))
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
     }
 
@@ -46,12 +44,14 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = Configs.JVM_TARGET
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     packaging {
         resources {
@@ -65,20 +65,20 @@ android {
 
 dependencies {
     implementation(project(":ui"))
-    implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":core:common"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:model-data"))
+    implementation(project(":core:model-ui"))
+    implementation(project(":core:remote"))
+    implementation(project(":core:room"))
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    implementation("com.google.dagger:hilt-android:2.49")
-    kapt("com.google.dagger:hilt-android-compiler:2.49")
+    implementation(libs.hilt)
+    kapt(libs.hilt.compiler)
 
-    implementation("com.kakao.sdk:v2-user:2.19.0")
+    implementation(libs.kakao.login)
 
-    implementation("io.getstream:stream-log:1.1.4")
+    implementation(libs.stream.log)
 }
 
 kapt {
@@ -86,5 +86,5 @@ kapt {
 }
 
 fun getProperty(propertyKey: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+    return gradleLocalProperties(rootDir,providers).getProperty(propertyKey)
 }
