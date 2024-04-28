@@ -33,12 +33,14 @@ jetbrains-plugin = "1.9.23"
 android-application = "8.4.0"
 appcompat = "1.6.1"
 material = "1.12.0"
+annotationJvm = "1.7.1"
 
 [libraries]
 # android
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-annotation-jvm = { group = "androidx.annotation", name = "annotation-jvm", version.ref = "annotationJvm" }
 
 # test
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
