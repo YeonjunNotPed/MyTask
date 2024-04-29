@@ -8,11 +8,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import com.youhajun.ui.models.destinations.BottomNavDestination
+import com.youhajun.ui.destinations.BottomNavDestination
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun MyTaskBottomNavigation(
-    bottomScreens: List<BottomNavDestination>,
+    bottomScreens: ImmutableList<BottomNavDestination>,
     onTabSelected: (BottomNavDestination) -> Unit,
     currentRoute: String?
 ) {
