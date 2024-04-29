@@ -11,10 +11,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.youhajun.domain.models.sealeds.CallControlAction
-import com.youhajun.ui.models.holder.CallMediaStateHolder
+import com.youhajun.model_ui.holder.CallControlAction
+import com.youhajun.model_ui.holder.CallMediaStateHolder
 import com.youhajun.ui.R
-import com.youhajun.ui.models.holder.CallControlActionHolder
+import com.youhajun.model_ui.holder.CallControlActionHolder
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun CallBottomComp(
@@ -30,7 +32,7 @@ fun CallBottomComp(
         verticalAlignment = Alignment.CenterVertically
     ) {
         buildCallControlActions(
-            listOf(
+            persistentListOf(
                 CallControlAction.ToggleSpeakerphone(mediaStateVo.isSpeakerEnable),
                 CallControlAction.ToggleMicMute(mediaStateVo.isMicMute),
                 CallControlAction.CallingEnd,
@@ -46,7 +48,7 @@ fun CallBottomComp(
 
 @Composable
 fun buildCallControlActions(
-    callControlActions: List<CallControlAction>,
+    callControlActions: ImmutableList<CallControlAction>,
     callMediaStateHolder: CallMediaStateHolder,
 ): List<CallControlActionHolder> {
     return callControlActions.map {
