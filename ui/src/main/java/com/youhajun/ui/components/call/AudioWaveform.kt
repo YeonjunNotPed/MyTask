@@ -1,11 +1,9 @@
 package com.youhajun.ui.components.call
 
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,16 +14,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 private const val MAX_AUDIO_LEVEL = 1f
 
 @Composable
 fun AudioWaveform(
     modifier: Modifier,
-    audioLevels: List<Float>,
+    audioLevels: ImmutableList<Float>,
     blockColor: Color = Color.Blue,
     blockHeight: Float = 8f,
-    animationSpec: AnimationSpec<Float> = tween(500),
+    animationDuration: Int = 500,
     boundaryColor: Color = Color.White,
     boundaryWidth: Float = 1f,
     amplifyFactor: Float = 3f
@@ -39,7 +39,7 @@ fun AudioWaveform(
     val animatedLevels = amplifiedAudioLevels.map { level ->
         animateFloatAsState(
             targetValue = level,
-            animationSpec = animationSpec,
+            animationSpec = tween(animationDuration),
             label = ""
         ).value
     }
@@ -79,6 +79,6 @@ fun PreviewSoundWaveform() {
         modifier = Modifier
             .width(40.dp)
             .height(40.dp),
-        audioLevels = listOf(0.12f, 0.52f, 0.94f, 0.35f, 1f, 0.61f)
+        audioLevels = persistentListOf(0.12f, 0.52f, 0.94f, 0.35f, 1f, 0.61f)
     )
 }
