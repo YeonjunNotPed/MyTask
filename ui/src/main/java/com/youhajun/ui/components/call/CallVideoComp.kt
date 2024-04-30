@@ -16,18 +16,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.youhajun.ui.models.holder.CallMediaStateHolder
+import com.youhajun.model_ui.holder.CallMediaStateHolder
 import com.youhajun.ui.R
-import org.webrtc.EglBase
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
+import com.youhajun.model_ui.vo.webrtc.TrackVo
 import org.webrtc.RendererCommon
-import org.webrtc.VideoTrack
 
 @Composable
 fun CallVideoComp(
     modifier: Modifier = Modifier,
-    videoTrack: VideoTrack,
+    trackVo: TrackVo,
     mediaStateVo: CallMediaStateHolder,
-    eglBaseContext: EglBase.Context,
+    eglBaseContextWrapper: EglBaseContextWrapper
 ) {
 
     val rendererEvents = object : RendererCommon.RendererEvents {
@@ -48,9 +48,9 @@ fun CallVideoComp(
 
         if(mediaStateVo.isCameraEnable) {
             MyTaskVideoRenderer(
-                videoTrack = videoTrack,
+                trackVo = trackVo,
                 modifier = Modifier.fillMaxSize(),
-                eglBaseContext = eglBaseContext,
+                eglBaseContextWrapper = eglBaseContextWrapper,
                 rendererEvents = rendererEvents,
                 isFrontCamera = mediaStateVo.isFrontCamera
             )
