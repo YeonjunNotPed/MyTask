@@ -25,10 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.youhajun.ui.utils.webRtc.models.VideoScalingType
-import com.youhajun.ui.utils.webRtc.models.VideoScalingType.Companion.toCommonScalingType
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
+import com.youhajun.model_ui.vo.webrtc.TrackVo
+import com.youhajun.model_ui.types.webrtc.VideoScalingType
+import com.youhajun.model_ui.types.webrtc.VideoScalingType.Companion.toCommonScalingType
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
-import org.webrtc.EglBase.Context
 import org.webrtc.RendererCommon.RendererEvents
 import org.webrtc.VideoTrack
 
@@ -41,13 +42,14 @@ import org.webrtc.VideoTrack
 @Composable
 fun MyTaskVideoRenderer(
     modifier: Modifier = Modifier,
-    videoTrack: VideoTrack,
-    eglBaseContext: Context,
+    trackVo: TrackVo,
+    eglBaseContextWrapper: EglBaseContextWrapper,
     videoScalingType: VideoScalingType = VideoScalingType.SCALE_ASPECT_BALANCED,
     onTextureViewCreated: (VideoTextureViewRenderer) -> Unit = { },
     rendererEvents: RendererEvents,
     isFrontCamera: Boolean
 ) {
+    val videoTrack = trackVo.videoTrack ?: return
     val trackState: MutableState<VideoTrack?> = remember { mutableStateOf(null) }
     var view: VideoTextureViewRenderer? by remember { mutableStateOf(null) }
 
@@ -60,7 +62,7 @@ fun MyTaskVideoRenderer(
     AndroidView(
         factory = { context ->
             VideoTextureViewRenderer(context).apply {
-                init(eglBaseContext, rendererEvents)
+                init(eglBaseContextWrapper.eglContext, rendererEvents)
                 setScalingType(scalingType = videoScalingType.toCommonScalingType())
                 setupVideo(trackState, videoTrack, this)
                 onTextureViewCreated.invoke(this)
