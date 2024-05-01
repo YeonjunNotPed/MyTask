@@ -36,13 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youhajun.ui.R
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun GptSelectRoleComp(
     modifier: Modifier = Modifier,
     selectedRole:String,
     isExpanded: Boolean,
-    roleList: List<String>,
+    roleList: ImmutableList<String>,
     addRoleInput: String,
     onAddRoleValueChange: (String) -> Unit,
     onClickExpandIcon: () -> Unit,
