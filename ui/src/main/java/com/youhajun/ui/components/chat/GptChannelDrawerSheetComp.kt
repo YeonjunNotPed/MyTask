@@ -34,12 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youhajun.domain.models.vo.gpt.GptChannelVo
+import com.youhajun.model_ui.vo.gpt.GptChannelVo
 import com.youhajun.ui.R
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun GptChannelDrawerSheetComp(
-    gptChannelList: List<GptChannelVo>,
+    gptChannelList: ImmutableList<GptChannelVo>,
     currentChannelIdx: Long?,
     onClickChannel: (idx: Long) -> Unit,
     onClickDeleteChannel: (idx: Long) -> Unit,
