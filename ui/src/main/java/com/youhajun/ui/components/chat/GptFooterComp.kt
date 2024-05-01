@@ -8,7 +8,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youhajun.domain.models.vo.gpt.GptRecommendUrlVo
+import com.youhajun.model_ui.vo.gpt.GptRecommendUrlVo
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun GptFooterCreateAt(createdAtUnixTimeStamp: Long) {
@@ -22,6 +23,6 @@ fun GptFooterCreateAt(createdAtUnixTimeStamp: Long) {
 }
 
 @Composable
-fun GptFooterRecommendUrl(recommendUrlVoList: List<GptRecommendUrlVo>) {
+fun GptFooterRecommendUrl(recommendUrlVoList: ImmutableList<GptRecommendUrlVo>) {
 
 }
