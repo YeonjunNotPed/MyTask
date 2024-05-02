@@ -16,40 +16,40 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.youhajun.ui.components.call.CallVideoComp
 import com.youhajun.ui.components.call.FloatingCallVideoComp
-import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
-import com.youhajun.ui.utils.webRtc.models.TrackType
-import org.webrtc.EglBase
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
+import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
+import com.youhajun.model_ui.types.webrtc.TrackType
 
 @Composable
 fun RoomCallingComp(
     modifier: Modifier,
     mySessionInfoVo: SessionInfoVo?,
     partnerSessionInfoVo: SessionInfoVo?,
-    eglBaseContext: EglBase.Context
+    eglBaseContextWrapper: EglBaseContextWrapper
 ) {
-    val myVideoTrack = mySessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
+    val myVideoTrackVo = mySessionInfoVo?.findTrack(TrackType.VIDEO)
     val myMediaStateVo = mySessionInfoVo?.callMediaStateHolder
-    val partnerVideoTrack = partnerSessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
+    val partnerVideoTrackVo = partnerSessionInfoVo?.findTrack(TrackType.VIDEO)
     val partnerMediaStateVo = partnerSessionInfoVo?.callMediaStateHolder
 
     var parentSize: IntSize by remember { mutableStateOf(IntSize(0, 0)) }
 
     Box(modifier = modifier.padding(10.dp)) {
-        if (partnerVideoTrack != null && partnerMediaStateVo != null) {
+        if (partnerVideoTrackVo != null && partnerMediaStateVo != null) {
             CallVideoComp(
                 modifier = Modifier.onSizeChanged { parentSize = it }.fillMaxSize(),
-                videoTrack = partnerVideoTrack,
+                trackVo = partnerVideoTrackVo,
                 mediaStateVo = partnerMediaStateVo,
-                eglBaseContext = eglBaseContext
+                eglBaseContextWrapper = eglBaseContextWrapper
             )
         }
 
-        if (myVideoTrack != null && myMediaStateVo != null) {
+        if (myVideoTrackVo != null && myMediaStateVo != null) {
             FloatingCallVideoComp(
                 modifier = Modifier.size(width = 100.dp, height = 150.dp),
-                videoTrack = myVideoTrack,
+                trackVo = myVideoTrackVo,
                 mediaStateVo = myMediaStateVo,
-                eglBaseContext = eglBaseContext,
+                eglBaseContextWrapper = eglBaseContextWrapper,
                 parentBounds = parentSize,
                 paddingValues = PaddingValues(10.dp)
             )
