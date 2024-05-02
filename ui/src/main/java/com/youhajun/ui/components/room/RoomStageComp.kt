@@ -27,18 +27,18 @@ import com.youhajun.ui.R
 import com.youhajun.ui.components.call.MyTaskVideoRenderer
 import com.youhajun.ui.components.call.VoiceRecognizerComp
 import com.youhajun.ui.components.modifier.infinityProgressCircleBorder
-import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
-import com.youhajun.ui.utils.webRtc.models.TrackType
-import org.webrtc.EglBase
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
+import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
+import com.youhajun.model_ui.types.webrtc.TrackType
 import org.webrtc.RendererCommon
 
 @Composable
 fun RoomStageComp(
     modifier: Modifier,
     mySessionInfoVo: SessionInfoVo?,
-    eglBaseContext: EglBase.Context
+    eglBaseContextWrapper: EglBaseContextWrapper
 ) {
-    val myVideoTrack = mySessionInfoVo?.findTrack(TrackType.VIDEO)?.videoTrack
+    val myVideoTrackVo = mySessionInfoVo?.findTrack(TrackType.VIDEO)
     val myMediaStateVo = mySessionInfoVo?.callMediaStateHolder
 
     val rendererEvents = object : RendererCommon.RendererEvents {
@@ -69,10 +69,10 @@ fun RoomStageComp(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            if (myVideoTrack != null && myMediaStateVo?.isCameraEnable == true) {
+            if (myVideoTrackVo != null && myMediaStateVo?.isCameraEnable == true) {
                 MyTaskVideoRenderer(
-                    videoTrack = myVideoTrack,
-                    eglBaseContext = eglBaseContext,
+                    trackVo = myVideoTrackVo,
+                    eglBaseContextWrapper = eglBaseContextWrapper,
                     rendererEvents = rendererEvents,
                     isFrontCamera = myMediaStateVo.isFrontCamera,
                     modifier = Modifier
