@@ -23,7 +23,7 @@ import android.hardware.camera2.CameraMetadata
 import androidx.core.content.getSystemService
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
-import com.youhajun.ui.utils.webRtc.models.TrackType
+import com.youhajun.model_ui.types.webrtc.TrackType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.Camera2Capturer

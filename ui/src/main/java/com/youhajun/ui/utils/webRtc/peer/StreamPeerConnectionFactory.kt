@@ -21,7 +21,7 @@ import android.os.Build
 import com.youhajun.ui.BuildConfig
 import com.youhajun.ui.utils.webRtc.Loggers
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
+import com.youhajun.model_ui.types.webrtc.StreamPeerType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import org.webrtc.AudioSource

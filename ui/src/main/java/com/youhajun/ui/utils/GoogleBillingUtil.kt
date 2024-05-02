@@ -24,10 +24,10 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryProductDetails
-import com.youhajun.domain.models.enums.PurchaseType
-import com.youhajun.domain.models.vo.PurchaseItemVo
-import com.youhajun.ui.di.IoDispatcher
-import com.youhajun.ui.di.MainImmediateDispatcher
+import com.youhajun.common.IoDispatcher
+import com.youhajun.common.MainImmediateDispatcher
+import com.youhajun.model_ui.types.store.PurchaseType
+import com.youhajun.model_ui.vo.store.PurchaseItemVo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher

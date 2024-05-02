@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.youhajun.ui.models.destinations.MainBottomTabScreens
-import com.youhajun.ui.models.destinations.MyTaskDestination
+import com.youhajun.ui.destinations.MainBottomTabScreens
+import com.youhajun.ui.destinations.MyTaskDestination
 import com.youhajun.ui.components.MyTaskBottomNavigation
 import com.youhajun.ui.navigation.MyTaskNavHost
 

@@ -31,7 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.youhajun.domain.models.enums.GptType
+import com.youhajun.model_ui.types.gpt.GptType
 import com.youhajun.ui.R
 
 @Composable

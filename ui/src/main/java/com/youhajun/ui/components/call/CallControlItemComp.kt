@@ -13,9 +13,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.youhajun.domain.models.sealeds.CallControlAction
+import com.youhajun.model_ui.holder.CallControlAction
 import com.youhajun.ui.R
-import com.youhajun.ui.models.holder.CallControlActionHolder
+import com.youhajun.model_ui.holder.CallControlActionHolder
 
 @Composable
 fun CallControlItemComp(

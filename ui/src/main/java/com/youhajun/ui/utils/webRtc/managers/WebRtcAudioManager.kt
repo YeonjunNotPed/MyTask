@@ -20,7 +20,7 @@ import com.youhajun.ui.utils.audio.AudioController
 import com.youhajun.ui.utils.audio.AudioRecorder
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
-import com.youhajun.ui.utils.webRtc.models.TrackType
+import com.youhajun.model_ui.types.webrtc.TrackType
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.SharedFlow
 import org.webrtc.AudioTrack

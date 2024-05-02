@@ -3,7 +3,7 @@ package com.youhajun.ui.utils.audio
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import com.youhajun.ui.di.DefaultDispatcher
+import com.youhajun.common.DefaultDispatcher
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

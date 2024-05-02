@@ -18,7 +18,7 @@ package com.youhajun.ui.utils.webRtc.peer
 
 import com.youhajun.ui.utils.webRtc.Loggers
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
+import com.youhajun.model_ui.types.webrtc.StreamPeerType
 import org.webrtc.CandidatePairChangeEvent
 import org.webrtc.DataChannel
 import org.webrtc.IceCandidate

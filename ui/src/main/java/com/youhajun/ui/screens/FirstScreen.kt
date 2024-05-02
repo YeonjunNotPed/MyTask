@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.youhajun.ui.models.destinations.MyTaskDestination
+import com.youhajun.ui.destinations.MyTaskDestination
 
 @Composable
 fun FirstScreen(navController: NavController) {

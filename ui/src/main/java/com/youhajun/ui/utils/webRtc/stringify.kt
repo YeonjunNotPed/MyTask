@@ -16,7 +16,7 @@
 
 package com.youhajun.ui.utils.webRtc
 
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
+import com.youhajun.model_ui.types.webrtc.StreamPeerType
 import org.webrtc.IceCandidateErrorEvent
 import org.webrtc.MediaStreamTrack
 import org.webrtc.SessionDescription

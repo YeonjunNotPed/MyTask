@@ -14,10 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +46,7 @@ import com.youhajun.ui.components.chat.GptMessageItemComp
 import com.youhajun.ui.components.chat.GptSelectRoleComp
 import com.youhajun.ui.components.chat.GptTypeItemComp
 import com.youhajun.ui.components.input.GptInputTextField
-import com.youhajun.ui.models.sideEffects.GptSideEffect
+import com.youhajun.model_ui.sideEffects.GptSideEffect
 import com.youhajun.ui.viewModels.GptViewModel
 import kotlinx.coroutines.launch
 

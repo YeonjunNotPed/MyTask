@@ -1,6 +1,6 @@
 package com.youhajun.ui.utils.audio
 
-import com.youhajun.ui.di.DefaultDispatcher
+import com.youhajun.common.DefaultDispatcher
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.sync.Mutex

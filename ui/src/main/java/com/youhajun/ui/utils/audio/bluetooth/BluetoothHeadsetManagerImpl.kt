@@ -8,7 +8,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
-import com.youhajun.ui.di.DefaultDispatcher
+import com.youhajun.common.DefaultDispatcher
 import com.youhajun.ui.utils.audio.AudioController
 import com.youhajun.ui.utils.audio.model.BluetoothDeviceInfoVo
 import com.youhajun.ui.utils.audio.model.BluetoothHeadsetState

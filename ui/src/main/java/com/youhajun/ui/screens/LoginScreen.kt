@@ -43,8 +43,7 @@ import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.input.TopTitleInput
 import com.youhajun.ui.components.social.GoogleLoginButton
 import com.youhajun.ui.components.social.KakaoLoginButton
-import com.youhajun.ui.models.sideEffects.GptSideEffect
-import com.youhajun.ui.models.sideEffects.LoginSideEffect
+import com.youhajun.model_ui.sideEffects.LoginSideEffect
 import com.youhajun.ui.utils.GoogleLoginUtil
 import com.youhajun.ui.utils.KakaoLoginUtil
 import com.youhajun.ui.viewModels.LoginViewModel

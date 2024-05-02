@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.youhajun.ui.models.destinations.MyTaskDestination
+import com.youhajun.ui.destinations.MyTaskDestination
 import com.youhajun.ui.screens.ThirdScreen
 
 fun NavGraphBuilder.thirdNav(navController: NavHostController) {

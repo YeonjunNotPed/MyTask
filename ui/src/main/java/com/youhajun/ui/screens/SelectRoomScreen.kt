@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.ui.R
 import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.room.RoomPreviewItemComp
-import com.youhajun.ui.models.sideEffects.SelectRoomSideEffect
+import com.youhajun.model_ui.sideEffects.SelectRoomSideEffect
 import com.youhajun.ui.viewModels.SelectRoomViewModel
 
 @Composable

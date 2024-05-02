@@ -19,7 +19,7 @@ package com.youhajun.ui.utils.webRtc.peer
 import com.youhajun.ui.utils.webRtc.Loggers
 import com.youhajun.ui.utils.webRtc.addRtcIceCandidate
 import com.youhajun.ui.utils.webRtc.managers.SDPManager
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
+import com.youhajun.model_ui.types.webrtc.StreamPeerType
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStreamTrack

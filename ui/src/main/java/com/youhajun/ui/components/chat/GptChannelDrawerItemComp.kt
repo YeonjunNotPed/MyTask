@@ -32,12 +32,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
-import com.youhajun.domain.models.enums.GptType
-import com.youhajun.domain.models.vo.gpt.GptChannelVo
+import com.youhajun.model_ui.types.gpt.GptType
+import com.youhajun.model_ui.vo.gpt.GptChannelVo
 import com.youhajun.ui.R
 
 
