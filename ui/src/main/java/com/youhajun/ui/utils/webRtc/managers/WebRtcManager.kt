@@ -217,13 +217,14 @@ class WebRtcManager @AssistedInject constructor(
     }
     private fun addTrack(sessionId: String, trackVo: TrackVo) {
         editSessionInfo(sessionId) {
-            it.copy(trackList = it.trackList + trackVo)
+            val mergedList = it.trackList + trackVo
+            it.copy(trackList = mergedList.toImmutableList())
         }
     }
 
     private fun removeTrack(sessionId: String, trackType: TrackType) {
         editSessionInfo(sessionId) {
-            it.copy(trackList = it.trackList.filterNot { it.trackType == trackType })
+            it.copy(trackList = it.trackList.filterNot { it.trackType == trackType }.toImmutableList())
         }
     }
 
@@ -270,7 +271,7 @@ class WebRtcManager @AssistedInject constructor(
     override fun updateAudioLevelList(sessionId: String, audioLevelList: List<Float>) {
         editSessionInfo(sessionId) {
             it.copy(
-                callMediaStateHolder = it.callMediaStateHolder.copy(audioLevelList = audioLevelList)
+                callMediaStateHolder = it.callMediaStateHolder.copy(audioLevelList = audioLevelList.toImmutableList())
             )
         }
     }
