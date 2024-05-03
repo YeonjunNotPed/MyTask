@@ -24,14 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.youhajun.domain.models.enums.WebRTCSessionType
-import com.youhajun.ui.models.holder.CallMediaStateHolder
+import com.youhajun.model_ui.types.webrtc.WebRTCSessionType
 import com.youhajun.ui.R
 import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.call.CallBottomComp
 import com.youhajun.ui.components.room.RoomCallingComp
 import com.youhajun.ui.components.room.RoomStageComp
-import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
+import com.youhajun.model_ui.holder.CallMediaStateHolder
+import com.youhajun.model_ui.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.viewModels.LiveRoomViewModel
 
 @Composable
@@ -83,7 +83,7 @@ fun LiveRoomScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 state.mySessionInfoVo,
-                state.eglContext
+                state.eglContextWrapper
             )
 
             WebRTCSessionType.Active -> RoomCallingComp(
@@ -97,7 +97,7 @@ fun LiveRoomScreen(
                     },
                 state.mySessionInfoVo,
                 state.partnerSessionInfoVo,
-                state.eglContext
+                state.eglContextWrapper
             )
         }
 
