@@ -76,14 +76,18 @@ fun FloatingCallVideoComp(
     }
 
 
-    val rendererEvents = object : RendererCommon.RendererEvents {
-        override fun onFirstFrameRendered() {
+    val rendererEvents by remember {
+        mutableStateOf(
+            object : RendererCommon.RendererEvents {
+                override fun onFirstFrameRendered() {
 
-        }
+                }
 
-        override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
+                override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
 
-        }
+                }
+            }
+        )
     }
 
     Box(
@@ -148,8 +152,12 @@ fun FloatingCallVideoComp(
         }
 
         VoiceRecognizerComp(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(3.dp),
-            waveModifier = Modifier.width(60.dp).height(45.dp),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(3.dp),
+            waveModifier = Modifier
+                .width(60.dp)
+                .height(45.dp),
             isMicEnable = !mediaStateVo.isMicMute,
             audioLevels = mediaStateVo.audioLevelList
         )
