@@ -1,9 +1,9 @@
 package com.youhajun.ui.utils.webRtc
 
-import com.youhajun.domain.models.enums.SignalingType
+import com.youhajun.model_ui.types.webrtc.SignalingCommandType
 import com.youhajun.ui.utils.webRtc.managers.WebRtcManager
-import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
+import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
+import com.youhajun.model_ui.types.webrtc.StreamPeerType
 import com.youhajun.ui.utils.webRtc.peer.StreamPeerConnection
 import dagger.assisted.AssistedFactory
 import kotlinx.coroutines.flow.Flow
@@ -46,8 +46,8 @@ interface WebRTCContract {
     }
 
     interface Signaling {
-        val signalingCommandFlow: Flow<Pair<SignalingType, String>>
-        fun sendCommand(signalingCommand: SignalingType, message: String)
+        val signalingCommandFlow: Flow<Pair<SignalingCommandType, String>>
+        fun sendCommand(signalingCommand: SignalingCommandType, message: String)
     }
 
     @AssistedFactory

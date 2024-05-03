@@ -1,17 +1,18 @@
 package com.youhajun.ui.utils.webRtc.managers
 
-import com.youhajun.domain.models.enums.SignalingType
-import com.youhajun.ui.di.DefaultDispatcher
+import com.youhajun.common.DefaultDispatcher
+import com.youhajun.model_ui.types.webrtc.SignalingCommandType
 import com.youhajun.ui.utils.webRtc.WebRTCContract
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ICE_SEPARATOR
 import com.youhajun.ui.utils.webRtc.WebRTCContract.Companion.ID_SEPARATOR
-import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
-import com.youhajun.ui.utils.webRtc.models.StreamPeerType
-import com.youhajun.ui.utils.webRtc.models.TrackType
-import com.youhajun.ui.utils.webRtc.models.TrackVo
+import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
+import com.youhajun.model_ui.types.webrtc.StreamPeerType
+import com.youhajun.model_ui.types.webrtc.TrackType
+import com.youhajun.model_ui.vo.webrtc.TrackVo
 import com.youhajun.ui.utils.webRtc.peer.StreamPeerConnection
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -153,7 +154,7 @@ class WebRtcManager @AssistedInject constructor(
         val result = peerConnection.setLocalDescription(offer)
         result.onSuccess {
             collectPendingIce()
-            signaling.sendCommand(SignalingType.OFFER, offer.description)
+            signaling.sendCommand(SignalingCommandType.OFFER, offer.description)
         }
     }
 
@@ -165,7 +166,7 @@ class WebRtcManager @AssistedInject constructor(
         val result = peerConnection.setLocalDescription(answer)
         result.onSuccess {
             collectPendingIce()
-            signaling.sendCommand(SignalingType.ANSWER, answer.description)
+            signaling.sendCommand(SignalingCommandType.ANSWER, answer.description)
         }
     }
 
@@ -201,7 +202,7 @@ class WebRtcManager @AssistedInject constructor(
     }
     private fun handleOnAddedTrack(sessionId: String, track: MediaStreamTrack, trackType: TrackType) {
         track.setEnabled(true)
-        val trackVo:TrackVo = when(track.kind()) {
+        val trackVo: TrackVo = when(track.kind()) {
             MediaStreamTrack.VIDEO_TRACK_KIND -> {
                 track as VideoTrack
                 TrackVo(trackType, videoTrack = track)
@@ -248,7 +249,7 @@ class WebRtcManager @AssistedInject constructor(
 
         iceCollectJob = sessionManagerScope.launch {
             pendingIceSharedFlow.collect {
-                signaling.sendCommand(SignalingType.ICE, it)
+                signaling.sendCommand(SignalingCommandType.ICE, it)
             }
         }
     }
@@ -257,9 +258,9 @@ class WebRtcManager @AssistedInject constructor(
         sessionManagerScope.launch {
             signaling.signalingCommandFlow.collect { commandToValue ->
                 when (commandToValue.first) {
-                    SignalingType.OFFER -> handleOffer(commandToValue.second)
-                    SignalingType.ANSWER -> handleAnswer(commandToValue.second)
-                    SignalingType.ICE -> handleIce(commandToValue.second)
+                    SignalingCommandType.OFFER -> handleOffer(commandToValue.second)
+                    SignalingCommandType.ANSWER -> handleAnswer(commandToValue.second)
+                    SignalingCommandType.ICE -> handleIce(commandToValue.second)
                     else -> Unit
                 }
             }
