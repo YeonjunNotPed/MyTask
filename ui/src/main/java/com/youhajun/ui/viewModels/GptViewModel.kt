@@ -5,44 +5,38 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.domain.models.UiState
-import com.youhajun.domain.models.enums.GptAiType
-import com.youhajun.domain.models.enums.GptMessageType
-import com.youhajun.domain.models.enums.GptRoleType
-import com.youhajun.domain.models.enums.GptType
-import com.youhajun.domain.models.inspectUiState
-import com.youhajun.domain.models.vo.gpt.ChatGptMessageVo
-import com.youhajun.domain.models.vo.gpt.ChatGptRequestVo
-import com.youhajun.domain.models.vo.gpt.ChatGptResponseVo
-import com.youhajun.domain.models.vo.gpt.GptAssistantVo
-import com.youhajun.domain.models.vo.gpt.GptChannelVo
-import com.youhajun.domain.models.vo.gpt.GptMessageVo
-import com.youhajun.domain.models.vo.gpt.UpdateGptChannelInfoRequestVo
-import com.youhajun.domain.usecase.gpt.DeleteGptChannelUseCase
-import com.youhajun.domain.usecase.gpt.DeleteGptRoleUseCase
-import com.youhajun.domain.usecase.gpt.InsertGptAssistantUseCase
-import com.youhajun.domain.usecase.gpt.InsertGptChannelUseCase
-import com.youhajun.domain.usecase.gpt.InsertGptMessageUseCase
-import com.youhajun.domain.usecase.gpt.InsertGptRoleUseCase
-import com.youhajun.domain.usecase.gpt.PostChatGptPromptUseCase
-import com.youhajun.domain.usecase.gpt.SelectAllGptAssistantsUseCase
-import com.youhajun.domain.usecase.gpt.SelectAllGptChannelsUseCase
-import com.youhajun.domain.usecase.gpt.SelectAllGptMessagesUseCase
-import com.youhajun.domain.usecase.gpt.SelectAllGptRolesUseCase
-import com.youhajun.domain.usecase.gpt.SelectGptChannelUseCase
-import com.youhajun.domain.usecase.gpt.SelectLatestChannelsUseCase
-import com.youhajun.domain.usecase.gpt.UpdateGptChannelInfoUseCase
+import com.youhajun.data.onSuccess
+import com.youhajun.data.repositories.GptRepository
+import com.youhajun.model_ui.types.gpt.GptAIType
+import com.youhajun.model_ui.types.gpt.GptMessageType
+import com.youhajun.model_ui.types.gpt.GptRoleType
+import com.youhajun.model_ui.types.gpt.GptType
+import com.youhajun.model_ui.vo.gpt.ChatGptMessageVo
+import com.youhajun.model_ui.vo.gpt.ChatGptRequestVo
+import com.youhajun.model_ui.vo.gpt.ChatGptRequestVo.Companion.toDto
+import com.youhajun.model_ui.vo.gpt.ChatGptResponseVo
+import com.youhajun.model_ui.vo.gpt.ChatGptResponseVo.Companion.toModel
+import com.youhajun.model_ui.vo.gpt.GptAssistantVo
+import com.youhajun.model_ui.vo.gpt.GptAssistantVo.Companion.toDto
+import com.youhajun.model_ui.vo.gpt.GptAssistantVo.Companion.toModel
+import com.youhajun.model_ui.vo.gpt.GptChannelVo
+import com.youhajun.model_ui.vo.gpt.GptChannelVo.Companion.toDto
+import com.youhajun.model_ui.vo.gpt.GptChannelVo.Companion.toModel
+import com.youhajun.model_ui.vo.gpt.GptMessageVo
+import com.youhajun.model_ui.vo.gpt.GptMessageVo.Companion.toDto
+import com.youhajun.model_ui.vo.gpt.GptMessageVo.Companion.toModel
+import com.youhajun.model_ui.vo.gpt.UpdateGptChannelInfoRequestVo
+import com.youhajun.model_ui.vo.gpt.UpdateGptChannelInfoRequestVo.Companion.toDto
 import com.youhajun.ui.R
-import com.youhajun.ui.models.sideEffects.GptSideEffect
-import com.youhajun.ui.models.states.GptState
+import com.youhajun.model_ui.sideEffects.GptSideEffect
+import com.youhajun.model_ui.states.GptState
 import com.youhajun.ui.utils.ResourceProviderUtil
 import com.youhajun.ui.utils.TimeStampUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -52,7 +46,7 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
-interface GptIntent {
+private interface GptIntent {
     fun onChangedGptInput(input: String)
     fun onChangedAddRoleInput(input: String)
     fun onClickSendAnswer()
@@ -71,20 +65,7 @@ interface GptIntent {
 @HiltViewModel
 class GptViewModel @Inject constructor(
     private val resourceProviderUtil: ResourceProviderUtil,
-    private val postChatGptPromptUseCase: PostChatGptPromptUseCase,
-    private val insertGptRoleUseCase: InsertGptRoleUseCase,
-    private val insertGptChannelUseCase: InsertGptChannelUseCase,
-    private val insertGptAssistantUseCase: InsertGptAssistantUseCase,
-    private val insertGptMessagesUseCase: InsertGptMessageUseCase,
-    private val selectAllGptRolesUseCase: SelectAllGptRolesUseCase,
-    private val selectAllGptChannelsUseCase: SelectAllGptChannelsUseCase,
-    private val selectAllGptMessagesUseCase: SelectAllGptMessagesUseCase,
-    private val selectAllGptAssistantsUseCase: SelectAllGptAssistantsUseCase,
-    private val selectLatestGptChannelsUseCase: SelectLatestChannelsUseCase,
-    private val selectGptChannelUseCase: SelectGptChannelUseCase,
-    private val deleteGptRoleUseCase: DeleteGptRoleUseCase,
-    private val deleteGptChannelUseCase: DeleteGptChannelUseCase,
-    private val updateGptChannelInfoUseCase: UpdateGptChannelInfoUseCase,
+    private val gptRepository: GptRepository,
 ) : ContainerHost<GptState, GptSideEffect>, ViewModel(), GptIntent {
 
     private val _gptInputStateOf: MutableState<String> = mutableStateOf("")
@@ -124,9 +105,8 @@ class GptViewModel @Inject constructor(
             val isCurrentChannel = idx == state.currentGptChannel?.channelIdx
 
             viewModelScope.launch {
-                deleteGptChannelUseCase(idx).first().inspectUiState {
-                    if (isCurrentChannel && !isLastChannel) insertNewChannel()
-                }
+                gptRepository.deleteGptChannel(idx)
+                if (isCurrentChannel && !isLastChannel) insertNewChannel()
             }
         }
     }
@@ -154,13 +134,10 @@ class GptViewModel @Inject constructor(
             val currentRole =
                 if (currentChannel.gptType == GptType.NONE) state.selectedRole else currentChannel.roleOfAi
 
-            when (GptAiType.gptTypeOf(gptType)) {
-                GptAiType.NONE -> {}
-                GptAiType.CHAT_GPT -> {
-                    launcherChatGptPrompt(message, gptType, currentRole)
-                }
-
-                GptAiType.GEMINI -> TODO()
+            when (gptType.toGptAiType()) {
+                GptAIType.NONE -> {}
+                GptAIType.CHAT_GPT -> launcherChatGptPrompt(message, gptType, currentRole)
+                GptAIType.GEMINI -> TODO()
             }
         }
     }
@@ -172,20 +149,19 @@ class GptViewModel @Inject constructor(
     }
 
     override fun onClickAddRole() {
-        val role = _addRoleInputStateOf.value
-        viewModelScope.launch {
-            insertGptRoleUseCase(role).first().inspectUiState {
-                intent {
-                    postSideEffect(GptSideEffect.HideKeyboard)
-                    _addRoleInputStateOf.value = ""
-                }
+        intent {
+            viewModelScope.launch {
+                val role = _addRoleInputStateOf.value
+                gptRepository.insertGptRole(role)
+                postSideEffect(GptSideEffect.HideKeyboard)
+                _addRoleInputStateOf.value = ""
             }
         }
     }
 
     override fun onClickDeleteRole(role: String) {
         viewModelScope.launch {
-            deleteGptRoleUseCase(role).first()
+            gptRepository.deleteGptRole(role)
         }
     }
 
@@ -204,9 +180,9 @@ class GptViewModel @Inject constructor(
     private fun onCollectAllRoles() {
         intent {
             viewModelScope.launch {
-                selectAllGptRolesUseCase(Unit).collect {
-                    it.inspectUiState {
-                        reduce { state.copy(roleList = it) }
+                gptRepository.selectAllGptRoles().collect {
+                    reduce {
+                        state.copy(roleList = it.map { it.role }.toImmutableList())
                     }
                 }
             }
@@ -216,17 +192,13 @@ class GptViewModel @Inject constructor(
     private fun onCollectAllChannels() {
         intent {
             viewModelScope.launch {
-                selectAllGptChannelsUseCase(Unit)
-                    .onEach {
-                        it.inspectUiState {
-                            if (it.isEmpty()) insertNewChannel()
-                        }
+                gptRepository.selectAllGptChannels().onEach {
+                    if (it.isEmpty()) insertNewChannel()
+                }.collect {
+                    reduce {
+                        state.copy(gptChannelList = it.map { it.toModel() }.toImmutableList())
                     }
-                    .collect {
-                        it.inspectUiState {
-                            reduce { state.copy(gptChannelList = it) }
-                        }
-                    }
+                }
             }
         }
     }
@@ -255,45 +227,35 @@ class GptViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onCollectGptChannel(idx: Long) {
-        selectGptChannelUseCase(idx).collect {
-            it.inspectUiState {
-                intent {
-                    reduce { state.copy(currentGptChannel = it) }
-                }
+    private suspend fun onCollectGptChannel(idx: Long) = intent {
+        gptRepository.selectGptChannel(idx).collect {
+            reduce { state.copy(currentGptChannel = it.toModel()) }
+        }
+    }
+
+    private suspend fun onCollectAllMessages(idx: Long) = intent {
+        gptRepository.selectAllGptMessages(idx).collect {
+            reduce {
+                state.copy(currentGptMessages = it.map { it.toModel() }.toImmutableList())
             }
         }
     }
 
-    private suspend fun onCollectAllMessages(idx: Long) {
-        selectAllGptMessagesUseCase(idx).collect {
-            it.inspectUiState {
-                intent {
-                    reduce { state.copy(currentGptMessages = it) }
-                }
+    private suspend fun onCollectAllAssistant(idx: Long) = intent {
+        gptRepository.selectAllGptAssistants(idx).collect {
+            reduce {
+                state.copy(currentGptAssistants = it.map { it.toModel() }.toImmutableList())
             }
         }
     }
 
-    private suspend fun onCollectAllAssistant(idx: Long) {
-        selectAllGptAssistantsUseCase(idx).collect {
-            it.inspectUiState {
-                intent {
-                    reduce { state.copy(currentGptAssistants = it) }
-                }
-            }
-        }
-    }
-
-    private fun launcherChatGptPrompt(message: String, gptType: GptType, role: String?) {
-        intent {
-            val prefixPrompt = makePrefixPrompt(role)
-            val assistantPrompt = makeAssistantPrompt(state.currentGptAssistants)
-            val userPrompt = makeUserPrompt(message)
-            val prompt = prefixPrompt + assistantPrompt + userPrompt
-            val request = ChatGptRequestVo(gptType, prompt)
-            onPostChatGptPrompt(request, message, role)
-        }
+    private fun launcherChatGptPrompt(message: String, gptType: GptType, role: String?) = intent {
+        val prefixPrompt = makePrefixPrompt(role)
+        val assistantPrompt = makeAssistantPrompt(state.currentGptAssistants)
+        val userPrompt = makeUserPrompt(message)
+        val prompt = prefixPrompt + assistantPrompt + userPrompt
+        val request = ChatGptRequestVo(gptType, prompt)
+        onPostChatGptPrompt(request, message, role)
     }
 
     private fun makePrefixPrompt(role: String?): List<ChatGptMessageVo> {
@@ -302,35 +264,23 @@ class GptViewModel @Inject constructor(
         return listOf(ChatGptMessageVo(GptRoleType.SYSTEM, prefixPrompt))
     }
 
-    private fun makeAssistantPrompt(list: List<GptAssistantVo>): List<ChatGptMessageVo> {
-        return list.map { ChatGptMessageVo(GptRoleType.ASSISTANT, it.assistantMessage) }
-    }
+    private fun makeAssistantPrompt(list: List<GptAssistantVo>): List<ChatGptMessageVo> =
+        list.map { ChatGptMessageVo(GptRoleType.ASSISTANT, it.assistantMessage) }
 
-    private fun makeUserPrompt(message: String): List<ChatGptMessageVo> {
-        return listOf(ChatGptMessageVo(GptRoleType.USER, message))
-    }
+    private fun makeUserPrompt(message: String): List<ChatGptMessageVo> =
+        listOf(ChatGptMessageVo(GptRoleType.USER, message))
 
-    private fun onPostChatGptPrompt(request: ChatGptRequestVo, message: String, role: String?) {
+    private fun onPostChatGptPrompt(request: ChatGptRequestVo, message: String, role: String?) =
         intent {
             viewModelScope.launch {
-                postChatGptPromptUseCase(request)
-                    .onStart {
-                        insertMessage(
-                            message,
-                            GptMessageType.QUESTION,
-                            TimeStampUtil.currentTimestamp
-                        )
-                        clearGptInput()
-                        updateChannelLastQuestion(message, role, request.model)
-                    }
-                    .collect {
-                        it.inspectUiState {
-                            handlePostChatGptSuccess(it)
-                        }
-                    }
+                insertMessage(message, GptMessageType.QUESTION, TimeStampUtil.currentTimestamp)
+                clearGptInput()
+                updateChannelLastQuestion(message, role, request.type)
+                gptRepository.postChatGptPrompt(request.toDto()).onSuccess {
+                    handlePostChatGptSuccess(it.toModel())
+                }
             }
         }
-    }
 
     private fun handlePostChatGptSuccess(chatGptResponseVo: ChatGptResponseVo) {
         val message = chatGptResponseVo.message.first().messageVo.content
@@ -347,45 +297,40 @@ class GptViewModel @Inject constructor(
                     assistantMessage = assistantMessage,
                     createdAtUnixTimeStamp = createdAt
                 )
-                insertGptAssistantUseCase(request).first()
+
+                gptRepository.insertGptAssistant(request.toDto())
             }
         }
     }
 
-    private fun insertMessage(message: String, messageType: GptMessageType, createdAt: Long) {
-        currentChannelIdx?.let { channelIdx ->
-            viewModelScope.launch {
-                val request = GptMessageVo(
-                    channelIdx = channelIdx,
-                    gptMessageType = messageType,
-                    message = message,
-                    createdAtUnixTimeStamp = createdAt
-                )
-                insertGptMessagesUseCase(request).first().inspectUiState {
-                    if (messageType == GptMessageType.ANSWER) {
-                        intent {
-                            postSideEffect(GptSideEffect.RunTypingAnimation(it))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun insertNewChannel() {
+    private fun insertMessage(message: String, messageType: GptMessageType, createdAt: Long) =
         intent {
-            viewModelScope.launch {
-                val newChannel = GptChannelVo(
-                    gptType = GptType.NONE,
-                    createdAtUnixTimeStamp = TimeStampUtil.currentTimestamp
-                )
-                insertGptChannelUseCase(newChannel).collect {
-                    it.inspectUiState(onLoading = { showLoading() }) {
-                        onChannelChanged(it)
-                        reduce { state.copy(onLoading = false) }
+            currentChannelIdx?.let { channelIdx ->
+                viewModelScope.launch {
+                    val request = GptMessageVo(
+                        channelIdx = channelIdx,
+                        gptMessageType = messageType,
+                        message = message,
+                        createdAtUnixTimeStamp = createdAt
+                    )
+                    val insertIdx = gptRepository.insertGptMessage(request.toDto())
+                    if (messageType == GptMessageType.ANSWER) {
+                        postSideEffect(GptSideEffect.RunTypingAnimation(insertIdx))
                     }
                 }
             }
+        }
+
+    private fun insertNewChannel() = intent {
+        viewModelScope.launch {
+            reduce { state.copy(onLoading = true) }
+            val newChannel = GptChannelVo(
+                gptType = GptType.NONE,
+                createdAtUnixTimeStamp = TimeStampUtil.currentTimestamp
+            )
+            val insertIdx = gptRepository.insertGptChannel(newChannel.toDto())
+            onChannelChanged(insertIdx)
+            reduce { state.copy(onLoading = false) }
         }
     }
 
@@ -393,37 +338,22 @@ class GptViewModel @Inject constructor(
         currentChannelIdx?.let { channelIdx ->
             val request = UpdateGptChannelInfoRequestVo(channelIdx, gptType, roleOfAi, question)
             viewModelScope.launch {
-                updateGptChannelInfoUseCase(request).first()
+                gptRepository.updateGptChannelInfo(request.toDto())
             }
         }
     }
 
-    private fun initInsertNewChannelCheck() {
-        intent {
-            viewModelScope.launch {
-                selectLatestGptChannelsUseCase(Unit)
-                    .filter { it is UiState.Success }
-                    .first()
-                    .inspectUiState {
-                        val isNewCreate = it.gptType != GptType.NONE
-
-                        if (isNewCreate) insertNewChannel()
-                        else onChannelChanged(it.channelIdx)
-                    }
-            }
+    private fun initInsertNewChannelCheck() = intent {
+        viewModelScope.launch {
+            val channel = gptRepository.selectLatestChannel().first().toModel()
+            val isNewCreate = channel.gptType != GptType.NONE
+            if (isNewCreate) insertNewChannel()
+            else onChannelChanged(channel.channelIdx)
         }
     }
 
-    private fun showLoading() {
-        intent {
-            reduce { state.copy(onLoading = true) }
-        }
-    }
-
-    private fun clearGptInput() {
-        intent {
-            postSideEffect(GptSideEffect.HideKeyboard)
-        }
+    private fun clearGptInput() = intent {
         _gptInputStateOf.value = ""
+        postSideEffect(GptSideEffect.HideKeyboard)
     }
 }
