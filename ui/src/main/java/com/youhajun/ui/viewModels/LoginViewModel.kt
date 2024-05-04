@@ -7,16 +7,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.kakao.sdk.auth.model.OAuthToken
-import com.youhajun.domain.models.StatusCode
-import com.youhajun.domain.models.UiStateErrorVo
-import com.youhajun.domain.models.enums.SocialLoginType
-import com.youhajun.domain.models.inspectUiState
-import com.youhajun.domain.models.vo.LoginRequestVo
-import com.youhajun.domain.models.vo.SocialLoginRequestVo
-import com.youhajun.domain.usecase.sign.PostLoginUseCase
-import com.youhajun.domain.usecase.sign.PostSocialLoginUseCase
-import com.youhajun.ui.models.sideEffects.LoginSideEffect
-import com.youhajun.ui.models.states.LoginState
+import com.youhajun.data.error.MyTaskCode
+import com.youhajun.data.onError
+import com.youhajun.data.onSuccess
+import com.youhajun.domain.PostLoginUseCase
+import com.youhajun.domain.PostSocialLoginUseCase
+import com.youhajun.model_ui.types.login.SocialLoginType
+import com.youhajun.model_ui.vo.login.LoginRequestVo
+import com.youhajun.model_ui.vo.login.LoginRequestVo.Companion.toDto
+import com.youhajun.model_ui.vo.login.MyTaskTokenVo
+import com.youhajun.model_ui.vo.login.MyTaskTokenVo.Companion.toModel
+import com.youhajun.model_ui.vo.login.SocialLoginRequestVo
+import com.youhajun.model_ui.vo.login.SocialLoginRequestVo.Companion.toDto
+import com.youhajun.model_ui.sideEffects.LoginSideEffect
+import com.youhajun.model_ui.states.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
@@ -27,7 +31,7 @@ import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 
-interface LoginIntent {
+private interface LoginIntent {
     fun onClickForgotPassword()
     fun onClickLogin()
     fun onClickSignUp()
@@ -42,8 +46,8 @@ interface LoginIntent {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val postLogin: PostLoginUseCase,
-    private val postSocialLoginUseCase: PostSocialLoginUseCase
+    private val postLoginUseCase: PostLoginUseCase,
+    private val postSocialLoginUseCase: PostSocialLoginUseCase,
 ) : ContainerHost<LoginState, LoginSideEffect>, ViewModel(), LoginIntent {
 
     private val _emailStateOf: MutableState<String> = mutableStateOf("")
@@ -71,11 +75,10 @@ class LoginViewModel @Inject constructor(
     override fun onClickLogin() {
         viewModelScope.launch {
             val requestVo = LoginRequestVo(_emailStateOf.value, passwordStateOf.value)
-            postLogin(requestVo).collect {
-                it.inspectUiState(
-                    onError = ::onErrorLogin,
-                    onSuccess = { onSuccessLogin() }
-                )
+            postLoginUseCase(requestVo.toDto()).onError { data, code, message ->
+                onErrorLogin(data?.toModel(), code, message)
+            }.onSuccess {
+                onSuccessLogin()
             }
         }
     }
@@ -84,9 +87,9 @@ class LoginViewModel @Inject constructor(
         postSideEffect(LoginSideEffect.Toast("로그인 성공"))
     }
 
-    private fun onErrorLogin(error: UiStateErrorVo<Unit>) = intent {
-        when(error.code) {
-            StatusCode.NO_ACCOUNT_ERROR -> postSideEffect(LoginSideEffect.Toast("계정 없음"))
+    private fun onErrorLogin(data: MyTaskTokenVo?, code: Int, message: String?) = intent {
+        when(code) {
+            MyTaskCode.NO_ACCOUNT_ERROR -> postSideEffect(LoginSideEffect.Toast("계정 없음"))
             else -> postSideEffect(LoginSideEffect.Toast("로그인 실패"))
         }
     }
@@ -103,7 +106,10 @@ class LoginViewModel @Inject constructor(
 
     override fun onSuccessGoogleLogin(account: GoogleSignInAccount) {
         account.serverAuthCode?.let {
-            val request = SocialLoginRequestVo(SocialLoginType.GOOGLE, authCode = it)
+            val request = SocialLoginRequestVo(
+                SocialLoginType.GOOGLE,
+                authCode = it
+            )
             socialLogin(request)
         }
     }
@@ -115,17 +121,19 @@ class LoginViewModel @Inject constructor(
     }
 
     override fun onSuccessKakaoLogin(oAuthToken: OAuthToken) {
-        val request = SocialLoginRequestVo(SocialLoginType.KAKAO, accessToken = oAuthToken.accessToken)
+        val request = SocialLoginRequestVo(
+            SocialLoginType.KAKAO,
+            accessToken = oAuthToken.accessToken
+        )
         socialLogin(request)
     }
 
     private fun socialLogin(request: SocialLoginRequestVo) {
         viewModelScope.launch {
-            postSocialLoginUseCase(request).collect {
-                it.inspectUiState(
-                    onError = ::onErrorLogin,
-                    onSuccess = { onSuccessLogin() }
-                )
+            postSocialLoginUseCase(request.toDto()).onError { data, code, message ->
+                onErrorLogin(data?.toModel(), code, message)
+            }.onSuccess {
+                onSuccessLogin()
             }
         }
     }
