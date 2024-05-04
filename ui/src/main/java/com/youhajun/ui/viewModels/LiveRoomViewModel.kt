@@ -3,23 +3,23 @@ package com.youhajun.ui.viewModels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.domain.models.enums.SignalingType
-import com.youhajun.domain.models.enums.SocketMessageType
-import com.youhajun.domain.models.enums.WebRTCSessionType
-import com.youhajun.domain.models.sealeds.CallControlAction
-import com.youhajun.domain.usecase.room.ConnectLiveRoomUseCase
-import com.youhajun.domain.usecase.room.DisposeLiveRoomUseCase
-import com.youhajun.domain.usecase.room.GetRoomSignalingCommandUseCase
-import com.youhajun.domain.usecase.room.GetRoomWebRTCSessionUseCase
-import com.youhajun.domain.usecase.room.SendLiveRoomSignalingMsgUseCase
-import com.youhajun.domain.usecase.room.SendSocketMsgUseCase
+import com.youhajun.data.repositories.RoomRepository
+import com.youhajun.model_ui.types.webrtc.SignalingCommandType
+import com.youhajun.model_ui.types.webrtc.SignalingCommandType.Companion.toDto
+import com.youhajun.model_ui.types.webrtc.SignalingCommandType.Companion.toModel
+import com.youhajun.model_ui.types.webrtc.SocketMessageType
+import com.youhajun.model_ui.types.webrtc.SocketMessageType.Companion.toDto
+import com.youhajun.model_ui.types.webrtc.WebRTCSessionType
+import com.youhajun.model_ui.types.webrtc.WebRTCSessionType.Companion.toModel
 import com.youhajun.ui.R
-import com.youhajun.ui.models.destinations.MyTaskDestination
-import com.youhajun.ui.models.sideEffects.LiveRoomSideEffect
-import com.youhajun.ui.models.states.LiveRoomState
+import com.youhajun.ui.destinations.MyTaskDestination
+import com.youhajun.model_ui.holder.CallControlAction
+import com.youhajun.model_ui.sideEffects.LiveRoomSideEffect
+import com.youhajun.model_ui.states.LiveRoomState
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
 import com.youhajun.ui.utils.ResourceProviderUtil
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import com.youhajun.ui.utils.webRtc.models.SessionInfoVo
+import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.log.taggedLogger
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +34,7 @@ import org.orbitmvi.orbit.viewmodel.container
 import org.webrtc.EglBase
 import javax.inject.Inject
 
-interface LiveRoomIntent {
+private interface LiveRoomIntent {
     fun onClickHeaderBackIcon()
     fun onClickCallControlAction(action: CallControlAction)
     fun onLiveRoomSignalingConnect()
@@ -46,12 +46,7 @@ interface LiveRoomIntent {
 class LiveRoomViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val resourceProviderUtil: ResourceProviderUtil,
-    private val connectLiveRoomUseCase: ConnectLiveRoomUseCase,
-    private val disposeLiveRoomUseCase: DisposeLiveRoomUseCase,
-    private val sendLiveRoomSignalingMsgUseCase: SendLiveRoomSignalingMsgUseCase,
-    private val sendSocketMsgUseCase: SendSocketMsgUseCase,
-    private val getRoomSignalingCommandUseCase: GetRoomSignalingCommandUseCase,
-    private val getRoomWebRTCSessionUseCase: GetRoomWebRTCSessionUseCase,
+    private val roomRepository: RoomRepository,
     webRtcSessionManagerFactory: WebRTCContract.Factory,
     eglBaseContext: EglBase.Context
 ) : ContainerHost<LiveRoomState, LiveRoomSideEffect>, ViewModel(), LiveRoomIntent,
@@ -60,12 +55,17 @@ class LiveRoomViewModel @Inject constructor(
     private val logger by taggedLogger("LiveRoomViewModel")
 
     private val roomIdx: Long = checkNotNull(savedStateHandle[MyTaskDestination.LiveRoom.IDX_ARG_KEY])
-    private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingType, String>>()
-    override val signalingCommandFlow: Flow<Pair<SignalingType, String>> = _signalingCommandFlow
+
+    private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingCommandType, String>>()
+    override val signalingCommandFlow: Flow<Pair<SignalingCommandType, String>> = _signalingCommandFlow
+
     private val sessionManager: WebRTCContract.SessionManager = webRtcSessionManagerFactory.createSessionManager(this)
 
     override val container: Container<LiveRoomState, LiveRoomSideEffect> = container(
-        LiveRoomState(eglContext = eglBaseContext, mySessionId = sessionManager.mySessionId)
+        LiveRoomState(
+            eglContextWrapper = EglBaseContextWrapper(eglBaseContext),
+            mySessionId = sessionManager.mySessionId
+        )
     ) {
         onCollectSignaling()
         onCollectMedia()
@@ -90,14 +90,14 @@ class LiveRoomViewModel @Inject constructor(
         }
     }
 
-    override fun sendCommand(signalingCommand: SignalingType, message: String) {
-        sendLiveRoomSignalingMsgUseCase(signalingCommand to message)
+    override fun sendCommand(signalingCommand: SignalingCommandType, message: String) {
+        roomRepository.sendSignalingMessage(signalingCommand.toDto(), message)
     }
 
     override fun onLiveRoomSignalingConnect() {
         intent {
             postSideEffect(LiveRoomSideEffect.LivePermissionLauncher {
-                connectLiveRoomUseCase(Unit)
+                roomRepository.connectLiveRoom()
             })
         }
     }
@@ -120,6 +120,7 @@ class LiveRoomViewModel @Inject constructor(
         super.onCleared()
         callingEnd()
     }
+
     private fun onCollectMedia() {
         intent {
             viewModelScope.launch {
@@ -151,8 +152,7 @@ class LiveRoomViewModel @Inject constructor(
 
     private suspend fun onCollectAudioLevels() {
         sessionManager.audioLevelListFlow.collect {
-            val msg = SocketMessageType.AUDIO_LEVELS to it.toString()
-            sendSocketMsgUseCase(msg)
+            roomRepository.sendSocketMessage(SocketMessageType.AUDIO_LEVELS.toDto(), it.toString())
         }
     }
 
@@ -168,30 +168,32 @@ class LiveRoomViewModel @Inject constructor(
     }
 
     private suspend fun onGetRoomSignalingCommand() {
-        getRoomSignalingCommandUseCase(Unit).collect {
-            logger.d { "webRTCSignalingCmd : ${it.first} : ${it.second}" }
-            _signalingCommandFlow.emit(it)
+        roomRepository.signalingCommandTypeFlow.collect {
+            val (command, message) = it
+            logger.d { "signalingCommandType : $command : $message" }
+            _signalingCommandFlow.emit(command.toModel() to message)
         }
     }
 
-    private suspend fun onGetRoomWebRTCSession() {
-        getRoomWebRTCSessionUseCase(Unit).collect {
-            logger.d { "webRTCSessionType : ${it.type}" }
-            if (it == WebRTCSessionType.Ready) sessionManager.onSignalingImpossible()
-
-            intent {
-                reduce {
-                    state.copy(webRTCSessionType = it)
-                }
+    private suspend fun onGetRoomWebRTCSession() = intent {
+        roomRepository.sessionStateFlow.collect {
+            val sessionType = it.toModel()
+            logger.d { "webRTCSessionState : $sessionType" }
+            if(sessionType == WebRTCSessionType.Ready) sessionManager.onSignalingImpossible()
+            reduce {
+                state.copy(webRTCSessionType = sessionType)
             }
         }
     }
-    private fun findPartnerSessionInfo(session: Map<String, SessionInfoVo>, mySessionId: String) = session.filterKeys { it != mySessionId }.values.firstOrNull()
 
-    private fun findSessionInfo(session: Map<String, SessionInfoVo>, sessionId: String) = session[sessionId]
+    private fun findPartnerSessionInfo(session: Map<String, SessionInfoVo>, mySessionId: String) =
+        session.filterKeys { it != mySessionId }.values.firstOrNull()
+
+    private fun findSessionInfo(session: Map<String, SessionInfoVo>, sessionId: String) =
+        session[sessionId]
 
     private fun callingEnd() {
         sessionManager.disconnect()
-        disposeLiveRoomUseCase(Unit)
+        roomRepository.dispose()
     }
 }
