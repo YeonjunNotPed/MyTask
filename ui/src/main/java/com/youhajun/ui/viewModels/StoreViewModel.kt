@@ -3,16 +3,18 @@ package com.youhajun.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.Purchase
-import com.youhajun.domain.models.enums.PurchaseType
-import com.youhajun.domain.models.enums.SubsGradeType
-import com.youhajun.domain.models.inspectUiState
-import com.youhajun.domain.models.vo.PurchaseVerifyRequestVo
-import com.youhajun.domain.usecase.store.GetPurchaseItemInfoUseCase
-import com.youhajun.domain.usecase.store.PostVerifyPurchaseUseCase
-import com.youhajun.ui.models.sideEffects.StoreSideEffect
-import com.youhajun.ui.models.states.StoreState
+import com.youhajun.data.onSuccess
+import com.youhajun.data.repositories.StoreRepository
+import com.youhajun.model_ui.sideEffects.StoreSideEffect
+import com.youhajun.model_ui.states.StoreState
+import com.youhajun.model_ui.types.store.PurchaseType
+import com.youhajun.model_ui.types.store.SubsGradeType
+import com.youhajun.model_ui.vo.store.PurchaseItemInfoVo.Companion.toModel
+import com.youhajun.model_ui.vo.store.PurchaseVerifyRequestVo
+import com.youhajun.model_ui.vo.store.PurchaseVerifyRequestVo.Companion.toDto
 import com.youhajun.ui.utils.GoogleBillingUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -22,7 +24,7 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
-interface StoreIntent {
+private interface StoreIntent {
     fun onClickInAppPurchaseItem(productId: String, isMultiple: Boolean)
     fun onClickSubsPurchaseItem(productId: String, selectedBasePlanId: String)
     fun onClickCheckItemHistory()
@@ -34,8 +36,7 @@ interface StoreIntent {
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val googleBillingUtil: GoogleBillingUtil,
-    private val getPurchaseItemInfoUseCase: GetPurchaseItemInfoUseCase,
-    private val postVerifyPurchaseUseCase: PostVerifyPurchaseUseCase
+    private val storeRepository: StoreRepository
 ) : ContainerHost<StoreState, StoreSideEffect>, ViewModel(), StoreIntent {
 
     companion object {
@@ -147,19 +148,18 @@ class StoreViewModel @Inject constructor(
 
     override fun onFetchPurchaseItem() {
         viewModelScope.launch {
-            getPurchaseItemInfoUseCase(Unit).collect {
-                it.inspectUiState {
-                    intent {
-                        reduce {
-                            state.copy(
-                                currentItemCount = it.currentItemCount,
-                                currentGrade = it.currentGrade,
-                                purchaseInAppItemList = it.inAppItems,
-                                purchaseSubsItemList = it.subsItems
-                            )
-                        }
+            storeRepository.getPurchaseItemInfo().onSuccess {
+                val info = it.toModel()
+                intent {
+                    reduce {
+                        state.copy(
+                            currentItemCount = info.currentItemCount,
+                            currentGrade = info.currentGrade,
+                            purchaseInAppItemList = info.inAppItems.toImmutableList(),
+                            purchaseSubsItemList = info.subsItems.toImmutableList()
+                        )
                     }
-                    val purchaseList = it.inAppItems + it.subsItems
+                    val purchaseList = info.inAppItems + info.subsItems
                     googleBillingUtil.onStartConnect(googleBillingCallback, purchaseList)
                 }
             }
@@ -173,8 +173,11 @@ class StoreViewModel @Inject constructor(
                 productId = purchase.products,
                 purchaseToken = purchase.purchaseToken
             )
-            postVerifyPurchaseUseCase(requestVo).collect {
-                it.inspectUiState {
+            storeRepository.postPurchaseVerify(requestVo.toDto()).onSuccess {
+                intent {
+                    postSideEffect(
+                        StoreSideEffect.Toast("구입 확인 성공")
+                    )
                     googleBillingUtil.onPurchaseVerifySuccess(purchase)
                 }
             }
