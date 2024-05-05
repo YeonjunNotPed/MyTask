@@ -2,14 +2,15 @@ package com.youhajun.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.domain.models.inspectUiState
-import com.youhajun.domain.usecase.room.GetRoomPreviewInfoUseCase
-import com.youhajun.ui.models.sideEffects.SelectRoomSideEffect
-import com.youhajun.ui.models.states.SelectRoomState
+import com.youhajun.data.onSuccess
+import com.youhajun.data.repositories.RoomRepository
+import com.youhajun.model_ui.sideEffects.SelectRoomSideEffect
+import com.youhajun.model_ui.states.SelectRoomState
+import com.youhajun.model_ui.vo.room.RoomPreviewVo.Companion.toModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -19,8 +20,8 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
-interface SelectRoomIntent {
-    fun onClickRoom(idx:Long)
+private interface SelectRoomIntent {
+    fun onClickRoom(idx: Long)
     fun onClickHeaderBackIcon()
     fun onClickCreateRoom()
 
@@ -28,16 +29,18 @@ interface SelectRoomIntent {
 
 @HiltViewModel
 class SelectRoomViewModel @Inject constructor(
-    private val getRoomPreviewInfoUseCase: GetRoomPreviewInfoUseCase
+    private val roomRepository: RoomRepository
 ) : ContainerHost<SelectRoomState, SelectRoomSideEffect>, ViewModel(), SelectRoomIntent {
 
     companion object {
         private const val POLLING_DISABLE = 0L
     }
 
-    override val container: Container<SelectRoomState, SelectRoomSideEffect> = container(SelectRoomState()) {
-        onRepeatFetchRoomPreviewInfo()
-    }
+    override val container: Container<SelectRoomState, SelectRoomSideEffect> =
+        container(SelectRoomState()) {
+            onRepeatFetchRoomPreviewInfo()
+        }
+
     override fun onClickHeaderBackIcon() {
         intent { postSideEffect(SelectRoomSideEffect.Navigation.NavigateUp) }
     }
@@ -52,19 +55,16 @@ class SelectRoomViewModel @Inject constructor(
 
     }
 
-    private fun onRepeatFetchRoomPreviewInfo() {
+    private fun onRepeatFetchRoomPreviewInfo():Job = intent {
         viewModelScope.launch {
-            getRoomPreviewInfoUseCase(Unit).onEach {
-                it.inspectUiState {
-                    intent {
-                        reduce { state.copy(roomList = it.roomList) }
-                    }
-                    if(it.pollingTime != POLLING_DISABLE) {
-                        delay(it.pollingTime)
-                        onRepeatFetchRoomPreviewInfo()
-                    }
+            roomRepository.getRoomPreviewInfo().onSuccess {
+                if (it.pollingTime != POLLING_DISABLE) {
+                    delay(it.pollingTime)
+                    onRepeatFetchRoomPreviewInfo()
                 }
-            }.collect()
+
+                reduce { state.copy(roomList = it.roomList.map { it.toModel() }.toImmutableList()) }
+            }
         }
     }
 }
