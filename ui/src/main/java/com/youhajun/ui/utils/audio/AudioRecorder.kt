@@ -31,13 +31,18 @@ class AudioRecorder @Inject constructor(
     }
 
     private val bufferSizeInBytes: Int = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
-    private val audioRecord: AudioRecord = AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSizeInBytes)
+    private lateinit var audioRecord: AudioRecord
     private val scope = CoroutineScope(defaultDispatcher)
     private var job: Job? = null
     private val _audioLevelListSharedFlow: MutableSharedFlow<List<Float>> = MutableSharedFlow()
     val audioLevelListSharedFlow: SharedFlow<List<Float>> = _audioLevelListSharedFlow.asSharedFlow()
 
+    private fun initAudioRecord() {
+        audioRecord = AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSizeInBytes)
+    }
+
     fun startCapturing() {
+        initAudioRecord()
         if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
             throw IllegalStateException("AudioRecord initialization failed.")
         }
@@ -61,7 +66,14 @@ class AudioRecorder @Inject constructor(
     fun stopCapturing() {
         job?.cancel()
         job = null
-        audioRecord.stop()
-        audioRecord.release()
+        if (audioRecord.state == AudioRecord.STATE_INITIALIZED) {
+            audioRecord.stop()
+            audioRecord.release()
+        }
+    }
+
+    fun setAudioRecordEnable(isEnable: Boolean) {
+        if (isEnable) startCapturing()
+        else stopCapturing()
     }
 }

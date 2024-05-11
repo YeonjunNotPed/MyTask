@@ -54,6 +54,7 @@ class WebRtcAudioManager @Inject constructor(
 
     override fun setMicMute(isMute: Boolean) {
         localAudioTrack.setEnabled(!isMute)
+        audioRecorder.setAudioRecordEnable(!isMute)
     }
     override fun setEnableSpeakerphone(enabled: Boolean) {
         audioController.setEnableSpeakerphone(enabled)
