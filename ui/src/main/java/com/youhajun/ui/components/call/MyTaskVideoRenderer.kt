@@ -25,10 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
-import com.youhajun.model_ui.vo.webrtc.TrackVo
 import com.youhajun.model_ui.types.webrtc.VideoScalingType
 import com.youhajun.model_ui.types.webrtc.VideoScalingType.Companion.toCommonScalingType
+import com.youhajun.model_ui.vo.webrtc.TrackVo
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import org.webrtc.RendererCommon.RendererEvents
 import org.webrtc.VideoTrack
@@ -46,12 +46,23 @@ fun MyTaskVideoRenderer(
     eglBaseContextWrapper: EglBaseContextWrapper,
     videoScalingType: VideoScalingType = VideoScalingType.SCALE_ASPECT_BALANCED,
     onTextureViewCreated: (VideoTextureViewRenderer) -> Unit = { },
-    rendererEvents: RendererEvents,
+    onFirstFrameRendered: () -> Unit = { },
+    onFrameResolutionChanged: (Int, Int, Int) -> Unit = { _, _, _ -> },
     isFrontCamera: Boolean
 ) {
     val videoTrack = trackVo.videoTrack ?: return
     val trackState: MutableState<VideoTrack?> = remember { mutableStateOf(null) }
     var view: VideoTextureViewRenderer? by remember { mutableStateOf(null) }
+
+    val rendererEvents by remember { mutableStateOf(object : RendererEvents {
+        override fun onFirstFrameRendered() {
+            onFirstFrameRendered()
+        }
+        override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
+            onFrameResolutionChanged(videoWidth, videoHeight, rotation)
+        }
+    }
+    )}
 
     DisposableEffect(videoTrack) {
         onDispose {

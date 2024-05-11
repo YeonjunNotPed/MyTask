@@ -29,17 +29,6 @@ fun CallVideoComp(
     mediaStateVo: CallMediaStateHolder,
     eglBaseContextWrapper: EglBaseContextWrapper
 ) {
-
-    val rendererEvents = object : RendererCommon.RendererEvents {
-        override fun onFirstFrameRendered() {
-
-        }
-
-        override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
-
-        }
-    }
-
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
@@ -51,7 +40,6 @@ fun CallVideoComp(
                 trackVo = trackVo,
                 modifier = Modifier.fillMaxSize(),
                 eglBaseContextWrapper = eglBaseContextWrapper,
-                rendererEvents = rendererEvents,
                 isFrontCamera = mediaStateVo.isFrontCamera
             )
         }else {

@@ -34,10 +34,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.youhajun.model_ui.holder.CallMediaStateHolder
-import com.youhajun.ui.R
-import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
 import com.youhajun.model_ui.vo.webrtc.TrackVo
-import org.webrtc.RendererCommon
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
+import com.youhajun.ui.R
 
 @Composable
 fun FloatingCallVideoComp(
@@ -72,21 +71,6 @@ fun FloatingCallVideoComp(
             topEndPosition,
             bottomStartPosition,
             bottomEndPosition
-        )
-    }
-
-
-    val rendererEvents by remember {
-        mutableStateOf(
-            object : RendererCommon.RendererEvents {
-                override fun onFirstFrameRendered() {
-
-                }
-
-                override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
-
-                }
-            }
         )
     }
 
@@ -136,7 +120,6 @@ fun FloatingCallVideoComp(
                 trackVo = trackVo,
                 modifier = Modifier.fillMaxSize(),
                 eglBaseContextWrapper = eglBaseContextWrapper,
-                rendererEvents = rendererEvents,
                 isFrontCamera = mediaStateVo.isFrontCamera
             )
         } else {
