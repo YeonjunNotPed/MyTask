@@ -27,7 +27,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MyTask"
-include(":app")
 include(":data")
 include(":ui")
 include(":core:remote")

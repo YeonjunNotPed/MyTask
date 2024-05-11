@@ -1,4 +1,4 @@
-package com.youhajun.mytask
+package com.youhajun.ui
 
 import android.app.Application
 import com.kakao.sdk.common.KakaoSdk
