@@ -20,7 +20,6 @@ class AuthenticationInterceptor @Inject constructor(
         val token = remoteModuleBridge.fetchAccessToken()
         val request = if(token.isNullOrEmpty()) chain.request() else requestWithToken(chain, token)
 
-        Log.d(TAG, "AuthenticationInterceptor - intercept() called / request header: ${request.headers}")
         return chain.proceed(request)
     }
 
@@ -37,7 +36,7 @@ class AuthenticationInterceptor @Inject constructor(
         return chain
             .request()
             .newBuilder()
-            .addHeader("Authorization", "Bearer $token")
+            .addHeader("Authorization", "Bearer ${token.trim()}")
             .build()
     }
 }
