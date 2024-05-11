@@ -32,7 +32,7 @@ import com.youhajun.ui.components.modifier.infinityProgressCircleBorder
 
 @Composable
 fun RoomStageComp(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     mySessionVideoInfoVo: SessionTrackInfoVo?,
     eglBaseContextWrapper: EglBaseContextWrapper
 ) {

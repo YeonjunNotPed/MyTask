@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -75,35 +77,34 @@ fun LiveRoomScreen(
     ) {
         MyTaskHeader(title = stringResource(id = R.string.header_title_select_room), onClickLeftIcon = viewModel::onClickHeaderBackIcon)
 
-        when (state.webRTCSessionType) {
-            WebRTCSessionType.Offline,
-            WebRTCSessionType.Creating,
-            WebRTCSessionType.Ready,
-            WebRTCSessionType.Impossible -> RoomStageComp(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                state.myVideoSessionTrackInfoVo,
-                state.eglContextWrapper
-            )
+        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            when (state.webRTCSessionType) {
+                WebRTCSessionType.Offline,
+                WebRTCSessionType.Creating,
+                WebRTCSessionType.Ready,
+                WebRTCSessionType.Impossible -> RoomStageComp(
+                    modifier = Modifier.fillMaxSize(),
+                    mySessionVideoInfoVo = state.myVideoSessionTrackInfoVo,
+                    eglBaseContextWrapper = state.eglContextWrapper
+                )
 
-            WebRTCSessionType.Active -> RoomCallingComp(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(10.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures(onTap = {
-                            viewModel.onTabCallingScreen()
-                        })
-                    },
-                state.videoScreenType,
-                state.sessionTrackInfoList,
-                state.fillMaxSessionTrackInfo,
-                state.floatingSessionTrackInfo,
-                state.eglContextWrapper,
-                viewModel::onDoubleTabCallingScreen
-            )
+                WebRTCSessionType.Active -> RoomCallingComp(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = {
+                                viewModel.onTabCallingScreen()
+                            })
+                        },
+                    state.videoScreenType,
+                    state.sessionTrackInfoList,
+                    state.fillMaxSessionTrackInfo,
+                    state.floatingSessionTrackInfo,
+                    state.eglContextWrapper,
+                    viewModel::onDoubleTabCallingScreen
+                )
+            }
         }
 
         AnimatedVisibility(visible = state.isVisibleBottomAction) {
