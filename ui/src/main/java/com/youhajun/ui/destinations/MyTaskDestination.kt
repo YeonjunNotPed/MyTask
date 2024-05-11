@@ -8,10 +8,10 @@ sealed class MyTaskDestination {
             else -> false
         }
     }
-    object First : MyTaskDestination() {
+    data object First : MyTaskDestination() {
         override val route: String = "first"
     }
-    object Second : MyTaskDestination() {
+    data object Second : MyTaskDestination() {
         override val route: String = "second"
 
         const val FIRST_ARG_KEY = "firstArg"
@@ -20,7 +20,7 @@ sealed class MyTaskDestination {
         val routeWithArg = "$route$PATH"
     }
 
-    object Third : MyTaskDestination() {
+    data object Third : MyTaskDestination() {
         override val route: String = "third"
 
         const val FIRST_OPTIONAL_ARG_KEY = "firstArg"
@@ -29,18 +29,18 @@ sealed class MyTaskDestination {
         val routeWithArg = "$route$PATH"
     }
 
-    object Store : MyTaskDestination() {
+    data object Store : MyTaskDestination() {
         override val route: String = "store"
     }
 
-    object Login : MyTaskDestination() {
+    data object Login : MyTaskDestination() {
         override val route: String = "login"
     }
 
-    object SelectRoom : MyTaskDestination() {
+    data object SelectRoom : MyTaskDestination() {
         override val route: String = "selectRoom"
     }
-    object LiveRoom : MyTaskDestination() {
+    data object LiveRoom : MyTaskDestination() {
         override val route: String = "liveRoom"
 
         const val IDX_ARG_KEY = "idxArg"
@@ -50,7 +50,7 @@ sealed class MyTaskDestination {
         fun navigateLiveRoom(idx:Long):String = "$route/$idx"
     }
 
-    object Gpt : MyTaskDestination() {
+    data object Gpt : MyTaskDestination() {
         override val route: String = "gpt"
     }
 }
