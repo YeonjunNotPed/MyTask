@@ -230,7 +230,7 @@ class WebRtcManager @AssistedInject constructor(
 
     private fun editSessionInfo(sessionId: String, editBlock: (SessionInfoVo) -> SessionInfoVo) {
         val newMap = sessionFlow.value.toMutableMap().apply {
-            val sessionInfo = this.getOrDefault(sessionId, SessionInfoVo())
+            val sessionInfo = this.getOrDefault(sessionId, SessionInfoVo(sessionId = sessionId))
             this[sessionId] = editBlock(sessionInfo)
         }
         sessionManagerScope.launch {

@@ -4,22 +4,27 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.data.repositories.RoomRepository
+import com.youhajun.model_ui.holder.CallControlAction
+import com.youhajun.model_ui.sideEffects.LiveRoomSideEffect
+import com.youhajun.model_ui.states.LiveRoomState
 import com.youhajun.model_ui.types.webrtc.SignalingCommandType
 import com.youhajun.model_ui.types.webrtc.SignalingCommandType.Companion.toDto
 import com.youhajun.model_ui.types.webrtc.SignalingCommandType.Companion.toModel
 import com.youhajun.model_ui.types.webrtc.SocketMessageType
 import com.youhajun.model_ui.types.webrtc.SocketMessageType.Companion.toDto
+import com.youhajun.model_ui.types.webrtc.TrackType
+import com.youhajun.model_ui.types.webrtc.VideoScreenType
 import com.youhajun.model_ui.types.webrtc.WebRTCSessionType
 import com.youhajun.model_ui.types.webrtc.WebRTCSessionType.Companion.toModel
+import com.youhajun.model_ui.vo.webrtc.findSessionTrackInfo
+import com.youhajun.model_ui.vo.webrtc.findSessionTrackInfoById
+import com.youhajun.model_ui.vo.webrtc.partnerSessionTrackInfo
+import com.youhajun.model_ui.vo.webrtc.toSessionVideoTrackVoList
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
 import com.youhajun.ui.R
 import com.youhajun.ui.destinations.MyTaskDestination
-import com.youhajun.model_ui.holder.CallControlAction
-import com.youhajun.model_ui.sideEffects.LiveRoomSideEffect
-import com.youhajun.model_ui.states.LiveRoomState
-import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
 import com.youhajun.ui.utils.ResourceProviderUtil
 import com.youhajun.ui.utils.webRtc.WebRTCContract
-import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.log.taggedLogger
 import kotlinx.coroutines.flow.Flow
@@ -40,13 +45,14 @@ private interface LiveRoomIntent {
     fun onLiveRoomSignalingConnect()
     fun onLiveRoomPermissionDenied()
     fun onTabCallingScreen()
+    fun onDoubleTabCallingScreen(screenType: VideoScreenType, trackId: String?)
 }
 
 @HiltViewModel
 class LiveRoomViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val resourceProviderUtil: ResourceProviderUtil,
     private val roomRepository: RoomRepository,
+    savedStateHandle: SavedStateHandle,
     webRtcSessionManagerFactory: WebRTCContract.Factory,
     eglBaseContext: EglBase.Context
 ) : ContainerHost<LiveRoomState, LiveRoomSideEffect>, ViewModel(), LiveRoomIntent,
@@ -116,6 +122,14 @@ class LiveRoomViewModel @Inject constructor(
         }
     }
 
+    override fun onDoubleTabCallingScreen(screenType: VideoScreenType, trackId: String?) {
+        if (screenType == VideoScreenType.SPLIT) {
+            splitScreenDoubleTab(trackId)
+        } else {
+            floatingScreenDoubleTab()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         callingEnd()
@@ -134,18 +148,20 @@ class LiveRoomViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onCollectSession() {
-        sessionManager.sessionFlow.collect {
-            intent {
-                val mySessionInfo = findSessionInfo(it, state.mySessionId)
-                val partnerSessionInfo = findPartnerSessionInfo(it, state.mySessionId)
+    private suspend fun onCollectSession() = intent {
+        sessionManager.sessionFlow.collect { sessionMap ->
+            val sessions = sessionMap.values.toSessionVideoTrackVoList()
+            val floatingSessionInfo = state.floatingSessionTrackInfo
+                ?: sessions.findSessionTrackInfo(state.mySessionId, TrackType.VIDEO)
+            val fillMaxSessionInfo = state.fillMaxSessionTrackInfo
+                ?: sessions.partnerSessionTrackInfo(state.mySessionId, TrackType.VIDEO)
 
-                reduce {
-                    state.copy(
-                        mySessionInfoVo = mySessionInfo,
-                        partnerSessionInfoVo = partnerSessionInfo
-                    )
-                }
+            reduce {
+                state.copy(
+                    sessionTrackInfoList = sessions,
+                    floatingSessionTrackInfo = floatingSessionInfo,
+                    fillMaxSessionTrackInfo = fillMaxSessionInfo
+                )
             }
         }
     }
@@ -179,18 +195,30 @@ class LiveRoomViewModel @Inject constructor(
         roomRepository.sessionStateFlow.collect {
             val sessionType = it.toModel()
             logger.d { "webRTCSessionState : $sessionType" }
-            if(sessionType == WebRTCSessionType.Ready) sessionManager.onSignalingImpossible()
+            if (sessionType == WebRTCSessionType.Ready) sessionManager.onSignalingImpossible()
             reduce {
                 state.copy(webRTCSessionType = sessionType)
             }
         }
     }
 
-    private fun findPartnerSessionInfo(session: Map<String, SessionInfoVo>, mySessionId: String) =
-        session.filterKeys { it != mySessionId }.values.firstOrNull()
+    private fun splitScreenDoubleTab(trackId: String?) = intent {
+        reduce {
+            state.copy(
+                videoScreenType = VideoScreenType.FLOATING,
+                fillMaxSessionTrackInfo = state.sessionTrackInfoList.findSessionTrackInfoById(trackId),
+                floatingSessionTrackInfo = state.sessionTrackInfoList.findSessionTrackInfo(state.mySessionId, TrackType.VIDEO)
+            )
+        }
+    }
 
-    private fun findSessionInfo(session: Map<String, SessionInfoVo>, sessionId: String) =
-        session[sessionId]
+    private fun floatingScreenDoubleTab() = intent {
+        reduce {
+            state.copy(
+                videoScreenType = VideoScreenType.SPLIT,
+            )
+        }
+    }
 
     private fun callingEnd() {
         sessionManager.disconnect()
