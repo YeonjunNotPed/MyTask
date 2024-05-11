@@ -69,8 +69,7 @@ class LiveRoomViewModel @Inject constructor(
         checkNotNull(savedStateHandle[MyTaskDestination.LiveRoom.IDX_ARG_KEY])
 
     private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingCommandType, String>>()
-    override val signalingCommandFlow: Flow<Pair<SignalingCommandType, String>> =
-        _signalingCommandFlow
+    override val signalingCommandFlow: Flow<Pair<SignalingCommandType, String>> = _signalingCommandFlow
 
     private val sessionManager: WebRTCContract.SessionManager =
         webRtcSessionManagerFactory.createSessionManager(this)
@@ -84,6 +83,7 @@ class LiveRoomViewModel @Inject constructor(
         onCollectSignaling()
         onCollectMedia()
         onLiveRoomSignalingConnect()
+        onScreenReady()
     }
 
 
@@ -108,11 +108,7 @@ class LiveRoomViewModel @Inject constructor(
     }
 
     override fun onLiveRoomSignalingConnect() {
-        intent {
-            postSideEffect(LiveRoomSideEffect.LivePermissionLauncher {
-                roomRepository.connectLiveRoom()
-            })
-        }
+        roomRepository.connectLiveRoom()
     }
 
     override fun onLiveRoomPermissionDenied() {
@@ -179,11 +175,14 @@ class LiveRoomViewModel @Inject constructor(
         }
     }
 
+    private fun onScreenReady() = intent {
+        postSideEffect(LiveRoomSideEffect.LivePermissionLauncher {
+            sessionManager.onScreenReady()
+        })
+    }
+
     private fun onCollectSignaling() {
         viewModelScope.launch {
-            launch {
-                onCollectSocketState()
-            }
             launch {
                 onCollectRoomSignalingCommand()
             }
@@ -191,17 +190,6 @@ class LiveRoomViewModel @Inject constructor(
                 onCollectRoomWebRTCSession()
             }
         }
-    }
-
-    private suspend fun onCollectSocketState() {
-        roomRepository.socketFlow.map { it.toModel() }
-            .filterNot { it is WebSocketState.Message }
-            .collect {
-                when(it) {
-                    WebSocketState.Open -> sessionManager.onScreenReady()
-                    else -> Unit
-                }
-            }
     }
 
     private suspend fun onCollectRoomSignalingCommand() {
