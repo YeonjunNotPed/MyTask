@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
@@ -42,6 +43,7 @@ class WebRtcManager @AssistedInject constructor(
     override val mySessionId: String = peerConnectionFactory.sessionId
     private val sessionManagerScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
+    private var localAddedJob: Job? = null
     private var iceCollectJob:Job? = null
     private val pendingIceSharedFlow = MutableSharedFlow<String>(replay = 10, extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.SUSPEND)
 
@@ -117,13 +119,15 @@ class WebRtcManager @AssistedInject constructor(
      * 로컬 화면 준비 완료되면 localTrack 을 add
      */
     override fun onScreenReady() {
-        audioManager.addLocalAudioTrack {
-            peerConnection.addTrack(it, it.id())
-            handleOnAddedTrack(mySessionId, it, trackType = TrackType.AUDIO)
-        }
-        videoManager.addLocalVideoTrack {
-            peerConnection.addTrack(it, it.id())
-            handleOnAddedTrack(mySessionId, it, trackType = TrackType.VIDEO)
+        localAddedJob = sessionManagerScope.launch {
+            audioManager.addLocalAudioTrack {
+                peerConnection.addTrack(it, it.id())
+                handleOnAddedTrack(mySessionId, it, trackType = TrackType.AUDIO)
+            }
+            videoManager.addLocalVideoTrack {
+                peerConnection.addTrack(it, it.id())
+                handleOnAddedTrack(mySessionId, it, trackType = TrackType.VIDEO)
+            }
         }
     }
 
@@ -142,6 +146,9 @@ class WebRtcManager @AssistedInject constructor(
         audioManager.dispose()
         peerConnection.dispose()
 
+        localAddedJob?.cancel()
+        localAddedJob = null
+
         iceCollectJob?.cancel()
         iceCollectJob = null
     }
@@ -150,6 +157,7 @@ class WebRtcManager @AssistedInject constructor(
      * offer sdp 생성 및 localDescription 에 저장 후 Offer 전송
      */
     private suspend fun sendOffer() {
+        localAddedJob?.join()
         val offer = peerConnection.createOffer().getOrThrow()
         val result = peerConnection.setLocalDescription(offer)
         result.onSuccess {
@@ -162,6 +170,7 @@ class WebRtcManager @AssistedInject constructor(
      * answer sdp 생성 및 localDescription 에 저장 후 answer 전송
      */
     private suspend fun sendAnswer() {
+        localAddedJob?.join()
         val answer = peerConnection.createAnswer().getOrThrow()
         val result = peerConnection.setLocalDescription(answer)
         result.onSuccess {
@@ -234,7 +243,7 @@ class WebRtcManager @AssistedInject constructor(
             this[sessionId] = editBlock(sessionInfo)
         }
         sessionManagerScope.launch {
-            _sessionFlow.emit(newMap)
+            _sessionFlow.update { newMap }
         }
     }
 
