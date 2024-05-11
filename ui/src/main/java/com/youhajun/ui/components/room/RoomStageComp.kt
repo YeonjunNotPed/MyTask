@@ -23,33 +23,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.youhajun.model_ui.vo.webrtc.SessionTrackInfoVo
+import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
 import com.youhajun.ui.R
 import com.youhajun.ui.components.call.MyTaskVideoRenderer
 import com.youhajun.ui.components.call.VoiceRecognizerComp
 import com.youhajun.ui.components.modifier.infinityProgressCircleBorder
-import com.youhajun.model_ui.wrapper.EglBaseContextWrapper
-import com.youhajun.model_ui.vo.webrtc.SessionInfoVo
-import com.youhajun.model_ui.types.webrtc.TrackType
-import org.webrtc.RendererCommon
 
 @Composable
 fun RoomStageComp(
     modifier: Modifier,
-    mySessionInfoVo: SessionInfoVo?,
+    mySessionVideoInfoVo: SessionTrackInfoVo?,
     eglBaseContextWrapper: EglBaseContextWrapper
 ) {
-    val myVideoTrackVo = mySessionInfoVo?.findTrack(TrackType.VIDEO)
-    val myMediaStateVo = mySessionInfoVo?.callMediaStateHolder
+    mySessionVideoInfoVo ?: return
 
-    val rendererEvents = object : RendererCommon.RendererEvents {
-        override fun onFirstFrameRendered() {
-
-        }
-
-        override fun onFrameResolutionChanged(videoWidth: Int, videoHeight: Int, rotation: Int) {
-
-        }
-    }
+    val myMediaStateVo = mySessionVideoInfoVo.callMediaStateHolder
 
     Box(modifier) {
 
@@ -69,11 +58,10 @@ fun RoomStageComp(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            if (myVideoTrackVo != null && myMediaStateVo?.isCameraEnable == true) {
+            if (myMediaStateVo.isCameraEnable) {
                 MyTaskVideoRenderer(
-                    trackVo = myVideoTrackVo,
+                    trackVo = mySessionVideoInfoVo.trackVo,
                     eglBaseContextWrapper = eglBaseContextWrapper,
-                    rendererEvents = rendererEvents,
                     isFrontCamera = myMediaStateVo.isFrontCamera,
                     modifier = Modifier
                         .size(200.dp)
@@ -103,13 +91,11 @@ fun RoomStageComp(
             }
         }
 
-        if (myMediaStateVo != null) {
-            VoiceRecognizerComp(
-                modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-                waveModifier = Modifier.width(60.dp).height(45.dp),
-                isMicEnable = !myMediaStateVo.isMicMute,
-                audioLevels = myMediaStateVo.audioLevelList,
-            )
-        }
+        VoiceRecognizerComp(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+            waveModifier = Modifier.width(60.dp).height(45.dp),
+            isMicEnable = !myMediaStateVo.isMicMute,
+            audioLevels = myMediaStateVo.audioLevelList,
+        )
     }
 }

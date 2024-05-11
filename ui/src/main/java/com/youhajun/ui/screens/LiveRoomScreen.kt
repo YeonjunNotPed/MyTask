@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,14 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.youhajun.model_ui.holder.CallMediaStateHolder
+import com.youhajun.model_ui.sideEffects.LiveRoomSideEffect
 import com.youhajun.model_ui.types.webrtc.WebRTCSessionType
 import com.youhajun.ui.R
 import com.youhajun.ui.components.MyTaskHeader
 import com.youhajun.ui.components.call.CallBottomComp
 import com.youhajun.ui.components.room.RoomCallingComp
 import com.youhajun.ui.components.room.RoomStageComp
-import com.youhajun.model_ui.holder.CallMediaStateHolder
-import com.youhajun.model_ui.sideEffects.LiveRoomSideEffect
 import com.youhajun.ui.viewModels.LiveRoomViewModel
 
 @Composable
@@ -82,7 +83,7 @@ fun LiveRoomScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                state.mySessionInfoVo,
+                state.myVideoSessionTrackInfoVo,
                 state.eglContextWrapper
             )
 
@@ -90,19 +91,23 @@ fun LiveRoomScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+                    .padding(10.dp)
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = {
                             viewModel.onTabCallingScreen()
                         })
                     },
-                state.mySessionInfoVo,
-                state.partnerSessionInfoVo,
-                state.eglContextWrapper
+                state.videoScreenType,
+                state.sessionTrackInfoList,
+                state.fillMaxSessionTrackInfo,
+                state.floatingSessionTrackInfo,
+                state.eglContextWrapper,
+                viewModel::onDoubleTabCallingScreen
             )
         }
 
         AnimatedVisibility(visible = state.isVisibleBottomAction) {
-            val myMediaState = state.mySessionInfoVo?.callMediaStateHolder ?: CallMediaStateHolder()
+            val myMediaState = state.myVideoSessionTrackInfoVo?.callMediaStateHolder ?: CallMediaStateHolder()
             CallBottomComp(
                 modifier = Modifier
                     .fillMaxWidth()
