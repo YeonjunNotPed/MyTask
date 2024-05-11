@@ -16,6 +16,8 @@ import com.youhajun.model_ui.types.webrtc.TrackType
 import com.youhajun.model_ui.types.webrtc.VideoScreenType
 import com.youhajun.model_ui.types.webrtc.WebRTCSessionType
 import com.youhajun.model_ui.types.webrtc.WebRTCSessionType.Companion.toModel
+import com.youhajun.model_ui.types.webrtc.WebSocketState
+import com.youhajun.model_ui.types.webrtc.WebSocketState.Companion.toModel
 import com.youhajun.model_ui.vo.webrtc.findSessionTrackInfo
 import com.youhajun.model_ui.vo.webrtc.findSessionTrackInfoById
 import com.youhajun.model_ui.vo.webrtc.partnerSessionTrackInfo
@@ -29,6 +31,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.getstream.log.taggedLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -60,12 +65,15 @@ class LiveRoomViewModel @Inject constructor(
 
     private val logger by taggedLogger("LiveRoomViewModel")
 
-    private val roomIdx: Long = checkNotNull(savedStateHandle[MyTaskDestination.LiveRoom.IDX_ARG_KEY])
+    private val roomIdx: Long =
+        checkNotNull(savedStateHandle[MyTaskDestination.LiveRoom.IDX_ARG_KEY])
 
     private val _signalingCommandFlow = MutableSharedFlow<Pair<SignalingCommandType, String>>()
-    override val signalingCommandFlow: Flow<Pair<SignalingCommandType, String>> = _signalingCommandFlow
+    override val signalingCommandFlow: Flow<Pair<SignalingCommandType, String>> =
+        _signalingCommandFlow
 
-    private val sessionManager: WebRTCContract.SessionManager = webRtcSessionManagerFactory.createSessionManager(this)
+    private val sessionManager: WebRTCContract.SessionManager =
+        webRtcSessionManagerFactory.createSessionManager(this)
 
     override val container: Container<LiveRoomState, LiveRoomSideEffect> = container(
         LiveRoomState(
@@ -75,7 +83,6 @@ class LiveRoomViewModel @Inject constructor(
     ) {
         onCollectSignaling()
         onCollectMedia()
-        sessionManager.onScreenReady()
         onLiveRoomSignalingConnect()
     }
 
@@ -175,15 +182,29 @@ class LiveRoomViewModel @Inject constructor(
     private fun onCollectSignaling() {
         viewModelScope.launch {
             launch {
-                onGetRoomSignalingCommand()
+                onCollectSocketState()
             }
             launch {
-                onGetRoomWebRTCSession()
+                onCollectRoomSignalingCommand()
+            }
+            launch {
+                onCollectRoomWebRTCSession()
             }
         }
     }
 
-    private suspend fun onGetRoomSignalingCommand() {
+    private suspend fun onCollectSocketState() {
+        roomRepository.socketFlow.map { it.toModel() }
+            .filterNot { it is WebSocketState.Message }
+            .collect {
+                when(it) {
+                    WebSocketState.Open -> sessionManager.onScreenReady()
+                    else -> Unit
+                }
+            }
+    }
+
+    private suspend fun onCollectRoomSignalingCommand() {
         roomRepository.signalingCommandTypeFlow.collect {
             val (command, message) = it
             logger.d { "signalingCommandType : $command : $message" }
@@ -191,7 +212,7 @@ class LiveRoomViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onGetRoomWebRTCSession() = intent {
+    private suspend fun onCollectRoomWebRTCSession() = intent {
         roomRepository.sessionStateFlow.collect {
             val sessionType = it.toModel()
             logger.d { "webRTCSessionState : $sessionType" }
@@ -206,8 +227,13 @@ class LiveRoomViewModel @Inject constructor(
         reduce {
             state.copy(
                 videoScreenType = VideoScreenType.FLOATING,
-                fillMaxSessionTrackInfo = state.sessionTrackInfoList.findSessionTrackInfoById(trackId),
-                floatingSessionTrackInfo = state.sessionTrackInfoList.findSessionTrackInfo(state.mySessionId, TrackType.VIDEO)
+                fillMaxSessionTrackInfo = state.sessionTrackInfoList.findSessionTrackInfoById(
+                    trackId
+                ),
+                floatingSessionTrackInfo = state.sessionTrackInfoList.findSessionTrackInfo(
+                    state.mySessionId,
+                    TrackType.VIDEO
+                )
             )
         }
     }

@@ -39,6 +39,9 @@ class RoomRepository @Inject constructor(
 
     private val _sessionStateFlow = MutableStateFlow(WebRTCSessionTypeDto.Offline)
     val sessionStateFlow: StateFlow<WebRTCSessionTypeDto> = _sessionStateFlow.asStateFlow()
+
+    val socketFlow: SharedFlow<WebSocketStateDto> = webSocketDataSource.socketFlow
+
     suspend fun getRoomPreviewInfo(): ApiResult<RoomPreviewInfo> = roomRemoteDataSource.getRoomPreviewInfo()
 
     fun connectLiveRoom() {
@@ -69,7 +72,7 @@ class RoomRepository @Inject constructor(
 
     private fun collectSocket() {
         scope.launch {
-            webSocketDataSource.socketFlow
+            socketFlow
                 .filter { it is WebSocketStateDto.Message }
                 .collect {
                     if (it is WebSocketStateDto.Message) onMessage(it.text)
