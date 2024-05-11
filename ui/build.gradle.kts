@@ -2,7 +2,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     kotlin("kapt")
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.android)
     alias(libs.plugins.hilt)
 }
@@ -12,11 +12,16 @@ android {
     compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
+        applicationId = "com.youhajun.mytask"
         minSdk = Configs.MIN_SDK
+        targetSdk = Configs.TARGET_SDK
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        versionCode = Configs.VERSION_CODE
+        versionName = Configs.VERSION_NAME
 
         manifestPlaceholders["KAKAO_NATIVE_KEY"] = getProperty("KAKAO_NATIVE_KEY")
         buildConfigField("String", "GOOGLE_API_SERVER_ID", getProperty("GOOGLE_API_SERVER_ID"))
@@ -25,11 +30,25 @@ android {
         buildConfigField("String", "STUN_SERVER_URL3", getProperty("STUN_SERVER_URL3"))
         buildConfigField("String", "STUN_SERVER_URL4", getProperty("STUN_SERVER_URL4"))
         buildConfigField("String", "STUN_SERVER_URL5", getProperty("STUN_SERVER_URL5"))
+        buildConfigField("String", "KAKAO_NATIVE_KEY", getProperty("KAKAO_NATIVE_KEY"))
+        signingConfig = signingConfigs.getByName("debug")
     }
+
+
+//    signingConfigs {
+//        create("release") {
+//            storeFile = file(getProperty("STORE_FILE"))
+//            storePassword = getProperty("STORE_PASSWORD")
+//            keyAlias = getProperty("KEY_ALIAS")
+//            keyPassword = getProperty("KEY_PASSWORD")
+//        }
+//    }
 
     buildTypes {
         getByName("release") {
+//            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "../proguard-rules.pro",
@@ -37,7 +56,6 @@ android {
                 "../proguard_gson.pro",
             )
         }
-
     }
 
     kotlinOptions {
@@ -52,17 +70,22 @@ android {
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler"
         )
     }
-    buildFeatures {
-        compose = true
-        buildConfig = true
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
+        kotlinCompilerExtensionVersion = Configs.COMPOSE_VERSION
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    buildFeatures {
+        compose = true
+        buildConfig = true
     }
 }
 
@@ -93,10 +116,10 @@ dependencies {
 
     implementation(libs.kotlinx.collections.immutable)
 
-    testImplementation(libs.bundles.test)
-    debugImplementation(libs.bundles.debug)
-    androidTestImplementation(libs.bundles.android.test)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+//    testImplementation(libs.bundles.test)
+//    debugImplementation(libs.bundles.debug)
+//    androidTestImplementation(libs.bundles.android.test)
+//    androidTestImplementation(platform(libs.androidx.compose.bom))
 }
 
 kapt {
