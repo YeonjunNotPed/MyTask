@@ -1,4 +1,6 @@
 [versions]
+kotlin = "1.9.10"
+androidGradlePlugin = "8.6.1"
 activityCompose = "1.9.0"
 billingKtx = "6.2.1"
 coilCompose = "2.6.0"
@@ -6,6 +8,7 @@ composeBomVersion = "2024.05.00"
 constraintlayoutCompose = "1.0.1"
 coreKtx = "1.13.1"
 espressoCore = "3.5.1"
+ksp = "1.9.22-1.0.18"
 foundation = "1.6.7"
 hiltNavigationCompose = "1.2.0"
 junit = "4.13.2"
@@ -36,6 +39,12 @@ material = "1.12.0"
 annotationJvm = "1.7.1"
 
 [libraries]
+# plugins
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
+
 # android
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -115,11 +124,15 @@ orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orb
 orbit-core = { module = "org.orbit-mvi:orbit-core", version.ref = "orbitCore" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "android-application" }
-android-library = { id = "com.android.library", version.ref = "android-library" }
-jetbrains-android = { id = "org.jetbrains.kotlin.android", version.ref = "jetbrains-plugin" }
-jetbrains-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrains-plugin" }
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 
 [bundles]
 webrtc = ["webttc", "stream-webrtc-android-compose", "stream-webrtc-android-ui"]

@@ -26,6 +26,7 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "MyTask"
 include(":data")
 include(":ui")
@@ -36,3 +37,5 @@ include(":core:model-ui")
 include(":core:model-data")
 include(":core:common")
 include(":domain")
+include(":build-logic")
+include(":build-logic:convention")

@@ -3,7 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     kotlin("kapt")
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.android)
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.hilt)
 }
 
