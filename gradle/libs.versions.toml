@@ -1,10 +1,11 @@
 [versions]
-kotlin = "1.9.10"
-androidGradlePlugin = "8.6.1"
+kotlin = "1.9.22"
+androidGradlePlugin = "8.7.3"
 activityCompose = "1.9.0"
 billingKtx = "6.2.1"
 coilCompose = "2.6.0"
-composeBomVersion = "2024.05.00"
+composeBomVersion = "2024.12.01"
+androidxComposeCompiler = "1.5.8"
 constraintlayoutCompose = "1.0.1"
 coreKtx = "1.13.1"
 espressoCore = "3.5.1"
@@ -31,9 +32,6 @@ security-crypto = "1.0.0"
 streamLog = "1.1.4"
 kakao-login = "2.19.0"
 webRtc = "1.1.2"
-android-library = "8.0.2"
-jetbrains-plugin = "1.9.23"
-android-application = "8.4.0"
 appcompat = "1.6.1"
 material = "1.12.0"
 annotationJvm = "1.7.1"
@@ -133,6 +131,13 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
+
+youhajun-android-application = { id = "youhajun.android.application", version = "unspecified" }
+youhajun-android-application-compose = { id = "youhajun.android.application.compose", version = "unspecified" }
+youhajun-android-library = { id = "youhajun.android.library", version = "unspecified" }
+youhajun-android-library-compose = { id = "youhajun.android.library.compose", version = "unspecified" }
+youhajun-android-room = { id = "youhajun.android.room", version = "unspecified" }
+youhajun-android-hilt = { id = "youhajun.android.hilt", version = "unspecified" }
 
 [bundles]
 webrtc = ["webttc", "stream-webrtc-android-compose", "stream-webrtc-android-ui"]

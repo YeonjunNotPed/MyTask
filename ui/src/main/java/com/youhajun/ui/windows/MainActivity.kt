@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.youhajun.ui.screens.MainScreen
-import com.youhajun.mytask.ui.theme.MyTaskTheme
+import com.youhajun.ui.theme.MyTaskTheme
 import com.youhajun.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

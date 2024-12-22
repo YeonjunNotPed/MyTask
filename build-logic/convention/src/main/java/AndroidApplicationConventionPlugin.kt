@@ -18,6 +18,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 34
+                defaultConfig.versionCode = 1
+                defaultConfig.versionName = "1.0"
 
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 defaultConfig.vectorDrawables {

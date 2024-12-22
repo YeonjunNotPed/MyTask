@@ -1,4 +1,4 @@
-package com.youhajun.mytask.ui.theme
+package com.youhajun.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,24 +1,18 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.hilt)
-    kotlin("kapt")
+    alias(libs.plugins.youhajun.android.library)
+    alias(libs.plugins.youhajun.android.hilt)
 }
 
 android {
     namespace = "com.youhajun.core.remote"
-    compileSdk = Configs.COMPILE_SDK
 
-    kotlinOptions {
-        jvmTarget = Configs.JVM_TARGET
-    }
     buildFeatures {
         buildConfig = true
     }
+
     defaultConfig {
-        minSdk = Configs.MIN_SDK
         buildConfigField("String", "BASE_URL", getProperty("BASE_URL"))
         buildConfigField("String", "WEBSOCKET_BASE_URL", getProperty("WEBSOCKET_BASE_URL"))
         buildConfigField("String", "CHAT_GPT_API_KEY", getProperty("CHAT_GPT_API_KEY"))
@@ -27,10 +21,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model-data"))
+    implementation(projects.core.modelData)
     implementation(libs.bundles.network)
-    implementation(libs.hilt)
-    kapt(libs.hilt.compiler)
 }
 
 fun getProperty(propertyKey: String): String {

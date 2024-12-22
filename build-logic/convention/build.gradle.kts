@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
 }
@@ -5,6 +7,12 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
 }
 
 dependencies {
@@ -17,28 +25,32 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = "com.youhajun.android.application"
+            id = "youhajun.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidLibrary") {
-            id = "com.youhajun.android.library"
+            id = "youhajun.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("androidHilt") {
-            id = "com.youhajun.android.hilt"
+            id = "youhajun.android.hilt"
             implementationClass = "AndroidHiltConventionPlugin"
         }
         register("androidApplicationCompose") {
-            id = "com.youhajun.android.application.compose"
+            id = "youhajun.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("androidComposeLibrary") {
-            id = "com.youhajun.android.library.compose"
+            id = "youhajun.android.library.compose"
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
         register("androidRoom") {
-            id = "com.youhajun.android.room"
+            id = "youhajun.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
+        }
+        register("androidDataStore") {
+            id = "youhajun.android.dataStore"
+            implementationClass = "AndroidDataStoreConventionPlugin"
         }
     }
 }

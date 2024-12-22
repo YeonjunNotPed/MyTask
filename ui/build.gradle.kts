@@ -1,27 +1,19 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    kotlin("kapt")
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.youhajun.android.application)
+    alias(libs.plugins.youhajun.android.application.compose)
+    alias(libs.plugins.youhajun.android.hilt)
 }
 
 android {
     namespace = "com.youhajun.ui"
-    compileSdk = Configs.COMPILE_SDK
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
-        applicationId = "com.youhajun.mytask"
-        minSdk = Configs.MIN_SDK
-        targetSdk = Configs.TARGET_SDK
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
-        versionCode = Configs.VERSION_CODE
-        versionName = Configs.VERSION_NAME
 
         manifestPlaceholders["KAKAO_NATIVE_KEY"] = getProperty("KAKAO_NATIVE_KEY")
         buildConfigField("String", "GOOGLE_API_SERVER_ID", getProperty("GOOGLE_API_SERVER_ID"))
@@ -57,44 +49,14 @@ android {
             )
         }
     }
-
-    kotlinOptions {
-        jvmTarget = Configs.JVM_TARGET
-
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler"
-        )
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler"
-        )
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = Configs.COMPOSE_VERSION
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildFeatures {
-        compose = true
-        buildConfig = true
-    }
 }
 
 dependencies {
-    implementation(project(":domain"))
-    implementation(project(":data"))
-    implementation(project(":core:common"))
-    implementation(project(":core:model-ui"))
-    implementation(project(":core:model-data"))
+    implementation(projects.domain)
+    implementation(projects.core.data)
+    implementation(projects.core.common)
+    implementation(projects.core.modelUi)
+    implementation(projects.core.modelData)
 
     implementation(libs.core.ktx)
     implementation(libs.bundles.lifecycle)
@@ -102,9 +64,6 @@ dependencies {
     implementation(libs.bundles.compose.libs)
     implementation(libs.bundles.orbit)
     implementation(libs.bundles.webrtc)
-
-    implementation(libs.hilt)
-    kapt(libs.hilt.compiler)
 
     implementation(libs.kakao.login)
 
@@ -120,10 +79,6 @@ dependencies {
 //    debugImplementation(libs.bundles.debug)
 //    androidTestImplementation(libs.bundles.android.test)
 //    androidTestImplementation(platform(libs.androidx.compose.bom))
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 fun getProperty(propertyKey: String): String {

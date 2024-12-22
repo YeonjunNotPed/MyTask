@@ -1,27 +1,14 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.hilt)
-    kotlin("kapt")
+
+    alias(libs.plugins.youhajun.android.library)
+    alias(libs.plugins.youhajun.android.hilt)
 }
 
 android {
     namespace = "com.youhajun.domain"
-    compileSdk = Configs.COMPILE_SDK
-
-    kotlinOptions {
-        jvmTarget = Configs.JVM_TARGET
-    }
-
-    defaultConfig {
-        minSdk = Configs.MIN_SDK
-    }
 }
 
 dependencies {
-    implementation(project(":data"))
-    implementation(project(":core:model-data"))
-    implementation(project(":core:common"))
-    implementation(libs.hilt)
-    kapt(libs.hilt.compiler)
+    implementation(projects.core.data)
+    implementation(projects.core.modelData)
 }

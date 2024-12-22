@@ -31,7 +31,6 @@ internal fun Project.configureAndroidCompose(
         kotlinOptions {
             freeCompilerArgs += buildComposeMetricsParameters()
             freeCompilerArgs += stabilityConfiguration()
-//            freeCompilerArgs += strongSkippingConfiguration()
         }
     }
 }
